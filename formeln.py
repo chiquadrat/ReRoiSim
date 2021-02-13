@@ -19,13 +19,13 @@ kaufpreis_sanierung = 7_000
 kaufnebenkosten = 5_000
 renovierungskosten = 1_000
 
-mieteinnahmen = 3_000
+mieteinnahmen = 5_000
 instandhaltungskosten = 800
 verwaltungskosten = 500
 mietausfall = 0.02
 
 mietsteigerung = 0.02
-erste_mieterhoehung = 5
+erste_mieterhoehung = 1
 kostensteigerung = 0.015
 
 # Finanzierung
@@ -78,3 +78,16 @@ bemessung_sonderabschreibung = kaufpreis_sanierung * gesamtkosten / kaufpreis
 # verkaufspreis =
 # objektrendite_nach_steuern =
 # eigenkapitalrendite_nach_steuern =
+
+# Nachbauen der "Tabelle"
+# @Markus: In der Form würde ich die Tabelle nachbauen, ist vlt. nicht der
+# schönste weg, aber einfach und sollte auch schnell genug sein, der Loop
+# geht ja maximal über ~30 Jahre
+
+mieteinnahmen_pj = [mieteinnahmen]  # pj -> pro jahr
+
+for jahr in range(1, anlagehorizont + 1):
+    if jahr >= erste_mieterhoehung:
+        mieteinnahmen_pj.append(mieteinnahmen_pj[-1] * (1 + mietsteigerung))
+    else:
+        mieteinnahmen_pj.append(mieteinnahmen_pj[-1])
