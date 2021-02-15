@@ -419,8 +419,8 @@ html, body{
 }
 
 body {
-  background-color: #1E1E1E;
-  color: #d8d8d8;
+  background-color: #ffffff;
+  color: #333232;
   height: 100%;
   margin: 0;
   padding: 0;
@@ -446,7 +446,7 @@ a {
   text-decoration: none;
 }
 .bg-grey{
-  background-color: #31302F;
+  background-color: #94b9e4;
 }
 .text-padding{
   padding: 5px;

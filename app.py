@@ -138,8 +138,13 @@ app.layout = html.Div(
                                 ),  
                                 html.H2("4. Steuern"),
                                 html.P("Familienstand"),
-                                dcc.Input(
-                                    placeholder="Eingabe...", type="number",
+                                dcc.RadioItems(
+                                    options=[
+                                        {'label': 'Alleinstehend', 'value': '0'},
+                                        {'label': 'Ehepaar (zusammen veranlagt)', 'value': '1'},
+                                    ],
+                                    value='0',
+                                    labelStyle={'display': 'inline-block'}
                                 ),  
                                 html.H2(""),
                                 html.P("Zu versteuerndes Einkommen"),
@@ -148,14 +153,20 @@ app.layout = html.Div(
                                 ),  
                                 html.H2(""),
                                 html.P("Baujahr"),
-                                dcc.Input(
-                                    placeholder="Eingabe...", type="number",
+                                dcc.RadioItems(
+                                    options=[
+                                        {'label': 'nach 1924', 'value': '0'},
+                                        {'label': 'bis 1924', 'value': '1'},
+                                    ],
+                                    value='0',
+                                    labelStyle={'display': 'inline-block'}
                                 ),  
                                 html.H2(""),
                                 html.P("Sonderabschreibung für Neubauwohnung"),
-                                dcc.Input(
-                                    placeholder="Eingabe...", type="number",
-                                ),
+                                dcc.Checklist(
+                                    options=[
+                                        {'label': 'Ja', 'value': '1'},],
+                                ), 
                                 html.H2("5. Renditeberechnung"),
                                 html.P("Anlagehorizont"),
                                 dcc.Input(
