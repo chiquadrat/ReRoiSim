@@ -5,7 +5,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 import plotly.graph_objects as go
 import plotly.express as px
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 # Load data
 df = pd.read_csv("data/example_data.txt", index_col=0, parse_dates=True)
@@ -49,7 +49,10 @@ app.layout = html.Div(
                                 html.H2("1. Kauf"),
                                 html.P("Kaufpreis in Euro"),
                                 dcc.Input(
-                                    placeholder="Eingabe...", type="number",
+                                    id="kaufpreis",
+                                    placeholder="Eingabe...", 
+                                    value="",
+                                    type="number",
                                 ),
                                 html.H2(""),
                                 html.P("-> davon Grundstücksanteil"),
@@ -64,12 +67,18 @@ app.layout = html.Div(
                                 html.H2(""),
                                 html.P("Kaufnebenkosten"),
                                 dcc.Input(
-                                    placeholder="Eingabe...", type="number",
+                                    id="kaufnebenkosten",
+                                    placeholder="Eingabe...",
+                                    value="",
+                                    type="number",
                                 ),
                                 html.H2(""),
                                 html.P("Renovierungskosten"),
                                 dcc.Input(
-                                    placeholder="Eingabe...", type="number",
+                                    id="renovierungskosten",
+                                    placeholder="Eingabe...", 
+                                    value="",
+                                    type="number",
                                 ),  
                                 html.H2("2. Miete und laufende Kosten"),
                                 html.P("Mieteinahmen pro Jahr"),
@@ -176,7 +185,8 @@ app.layout = html.Div(
                                 html.P("Geschätzter Verkaufsfaktor"),
                                 dcc.Input(
                                     placeholder="Eingabe...", type="number",
-                                ),  
+                                ),
+                                html.Button(id='submit-button-state', n_clicks=0, children='Submit'),  
                             ],
                         ),
                     ],
@@ -184,11 +194,15 @@ app.layout = html.Div(
                 html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
+                        html.H1("Ergebnisse der Simmulation"),
+                        html.H2("Kennzahlen"),
+                        html.Div(id='my-output'),
                         dcc.Graph(
                             id="timeseries",
                             config={"displayModeBar": False},
                             animate=True,
-                        )
+                        ),
+
                     ],
                 ),
             ],
@@ -197,8 +211,9 @@ app.layout = html.Div(
 )
 
 
+
 # Callback for timeseries price
-@app.callback(Output("timeseries", "figure"), [Input("stockselector", "value")])
+@app.callback(Output("timeseries", "figure"), Input("stockselector", "value"))
 def update_graph(selected_dropdown_value):
     trace1 = []
     df_sub = df
@@ -235,6 +250,17 @@ def update_graph(selected_dropdown_value):
     }
 
     return figure
+
+@app.callback(
+    Output(component_id='my-output', component_property='children'),
+    Input('submit-button-state', 'n_clicks'),
+    State(component_id='kaufpreis', component_property='value'),
+    State(component_id='kaufnebenkosten', component_property='value'),
+    State(component_id='renovierungskosten', component_property='value'),
+)
+def update_output_div(n_clicks, kaufpreis, kaufnebenkosten, renovierungskosten):
+    gesamtkosten = kaufpreis + kaufnebenkosten + renovierungskosten
+    return 'Gesamtkosten: {}'.format(gesamtkosten)
 
 
 if __name__ == "__main__":

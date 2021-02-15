@@ -446,13 +446,14 @@ a {
   text-decoration: none;
 }
 .bg-grey{
-  background-color: #94b9e4;
+  background-color: #ffffff;
 }
 .text-padding{
   padding: 5px;
 }
 /* Graph Layout ––––––––––––––––––––––––––––––––––––––––––––––––––*/
 .div-for-charts{
+  padding-top: 64px;
   display: flex;
   flex-direction: column;
   height: 100vh;
