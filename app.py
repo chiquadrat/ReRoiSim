@@ -16,15 +16,6 @@ df.index = pd.to_datetime(df["Date"])
 app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 
-
-# def get_options(list_stocks):
-#     dict_list = []
-#     for i in list_stocks:
-#         dict_list.append({"label": i, "value": i})
-
-#     return dict_list
-
-
 app.layout = html.Div(
     children=[
         html.Div(
@@ -36,16 +27,7 @@ app.layout = html.Div(
                         html.H1("Wohnung als Kapital­anlage"),
                         html.H2("Simulation der Objektrendite"),
                         html.Div(
-                            #className="div-for-dropdown",
                             children=[
-                                # dcc.Dropdown(
-                                #     id="stockselector",
-                                #     options=get_options(df["stock"].unique()),
-                                #     multi=True,
-                                #     value=[df["stock"].sort_values()[0]],
-                                #     style={"backgroundColor": "#1E1E1E"},
-                                #     className="stockselector",
-                                # ),
                                 html.H2(""),
                                 html.H2("1. Kauf"),
                                 html.P("Kaufpreis in Euro"),
@@ -254,12 +236,6 @@ app.layout = html.Div(
                         html.H1("Ergebnisse der Simulation"),
                         html.H2("Kennzahlen"),
                         dcc.Graph(id="kennzahlen"),
-                        #html.Div(id='my-output'),
-                        # dcc.Graph(
-                        #     id="timeseries",
-                        #     config={"displayModeBar": False},
-                        #     animate=True,
-                        # ),
                         html.H2("Grafiken"),
                         dcc.Graph(id="mietentwicklung")
                     ],
@@ -269,46 +245,6 @@ app.layout = html.Div(
     ]
 )
 
-
-
-# Callback for timeseries price
-# @app.callback(Output("timeseries", "figure"), Input("stockselector", "value"))
-# def update_graph(selected_dropdown_value):
-#     trace1 = []
-#     df_sub = df
-#     for stock in selected_dropdown_value:
-#         trace1.append(
-#             go.Scatter(
-#                 x=df_sub[df_sub["stock"] == stock].index,
-#                 y=df_sub[df_sub["stock"] == stock]["value"],
-#                 mode="lines",
-#                 opacity=0.7,
-#                 name=stock,
-#                 textposition="bottom center",
-#             )
-#         )
-#     traces = [trace1]
-#     data = [val for sublist in traces for val in sublist]
-#     figure = {
-#         "data": data,
-#         "layout": go.Layout(
-#             colorway=["#5E0DAC", "#FF4F00", "#375CB1", "#FF7400", "#FFF400", "#FF0056"],
-#             template="plotly_dark",
-#             paper_bgcolor="rgba(0, 0, 0, 0)",
-#             plot_bgcolor="rgba(0, 0, 0, 0)",
-#             margin={"b": 15},
-#             hovermode="x",
-#             autosize=True,
-#             title={
-#                 "text": "Geschätzter Verkaufspreis",
-#                 "font": {"color": "white"},
-#                 "x": 0.5,
-#             },
-#             xaxis={"range": [df_sub.index.min(), df_sub.index.max()]},
-#         ),
-#     }
-
-#     return figure
 
 @app.callback(
     Output(component_id='my-output', component_property='children'),
@@ -332,8 +268,6 @@ def update_output_div(n_clicks, kaufpreis, kaufnebenkosten, renovierungskosten):
 # Produce first custom graph
 def custom_figure(mieteinnahmen, mietsteigerung, erste_mieterhoehung, anlagehorizont):
     mietsteigerung = mietsteigerung / 100
-    #anlagehorizont = 15
-    #erste_mieterhoehung = 5
     runs = 100
     df_sim_miete = pd.DataFrame(columns=["Run", "Miete"]) 
     
