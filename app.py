@@ -3,6 +3,7 @@ import pandas as pd
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_table
 import plotly.graph_objects as go
 import plotly.express as px
 from dash.dependencies import Input, Output, State
@@ -16,12 +17,12 @@ app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 
 
-def get_options(list_stocks):
-    dict_list = []
-    for i in list_stocks:
-        dict_list.append({"label": i, "value": i})
+# def get_options(list_stocks):
+#     dict_list = []
+#     for i in list_stocks:
+#         dict_list.append({"label": i, "value": i})
 
-    return dict_list
+#     return dict_list
 
 
 app.layout = html.Div(
@@ -33,18 +34,18 @@ app.layout = html.Div(
                     className="four columns div-user-controls",
                     children=[
                         html.H1("Wohnung als Kapital­anlage"),
-                        html.H2("Simmulation der Objektrendite"),
+                        html.H2("Simulation der Objektrendite"),
                         html.Div(
-                            className="div-for-dropdown",
+                            #className="div-for-dropdown",
                             children=[
-                                dcc.Dropdown(
-                                    id="stockselector",
-                                    options=get_options(df["stock"].unique()),
-                                    multi=True,
-                                    value=[df["stock"].sort_values()[0]],
-                                    style={"backgroundColor": "#1E1E1E"},
-                                    className="stockselector",
-                                ),
+                                # dcc.Dropdown(
+                                #     id="stockselector",
+                                #     options=get_options(df["stock"].unique()),
+                                #     multi=True,
+                                #     value=[df["stock"].sort_values()[0]],
+                                #     style={"backgroundColor": "#1E1E1E"},
+                                #     className="stockselector",
+                                # ),
                                 html.H2(""),
                                 html.H2("1. Kauf"),
                                 html.P("Kaufpreis in Euro"),
@@ -240,6 +241,8 @@ app.layout = html.Div(
                                     type="number",
                                     value=22,
                                 ),
+                                html.Br(),
+                                html.Br(),
                                 html.Button(id='submit-button-state', n_clicks=0, children='Submit'),  
                             ],
                         ),
@@ -248,15 +251,17 @@ app.layout = html.Div(
                 html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
-                        html.H1("Ergebnisse der Simmulation"),
+                        html.H1("Ergebnisse der Simulation"),
                         html.H2("Kennzahlen"),
-                        html.Div(id='my-output'),
-                        dcc.Graph(
-                            id="timeseries",
-                            config={"displayModeBar": False},
-                            animate=True,
-                        ),
-
+                        dcc.Graph(id="kennzahlen"),
+                        #html.Div(id='my-output'),
+                        # dcc.Graph(
+                        #     id="timeseries",
+                        #     config={"displayModeBar": False},
+                        #     animate=True,
+                        # ),
+                        html.H2("Grafiken"),
+                        dcc.Graph(id="mietentwicklung")
                     ],
                 ),
             ],
@@ -267,43 +272,43 @@ app.layout = html.Div(
 
 
 # Callback for timeseries price
-@app.callback(Output("timeseries", "figure"), Input("stockselector", "value"))
-def update_graph(selected_dropdown_value):
-    trace1 = []
-    df_sub = df
-    for stock in selected_dropdown_value:
-        trace1.append(
-            go.Scatter(
-                x=df_sub[df_sub["stock"] == stock].index,
-                y=df_sub[df_sub["stock"] == stock]["value"],
-                mode="lines",
-                opacity=0.7,
-                name=stock,
-                textposition="bottom center",
-            )
-        )
-    traces = [trace1]
-    data = [val for sublist in traces for val in sublist]
-    figure = {
-        "data": data,
-        "layout": go.Layout(
-            colorway=["#5E0DAC", "#FF4F00", "#375CB1", "#FF7400", "#FFF400", "#FF0056"],
-            template="plotly_dark",
-            paper_bgcolor="rgba(0, 0, 0, 0)",
-            plot_bgcolor="rgba(0, 0, 0, 0)",
-            margin={"b": 15},
-            hovermode="x",
-            autosize=True,
-            title={
-                "text": "Geschätzter Verkaufspreis",
-                "font": {"color": "white"},
-                "x": 0.5,
-            },
-            xaxis={"range": [df_sub.index.min(), df_sub.index.max()]},
-        ),
-    }
+# @app.callback(Output("timeseries", "figure"), Input("stockselector", "value"))
+# def update_graph(selected_dropdown_value):
+#     trace1 = []
+#     df_sub = df
+#     for stock in selected_dropdown_value:
+#         trace1.append(
+#             go.Scatter(
+#                 x=df_sub[df_sub["stock"] == stock].index,
+#                 y=df_sub[df_sub["stock"] == stock]["value"],
+#                 mode="lines",
+#                 opacity=0.7,
+#                 name=stock,
+#                 textposition="bottom center",
+#             )
+#         )
+#     traces = [trace1]
+#     data = [val for sublist in traces for val in sublist]
+#     figure = {
+#         "data": data,
+#         "layout": go.Layout(
+#             colorway=["#5E0DAC", "#FF4F00", "#375CB1", "#FF7400", "#FFF400", "#FF0056"],
+#             template="plotly_dark",
+#             paper_bgcolor="rgba(0, 0, 0, 0)",
+#             plot_bgcolor="rgba(0, 0, 0, 0)",
+#             margin={"b": 15},
+#             hovermode="x",
+#             autosize=True,
+#             title={
+#                 "text": "Geschätzter Verkaufspreis",
+#                 "font": {"color": "white"},
+#                 "x": 0.5,
+#             },
+#             xaxis={"range": [df_sub.index.min(), df_sub.index.max()]},
+#         ),
+#     }
 
-    return figure
+#     return figure
 
 @app.callback(
     Output(component_id='my-output', component_property='children'),
@@ -314,7 +319,97 @@ def update_graph(selected_dropdown_value):
 )
 def update_output_div(n_clicks, kaufpreis, kaufnebenkosten, renovierungskosten):
     gesamtkosten = kaufpreis + kaufnebenkosten + renovierungskosten
-    return 'Gesamtkosten: {}'.format(gesamtkosten)
+    return f"Gesamtkosten: {gesamtkosten}"
+
+
+@app.callback(
+   Output("mietentwicklung", "figure"), 
+   Input("mieteinnahmen", "value"),
+   Input("mietsteigerung", "value"), 
+   Input("erste_mieterhoehung", "value"), 
+   Input("anlagehorizont", "value"), 
+)
+# Produce first custom graph
+def custom_figure(mieteinnahmen, mietsteigerung, erste_mieterhoehung, anlagehorizont):
+    mietsteigerung = mietsteigerung / 100
+    #anlagehorizont = 15
+    #erste_mieterhoehung = 5
+    runs = 100
+    df_sim_miete = pd.DataFrame(columns=["Run", "Miete"]) 
+    
+    for run in list(range(1,runs+1)):
+        mietsteigerung_pj = np.random.normal(mietsteigerung, 0.01, anlagehorizont)
+        mieteinnahmen_pj = [mieteinnahmen]  # pj -> pro jahr
+        for jahr in range(1, anlagehorizont + 1):
+            if jahr >= erste_mieterhoehung:
+                mieteinnahmen_pj.append(mieteinnahmen_pj[-1] * (1 + mietsteigerung_pj[jahr-1]))
+            else:
+                mieteinnahmen_pj.append(mieteinnahmen_pj[-1])
+
+        df = pd.DataFrame({
+            "Jahr": np.array(list(range(1, anlagehorizont + 1))),
+            "Run":np.full((len(np.array(mieteinnahmen_pj)[1:])), run), 
+            "Miete":np.array(mieteinnahmen_pj)[1:]})
+        
+        df_sim_miete = df_sim_miete.append(df)
+
+    fig = px.line(df_sim_miete, x="Jahr", 
+                  y="Miete", title="Mietentwicklung", color="Run")
+
+    return fig
+
+@app.callback(
+   Output("kennzahlen", "figure"), 
+   Input("kaufpreis", "value"),
+   Input("kaufnebenkosten", "value"),
+   Input("renovierungskosten", "value"),
+   Input("mieteinnahmen", "value"),
+   Input("instandhaltungskosten", "value"),
+   Input("verwaltungskosten", "value"),
+   Input("mietausfall", "value"),
+   Input("eigenkapital", "value"),
+   Input("disagio", "value"),
+   Input("zinsatz", "value"),
+   Input("tilgungssatz", "value"),
+)
+# Produce first custom graph
+def custom_figure(kaufpreis, kaufnebenkosten, renovierungskosten,
+                  mieteinnahmen, instandhaltungskosten, verwaltungskosten,
+                  mietausfall, eigenkapital,
+                  disagio, zinsatz, tilgungssatz):
+    # Nur zum testen, bleibt natürlich später in dem Formel Modul
+    gesamtkosten = kaufpreis + kaufnebenkosten + renovierungskosten
+    jahresreinertrag = (
+        mieteinnahmen
+        - instandhaltungskosten
+        - verwaltungskosten
+        - (mieteinnahmen * (mietausfall/100))
+    )
+    kaufpreis_miet_verhaeltnis = round((kaufpreis + renovierungskosten) / mieteinnahmen,1)
+    anfangs_brutto_mietrendite = round((1 / kaufpreis_miet_verhaeltnis)*100,2)
+    anfangs_netto_mietrendite = round((jahresreinertrag / gesamtkosten)*100,2)
+
+# Finanzierung
+    darlehen = (gesamtkosten - eigenkapital) / (1 - disagio)
+    kreditrate_jahr = darlehen * ((zinsatz/100) + (tilgungssatz/100))
+    
+    fig = go.Figure(data=[go.Table(header=dict(values=['Startwerte', ""]),
+                 cells=dict(values=[[
+                     "Gesamtkosten", 
+                     "Kaufpreis-Miet-Verhältnis",
+                     "Brutto-Mietrendite",
+                     "Netto-Mietrendite", 
+                     "Darlehenshöhe", 
+                     "Kreditrate (Jahr)"], [
+                         f"{gesamtkosten}€", 
+                         kaufpreis_miet_verhaeltnis, 
+                         f"{anfangs_brutto_mietrendite}%", 
+                         f"{anfangs_netto_mietrendite}%",
+                         f"{int(darlehen)}€",
+                         f"{int(kreditrate_jahr)}€"]]))
+                     ])
+    return fig
+
 
 
 if __name__ == "__main__":
