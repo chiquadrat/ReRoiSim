@@ -103,10 +103,11 @@ afasatz_sanierung_pj = []
 afa_sanierung_pj = []
 
 
+
 for index_nr in range (0,anlagehorizont):
 
     # Jahr
-    jahr_pj.append (index_nr + 1)
+    jahr_pj.append(index_nr + 1)
 
     # Mieteinahmen
     if jahr_pj[index_nr] < erste_mieterhoehung:
