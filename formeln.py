@@ -5,6 +5,7 @@
 import numpy as np
 import pandas as pd
 
+
 ################################################################################
 #
 # Eingabeparameter
@@ -79,10 +80,12 @@ bemessung_sonderabschreibung = kaufpreis_sanierung * gesamtkosten / kaufpreis
 # objektrendite_nach_steuern =
 # eigenkapitalrendite_nach_steuern =
 
-# Nachbauen der "Tabelle"
-# @Markus: In der Form würde ich die Tabelle nachbauen, ist vlt. nicht der
-# schönste weg, aber einfach und sollte auch schnell genug sein, der Loop
-# geht ja maximal über ~30 Jahre
+################################################################################
+#
+# Berechnung
+#
+################################################################################
+
 
 jahr_pj = []
 mieteinnahmen_pj = []  # pj -> pro jahr
@@ -101,6 +104,8 @@ afa_gebaeude_pj = []
 bemessung_afa_sanierung_pj = []
 afasatz_sanierung_pj = []
 afa_sanierung_pj = []
+werbungskosten_pj=[]
+steuerliches_ergebnis_pj = []
 
 
 
@@ -198,7 +203,28 @@ for index_nr in range (0,anlagehorizont):
     # Afa Sanierung
     afa_sanierung_pj.append(bemessung_afa_sanierung_pj[index_nr]*afasatz_sanierung_pj[index_nr])
 
-    
+    # Werbungskosten (Sofortabzug)
+    if jahr_pj[index_nr] == 1:
+        if jahr_pj[index_nr] <= zinsbindung:
+            if disagio > 0.05:
+                werbungskosten_pj.append(renovierungskosten + disagio*darlehen/zinsbindung)
+            else:
+                werbungskosten_pj.append(renovierungskosten + disagio*darlehen)
+        else:
+            werbungskosten_pj.append(renovierungskosten + 0)
+    else:
+        if jahr_pj[index_nr] <= zinsbindung:
+            if disagio > 0.05:
+                werbungskosten_pj.append(disagio*darlehen/zinsbindung)
+            else:
+                werbungskosten_pj.append(0)
+        else:
+            werbungskosten_pj.append(0)
+
+    # Steuerliches Ergebnis
+    steuerliches_ergebnis_pj.append(jahresreinertrag_pj[index_nr] - zins_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr] - werbungskosten_pj[index_nr])
+
+   
 
 
 
