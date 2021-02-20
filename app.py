@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output, State
 # Initialize the app
 app = dash.Dash(__name__)
 server = app.server
-app.config.suppress_callback_exceptions = True
+#app.config.suppress_callback_exceptions = True
 
 app.layout = html.Div(
     children=[
@@ -329,5 +329,5 @@ def custom_figure(kaufpreis, kaufnebenkosten, renovierungskosten,
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
 
