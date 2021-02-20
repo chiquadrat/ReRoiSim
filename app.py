@@ -223,9 +223,6 @@ app.layout = html.Div(
                                     type="number",
                                     value=22,
                                 ),
-                                html.Br(),
-                                html.Br(),
-                                html.Button(id='submit-button-state', n_clicks=0, children='Submit'),  
                             ],
                         ),
                     ],
@@ -244,18 +241,6 @@ app.layout = html.Div(
         )
     ]
 )
-
-
-@app.callback(
-    Output(component_id='my-output', component_property='children'),
-    Input('submit-button-state', 'n_clicks'),
-    State(component_id='kaufpreis', component_property='value'),
-    State(component_id='kaufnebenkosten', component_property='value'),
-    State(component_id='renovierungskosten', component_property='value'),
-)
-def update_output_div(n_clicks, kaufpreis, kaufnebenkosten, renovierungskosten):
-    gesamtkosten = kaufpreis + kaufnebenkosten + renovierungskosten
-    return f"Gesamtkosten: {gesamtkosten}"
 
 
 @app.callback(
