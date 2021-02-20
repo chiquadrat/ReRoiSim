@@ -330,3 +330,4 @@ def custom_figure(kaufpreis, kaufnebenkosten, renovierungskosten,
 
 if __name__ == "__main__":
     app.run_server(debug=True)
+
