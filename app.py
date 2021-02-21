@@ -247,7 +247,7 @@ app.layout = html.Div(
    Input("erste_mieterhoehung", "value"), 
    Input("anlagehorizont", "value"), 
 )
-# Produce first custom graph
+# Line plot
 def custom_figure(mieteinnahmen, mietsteigerung, erste_mieterhoehung, anlagehorizont):
     mietsteigerung = mietsteigerung / 100
     runs = 100
@@ -273,6 +273,64 @@ def custom_figure(mieteinnahmen, mietsteigerung, erste_mieterhoehung, anlagehori
                   y="Miete", title="Mietentwicklung", color="Run")
 
     return fig
+
+# Density plot
+mietsteigerung = 2
+mieteinnahmen = 5000
+erste_mieterhoehung = 4
+anlagehorizont = 10
+
+mietsteigerung = mietsteigerung / 100
+runs = 100
+df_sim_miete = pd.DataFrame(columns=["Run", "Miete"]) 
+
+for run in list(range(1,runs+1)):
+    mietsteigerung_pj = np.random.normal(mietsteigerung, 0.01, anlagehorizont)
+    mieteinnahmen_pj = [mieteinnahmen]  # pj -> pro jahr
+    for jahr in range(1, anlagehorizont + 1):
+        if jahr >= erste_mieterhoehung:
+            mieteinnahmen_pj.append(mieteinnahmen_pj[-1] * (1 + mietsteigerung_pj[jahr-1]))
+        else:
+            mieteinnahmen_pj.append(mieteinnahmen_pj[-1])
+
+    df = pd.DataFrame({
+        "Jahr": np.array(list(range(1, anlagehorizont + 1))),
+        "Run":np.full((len(np.array(mieteinnahmen_pj)[1:])), run), 
+        "Miete":np.array(mieteinnahmen_pj)[1:]})
+    
+    df_sim_miete = df_sim_miete.append(df)
+
+df_sim_miete = df_sim_miete.loc[df_sim_miete["Jahr"]==anlagehorizont, ]
+round(df_sim_miete["Miete"].mean())
+
+import plotly.figure_factory as ff
+fig = ff.create_distplot([np.array(df_sim_miete["Miete"])], ["Geschätzter Verkaufspreis"], show_hist=False)
+fig.add_vline(
+    x=df_sim_miete["Miete"].mean(), line_width=3, line_dash="dash", 
+    line_color="black",
+    annotation_text=f"Arithmetisches Mittel: {round(df_sim_miete['Miete'].mean())} €", 
+    annotation_position="top right",
+    annotation_font_size=10,
+    annotation_font_color="black"
+    )
+fig.add_vline(
+    x=df_sim_miete["Miete"].quantile(.05), line_width=3, line_dash="dash", 
+    line_color="red",
+    annotation_text=f"5% Quantil: {round(df_sim_miete['Miete'].quantile(.05))} €", 
+    annotation_position="bottom right",
+    annotation_font_size=10,
+    annotation_font_color="red"
+    )
+fig.add_vline(
+    x=df_sim_miete["Miete"].quantile(.95), line_width=3, line_dash="dash", 
+    line_color="green",
+    annotation_text=f"95% Quantil: {round(df_sim_miete['Miete'].quantile(.95))} €", 
+    annotation_position="bottom left",
+    annotation_font_size=10,
+    annotation_font_color="green"
+    )
+
+fig.show()
 
 @app.callback(
    Output("kennzahlen", "figure"), 
