@@ -109,6 +109,11 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+venv
+*.pyc
+.DS_Store
+.env
+environment/
 
 # Spyder project settings
 .spyderproject
