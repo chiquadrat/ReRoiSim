@@ -17,8 +17,16 @@ import matplotlib.pyplot as plt
 # https://www.gesetze-im-internet.de/estg/__32a.html
 
 
-def steuerberechnung (jahreseinkommen, splittingtarif, grenzsteuersaetze, parameter_steuersatz):
+def steuerberechnung (jahreseinkommen, splittingtarif, steuerjahr):
     
+    # Parameter für die Steuerberechnung
+    if steuerjahr == 2015:
+        grenzsteuersaetze = [8472,13469,52881,250730]
+        parameter_steuersatz = [0,[997.6,1400],[228.74,2397,948.68],[0.42,8261.29],[0.45,15783.19]]
+    elif steuerjahr == 2021:
+        grenzsteuersaetze = [9744,14753,57918,274612]
+        parameter_steuersatz = [0,[995.21,1400],[208.85,2397,950.96],[0.42,9136.63],[0.45,17374.99]]
+
     if splittingtarif:
         jahreseinkommen = jahreseinkommen / 2
 
