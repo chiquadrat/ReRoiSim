@@ -4,6 +4,10 @@
 
 import numpy as np
 import pandas as pd
+import steuerberechnung
+
+
+
 
 
 ################################################################################
@@ -38,7 +42,7 @@ tilgungssatz = 0.03
 anschlusszinssatz = 0.05
 
 # Steuern
-alleinstehend = 1  # 0/1 -> nein/ja
+alleinstehend = False  #
 einkommen = 50_000 # zu versteuerndes Jahreseinkommen
 
 # Renditeberechnung
@@ -105,7 +109,12 @@ bemessung_afa_sanierung_pj = []
 afasatz_sanierung_pj = []
 afa_sanierung_pj = []
 werbungskosten_pj=[]
-steuerliches_ergebnis_pj = []
+steuerliches_ergebnis_ekr_pj = []
+einkommen_vorher_pj = []
+steuern_vorher_pj = []
+einkommen_nachher_ekr_pj = []
+steuern_nachher_ekr_pj = []
+steuerwirkung_ekr_pj = []
 
 
 
@@ -221,15 +230,23 @@ for index_nr in range (0,anlagehorizont):
         else:
             werbungskosten_pj.append(0)
 
-    # Steuerliches Ergebnis
-    steuerliches_ergebnis_pj.append(jahresreinertrag_pj[index_nr] - zins_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr] - werbungskosten_pj[index_nr])
+    # Steuerliches Ergebnis für die Berechnung der Eigenkapitalrendite
+    steuerliches_ergebnis_ekr_pj.append(jahresreinertrag_pj[index_nr] - zins_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr] - werbungskosten_pj[index_nr])
 
-   
+    # Einkommen vorher
+    einkommen_vorher_pj.append(einkommen)
 
+    # Steuern vorher
+    steuern_vorher_pj.append(steuerberechnung.steuerberechnung(einkommen_vorher_pj[index_nr], not(alleinstehend), 2015))
 
+    # Einkommen nachher für die Berechnung der Eigenkapitalrendite
+    einkommen_nachher_ekr_pj.append(einkommen_vorher_pj[index_nr] + steuerliches_ergebnis_ekr_pj[index_nr])
 
+    # Steuern nachher für die Berechnung der Eigenkapitalrendite
+    steuern_nachher_ekr_pj.append(steuerberechnung.steuerberechnung(einkommen_nachher_ekr_pj[index_nr], not(alleinstehend), 2015))
 
-
+    # Steuerwirkung für die Berechnung der Eigenkapitalrendite
+    steuerwirkung_ekr_pj.append(steuern_nachher_ekr_pj[index_nr] - steuern_vorher_pj[index_nr])
 
 
 
