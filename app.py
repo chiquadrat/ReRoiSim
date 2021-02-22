@@ -8,6 +8,9 @@ import plotly.graph_objects as go
 import plotly.express as px
 from dash.dependencies import Input, Output, State
 
+from sims_num import sim_value, sim_rent
+
+
 # Initialize the app
 app = dash.Dash(__name__)
 server = app.server
@@ -231,7 +234,8 @@ app.layout = html.Div(
                         html.H2("Kennzahlen"),
                         dcc.Graph(id="kennzahlen"),
                         html.H2("Grafiken"),
-                        dcc.Graph(id="mietentwicklung")
+                        dcc.Graph(id="mietentwicklung"),
+                        dcc.Graph(id="wertentwicklung")
                     ],
                 ),
             ],
@@ -247,32 +251,40 @@ app.layout = html.Div(
    Input("erste_mieterhoehung", "value"), 
    Input("anlagehorizont", "value"), 
 )
-# Produce first custom graph
+# Rent
 def custom_figure(mieteinnahmen, mietsteigerung, erste_mieterhoehung, anlagehorizont):
+
     mietsteigerung = mietsteigerung / 100
-    runs = 100
-    df_sim_miete = pd.DataFrame(columns=["Run", "Miete"]) 
+    runs = 10
     
-    for run in list(range(1,runs+1)):
-        mietsteigerung_pj = np.random.normal(mietsteigerung, 0.01, anlagehorizont)
-        mieteinnahmen_pj = [mieteinnahmen]  # pj -> pro jahr
-        for jahr in range(1, anlagehorizont + 1):
-            if jahr >= erste_mieterhoehung:
-                mieteinnahmen_pj.append(mieteinnahmen_pj[-1] * (1 + mietsteigerung_pj[jahr-1]))
-            else:
-                mieteinnahmen_pj.append(mieteinnahmen_pj[-1])
+    data = sim_rent(mieteinnahmen, n_sims=runs, n_years=anlagehorizont, flat_years=erste_mieterhoehung)
 
-        df = pd.DataFrame({
-            "Jahr": np.array(list(range(1, anlagehorizont + 1))),
-            "Run":np.full((len(np.array(mieteinnahmen_pj)[1:])), run), 
-            "Miete":np.array(mieteinnahmen_pj)[1:]})
-        
-        df_sim_miete = df_sim_miete.append(df)
-
-    fig = px.line(df_sim_miete, x="Jahr", 
-                  y="Miete", title="Mietentwicklung", color="Run")
+    fig = px.line(x=range(1, anlagehorizont+1), 
+                  y=[data[i, :] for i in range(runs)], 
+                  title="Mietentwicklung")
 
     return fig
+
+
+@app.callback(
+   Output("wertentwicklung", "figure"),
+   Input("kaufpreis", "value"),
+   Input("anlagehorizont", "value")
+)
+# Value
+def value_chart(kaufpreis, anlagehorizont, wertsteigerung=2):
+
+    wertsteigerung /= 100
+    runs = 10
+    
+    data = sim_value(kaufpreis, n_sims=runs, mean=wertsteigerung, n_years=anlagehorizont)
+
+    fig = px.line(x=range(1, anlagehorizont+1), 
+                  y=[data[i, :] for i in range(runs)], 
+                  title="Wertentwicklung")
+
+    return fig
+
 
 @app.callback(
    Output("kennzahlen", "figure"), 
