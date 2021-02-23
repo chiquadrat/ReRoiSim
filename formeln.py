@@ -4,7 +4,6 @@
 
 import numpy as np
 import numpy_financial as npf
-import pandas as pd
 import steuerberechnung
 
 # Todo: Verkaufsfaktor durch Immobilienpreissteierung ersetzen
@@ -45,6 +44,7 @@ anschlusszinssatz = 0.05
 # Steuern
 alleinstehend = False  #
 einkommen = 50_000 # zu versteuerndes Jahreseinkommen
+steuerjahr = 2015
 
 # Renditeberechnung
 anlagehorizont = 30
@@ -121,6 +121,11 @@ immobilienpreis_pj = [0]
 verkaufspreis_pj = [0]
 restschuld_faellig_pj = [0]
 ueberschuss_gesamt_pj = [-eigenkapital]
+steuerliches_ergebnis_objekt_pj = [0]
+einkommen_nachher_objekt_pj = [0]
+steuern_nachher_objekt_pj = [0]
+steuerwirkung_objekt_pj = [0]
+liquiditaet_pj = [-gesamtkosten]
 
 for index_nr in range (1,anlagehorizont+1):
 
@@ -129,7 +134,6 @@ for index_nr in range (1,anlagehorizont+1):
 
     # Mieteinahmen
     if jahr_pj[index_nr] < erste_mieterhoehung:
-        print(jahr_pj[index_nr])
         mieteinnahmen_pj.append(mieteinnahmen)
     elif jahr_pj[index_nr] >= erste_mieterhoehung:
         mieteinnahmen_pj.append(mieteinnahmen_pj[-1] * (1 + mietsteigerung))
@@ -228,13 +232,13 @@ for index_nr in range (1,anlagehorizont+1):
     einkommen_vorher_pj.append(einkommen)
 
     # Steuern vorher
-    steuern_vorher_pj.append(steuerberechnung.steuerberechnung(einkommen_vorher_pj[index_nr], not(alleinstehend), 2015))
+    steuern_vorher_pj.append(steuerberechnung.steuerberechnung(einkommen_vorher_pj[index_nr], not(alleinstehend), steuerjahr))
 
     # Einkommen nachher für die Berechnung der Eigenkapitalrendite
     einkommen_nachher_ekr_pj.append(einkommen_vorher_pj[index_nr] + steuerliches_ergebnis_ekr_pj[index_nr])
 
     # Steuern nachher für die Berechnung der Eigenkapitalrendite
-    steuern_nachher_ekr_pj.append(steuerberechnung.steuerberechnung(einkommen_nachher_ekr_pj[index_nr], not(alleinstehend), 2015))
+    steuern_nachher_ekr_pj.append(steuerberechnung.steuerberechnung(einkommen_nachher_ekr_pj[index_nr], not(alleinstehend), steuerjahr))
 
     # Steuerwirkung für die Berechnung der Eigenkapitalrendite
     steuerwirkung_ekr_pj.append(steuern_nachher_ekr_pj[index_nr] - steuern_vorher_pj[index_nr])
@@ -260,6 +264,30 @@ for index_nr in range (1,anlagehorizont+1):
     # Überschuss inkl. Verkauf und Restschuld
     ueberschuss_gesamt_pj.append(ueberschuss_pj[index_nr] + verkaufspreis_pj[index_nr] - restschuld_faellig_pj[index_nr])
 
+    # Steuerliches Ergebnis für die Berechnung der Objektrendite
+    if jahr_pj[index_nr] == 1:
+        steuerliches_ergebnis_objekt_pj.append(jahresreinertrag_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr] - renovierungskosten)
+    elif jahr_pj[index_nr] > 1:
+        steuerliches_ergebnis_objekt_pj.append(jahresreinertrag_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr])
+
+    # Einkommen nachher für die Berechnung der Objektrendite
+    einkommen_nachher_objekt_pj.append(einkommen_vorher_pj[index_nr] + steuerliches_ergebnis_objekt_pj[index_nr])
+
+    # Steuern nachher für die Berechnung der Objektrendite
+    steuern_nachher_objekt_pj.append(steuerberechnung.steuerberechnung(einkommen_nachher_objekt_pj[index_nr], not(alleinstehend), steuerjahr))
+
+    # Steuerwirkung für die Berechnung der Objektrendite
+    steuerwirkung_objekt_pj.append(steuern_nachher_objekt_pj[index_nr] - steuern_vorher_pj[index_nr])
+
+    # Liquidität
+    liquiditaet_pj.append(jahresreinertrag_pj[index_nr]-steuerwirkung_objekt_pj[index_nr]+verkaufspreis_pj[index_nr])
+
+
+# Verkaufspreis
+verkaufspreis = sum(verkaufspreis_pj)
 
 # Berechnung der Eigenkapitalrendite : interner Zinsfuß der Zahlungsreihe ueberschuss_gesamt_pj
-eigenkapitalrendite = npf.irr(ueberschuss_gesamt_pj.append)
+eigenkapitalrendite = npf.irr(ueberschuss_gesamt_pj)
+
+# Berechnung der Objektrendite : interner Zinsfuß der Zahlungsreihe liquiditaet_pj
+objektrendite = npf.irr(liquiditaet_pj)
