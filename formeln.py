@@ -3,6 +3,7 @@
 #
 
 import numpy as np
+import numpy_financial as npf
 import pandas as pd
 import steuerberechnung
 
@@ -258,3 +259,7 @@ for index_nr in range (1,anlagehorizont+1):
 
     # Überschuss inkl. Verkauf und Restschuld
     ueberschuss_gesamt_pj.append(ueberschuss_pj[index_nr] + verkaufspreis_pj[index_nr] - restschuld_faellig_pj[index_nr])
+
+
+# Berechnung der Eigenkapitalrendite : interner Zinsfuß der Zahlungsreihe ueberschuss_gesamt_pj
+eigenkapitalrendite = npf.irr(ueberschuss_gesamt_pj.append)
