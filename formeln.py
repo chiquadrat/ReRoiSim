@@ -3,7 +3,11 @@
 #
 
 import numpy as np
-import pandas as pd
+import numpy_financial as npf
+import steuerberechnung
+
+# Todo: Verkaufsfaktor durch Immobilienpreissteierung ersetzen
+
 
 
 ################################################################################
@@ -23,7 +27,7 @@ renovierungskosten = 1_000
 mieteinnahmen = 5_000           # pro Jahr
 instandhaltungskosten = 800     # pro Jahr
 verwaltungskosten = 500         # pro Jahr
-mietausfall = 0.02              # Vieflaches der Nettokaltmiete
+mietausfall = 0.02              # Vielfaches der Nettokaltmiete
 
 mietsteigerung = 0.02
 erste_mieterhoehung = 5         # Jahr ab dem die Mieterhöhung erfolgt >1
@@ -38,8 +42,9 @@ tilgungssatz = 0.03
 anschlusszinssatz = 0.05
 
 # Steuern
-alleinstehend = 1  # 0/1 -> nein/ja
+alleinstehend = False  #
 einkommen = 50_000 # zu versteuerndes Jahreseinkommen
+steuerjahr = 2015   # nur 2015 und 2021 implementiert
 
 # Renditeberechnung
 anlagehorizont = 30
@@ -87,45 +92,56 @@ bemessung_sonderabschreibung = kaufpreis_sanierung * gesamtkosten / kaufpreis
 ################################################################################
 
 
-jahr_pj = []
-mieteinnahmen_pj = []  # pj -> pro jahr
-nicht_umlegbare_kosten_pj = []
-mietausfall_pj = []
-jahresreinertrag_pj = []
-hilfsfeld_rate_pj = []
-kreditrate_pj = []
-zinssatz_pj = []
-zins_pj = []
-tilgung_pj = []
-restschult_pj = []
-bemessung_afa_gebaeude_pj = []
-afasatz_gebaeude_pj = []
-afa_gebaeude_pj = []
-bemessung_afa_sanierung_pj = []
-afasatz_sanierung_pj = []
-afa_sanierung_pj = []
-werbungskosten_pj=[]
-steuerliches_ergebnis_pj = []
+jahr_pj = [0]
+mieteinnahmen_pj = [0]  # pj -> pro jahr
+nicht_umlegbare_kosten_pj = [0]
+mietausfall_pj = [0]
+jahresreinertrag_pj = [0]
+hilfsfeld_rate_pj = [0]
+kreditrate_pj = [0]
+zinssatz_pj = [0]
+zins_pj = [0]
+tilgung_pj = [0]
+restschuld_pj = [darlehen]
+bemessung_afa_gebaeude_pj = [0]
+afasatz_gebaeude_pj = [0]
+afa_gebaeude_pj = [0]
+bemessung_afa_sanierung_pj = [0]
+afasatz_sanierung_pj = [0]
+afa_sanierung_pj = [0]
+werbungskosten_pj=[0]
+steuerliches_ergebnis_ekr_pj = [0]
+einkommen_vorher_pj = [0]
+steuern_vorher_pj = [0]
+einkommen_nachher_ekr_pj = [0]
+steuern_nachher_ekr_pj = [0]
+steuerwirkung_ekr_pj = [0]
+ueberschuss_pj = [0]
+immobilienpreis_pj = [0]
+verkaufspreis_pj = [0]
+restschuld_faellig_pj = [0]
+ueberschuss_gesamt_pj = [-eigenkapital]
+steuerliches_ergebnis_objekt_pj = [0]
+einkommen_nachher_objekt_pj = [0]
+steuern_nachher_objekt_pj = [0]
+steuerwirkung_objekt_pj = [0]
+liquiditaet_pj = [-gesamtkosten]
 
-
-
-for index_nr in range (0,anlagehorizont):
+for index_nr in range (1,anlagehorizont+1):
 
     # Jahr
-    jahr_pj.append(index_nr + 1)
+    jahr_pj.append(index_nr)
 
     # Mieteinahmen
     if jahr_pj[index_nr] < erste_mieterhoehung:
         mieteinnahmen_pj.append(mieteinnahmen)
-    elif jahr_pj[index_nr] == erste_mieterhoehung:
-        mieteinnahmen_pj.append(mieteinnahmen * (1 + mietsteigerung))
-    else:
+    elif jahr_pj[index_nr] >= erste_mieterhoehung:
         mieteinnahmen_pj.append(mieteinnahmen_pj[-1] * (1 + mietsteigerung))
 
     # nicht umlegbare Kosten
     if jahr_pj[index_nr] == 1:
         nicht_umlegbare_kosten_pj.append(instandhaltungskosten + verwaltungskosten)
-    else:
+    elif jahr_pj[index_nr] > 1:
         nicht_umlegbare_kosten_pj.append(nicht_umlegbare_kosten_pj[-1] * (1 + kostensteigerung))
 
     # Pauschale für Mietausfall
@@ -148,31 +164,19 @@ for index_nr in range (0,anlagehorizont):
         zinssatz_pj.append(anschlusszinssatz)
 
     # Zins
-    if jahr_pj[index_nr] == 1:
-        zins_pj.append(darlehen*zinssatz_pj[index_nr])
-    else:
-        zins_pj.append(restschult_pj[index_nr-1]*zinssatz_pj[index_nr])
+    zins_pj.append(restschuld_pj[index_nr-1]*zinssatz_pj[index_nr])
 
     # Kreditrate
-    if jahr_pj[index_nr] == 1:
-        if hilfsfeld_rate_pj[index_nr] > darlehen:
-            kreditrate_pj.append(darlehen*(1+zinssatz_pj[index_nr]))
-        else:
-            kreditrate_pj.append(hilfsfeld_rate_pj[index_nr])
+    if hilfsfeld_rate_pj[index_nr] > restschuld_pj[index_nr-1]:
+        kreditrate_pj.append(restschuld_pj[index_nr-1]*(1+zinssatz_pj[index_nr]))
     else:
-        if hilfsfeld_rate_pj[index_nr] > restschult_pj[index_nr-1]:
-            kreditrate_pj.append(restschult_pj[index_nr-1]*(1+zinssatz_pj[index_nr]))
-        else:
-            kreditrate_pj.append(hilfsfeld_rate_pj[index_nr])
+        kreditrate_pj.append(hilfsfeld_rate_pj[index_nr])
 
     # Tilgung
     tilgung_pj.append(kreditrate_pj[index_nr]-zins_pj[index_nr])
 
     # Restschuld
-    if jahr_pj[index_nr] == 1:
-        restschult_pj.append(darlehen-tilgung_pj[index_nr])
-    else:
-        restschult_pj.append(restschult_pj[index_nr-1]-tilgung_pj[index_nr])
+    restschuld_pj.append(restschuld_pj[index_nr-1]-tilgung_pj[index_nr])
 
     # Bemessung für Afa
     bemessung_afa_gebaeude_pj.append(bemessung_abschreibung)
@@ -212,7 +216,7 @@ for index_nr in range (0,anlagehorizont):
                 werbungskosten_pj.append(renovierungskosten + disagio*darlehen)
         else:
             werbungskosten_pj.append(renovierungskosten + 0)
-    else:
+    elif jahr_pj[index_nr] > 1:
         if jahr_pj[index_nr] <= zinsbindung:
             if disagio > 0.05:
                 werbungskosten_pj.append(disagio*darlehen/zinsbindung)
@@ -221,15 +225,69 @@ for index_nr in range (0,anlagehorizont):
         else:
             werbungskosten_pj.append(0)
 
-    # Steuerliches Ergebnis
-    steuerliches_ergebnis_pj.append(jahresreinertrag_pj[index_nr] - zins_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr] - werbungskosten_pj[index_nr])
+    # Steuerliches Ergebnis für die Berechnung der Eigenkapitalrendite
+    steuerliches_ergebnis_ekr_pj.append(jahresreinertrag_pj[index_nr] - zins_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr] - werbungskosten_pj[index_nr])
 
-   
+    # Einkommen vorher
+    einkommen_vorher_pj.append(einkommen)
+
+    # Steuern vorher
+    steuern_vorher_pj.append(steuerberechnung.steuerberechnung(einkommen_vorher_pj[index_nr], not(alleinstehend), steuerjahr))
+
+    # Einkommen nachher für die Berechnung der Eigenkapitalrendite
+    einkommen_nachher_ekr_pj.append(einkommen_vorher_pj[index_nr] + steuerliches_ergebnis_ekr_pj[index_nr])
+
+    # Steuern nachher für die Berechnung der Eigenkapitalrendite
+    steuern_nachher_ekr_pj.append(steuerberechnung.steuerberechnung(einkommen_nachher_ekr_pj[index_nr], not(alleinstehend), steuerjahr))
+
+    # Steuerwirkung für die Berechnung der Eigenkapitalrendite
+    steuerwirkung_ekr_pj.append(steuern_nachher_ekr_pj[index_nr] - steuern_vorher_pj[index_nr])
+
+    # Überschuss ohne Anfangsinvestition, Verkauf und Restschuld
+    ueberschuss_pj.append(jahresreinertrag_pj[index_nr] - kreditrate_pj[index_nr] - steuerwirkung_ekr_pj[index_nr])
+
+    # Immobilienpreis
+    immobilienpreis_pj.append(mieteinnahmen_pj[index_nr]*verkaufsfaktor)
+
+    # Verkaufspreis am Ende des Anlagehorizontes
+    if jahr_pj[index_nr] == anlagehorizont:
+        verkaufspreis_pj.append(immobilienpreis_pj[index_nr])
+    else:
+        verkaufspreis_pj.append(0)
+
+        # fällige Restschuld zum Ende des Anlagehorizontes
+    if jahr_pj[index_nr] == anlagehorizont:
+        restschuld_faellig_pj.append(restschuld_pj[index_nr])
+    else:
+        restschuld_faellig_pj.append(0)
+
+    # Überschuss inkl. Verkauf und Restschuld
+    ueberschuss_gesamt_pj.append(ueberschuss_pj[index_nr] + verkaufspreis_pj[index_nr] - restschuld_faellig_pj[index_nr])
+
+    # Steuerliches Ergebnis für die Berechnung der Objektrendite
+    if jahr_pj[index_nr] == 1:
+        steuerliches_ergebnis_objekt_pj.append(jahresreinertrag_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr] - renovierungskosten)
+    elif jahr_pj[index_nr] > 1:
+        steuerliches_ergebnis_objekt_pj.append(jahresreinertrag_pj[index_nr] - afa_gebaeude_pj[index_nr] - afa_sanierung_pj[index_nr])
+
+    # Einkommen nachher für die Berechnung der Objektrendite
+    einkommen_nachher_objekt_pj.append(einkommen_vorher_pj[index_nr] + steuerliches_ergebnis_objekt_pj[index_nr])
+
+    # Steuern nachher für die Berechnung der Objektrendite
+    steuern_nachher_objekt_pj.append(steuerberechnung.steuerberechnung(einkommen_nachher_objekt_pj[index_nr], not(alleinstehend), steuerjahr))
+
+    # Steuerwirkung für die Berechnung der Objektrendite
+    steuerwirkung_objekt_pj.append(steuern_nachher_objekt_pj[index_nr] - steuern_vorher_pj[index_nr])
+
+    # Liquidität
+    liquiditaet_pj.append(jahresreinertrag_pj[index_nr]-steuerwirkung_objekt_pj[index_nr]+verkaufspreis_pj[index_nr])
 
 
+# Verkaufspreis
+verkaufspreis = sum(verkaufspreis_pj)
 
+# Berechnung der Eigenkapitalrendite : interner Zinsfuß der Zahlungsreihe ueberschuss_gesamt_pj
+eigenkapitalrendite = npf.irr(ueberschuss_gesamt_pj)
 
-
-
-
-
+# Berechnung der Objektrendite : interner Zinsfuß der Zahlungsreihe liquiditaet_pj
+objektrendite = npf.irr(liquiditaet_pj)
