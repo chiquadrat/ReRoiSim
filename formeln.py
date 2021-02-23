@@ -27,7 +27,7 @@ renovierungskosten = 1_000
 mieteinnahmen = 5_000           # pro Jahr
 instandhaltungskosten = 800     # pro Jahr
 verwaltungskosten = 500         # pro Jahr
-mietausfall = 0.02              # Vieflaches der Nettokaltmiete
+mietausfall = 0.02              # Vielfaches der Nettokaltmiete
 
 mietsteigerung = 0.02
 erste_mieterhoehung = 5         # Jahr ab dem die Mieterhöhung erfolgt >1
@@ -44,7 +44,7 @@ anschlusszinssatz = 0.05
 # Steuern
 alleinstehend = False  #
 einkommen = 50_000 # zu versteuerndes Jahreseinkommen
-steuerjahr = 2015
+steuerjahr = 2015   # nur 2015 und 2021 implementiert
 
 # Renditeberechnung
 anlagehorizont = 30
