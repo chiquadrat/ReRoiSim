@@ -15,46 +15,43 @@ import steuerberechnung
 #
 ################################################################################
 
+
 def renditerechner(
     # Objekt
-    baujahr = 1925,
-    kaufpreis = 100_000,
-    kaufpreis_grundstueck = 30_000,
-    kaufpreis_sanierung = 7_000,
-    kaufnebenkosten = 5_000,
-    renovierungskosten = 1_000,
-    mieteinnahmen = 5_000,
-    instandhaltungskosten = 800,
-    verwaltungskosten = 500,
-    mietausfall = 0.02,
-    mietsteigerung = 0.02,
-    erste_mieterhoehung = 5,
-    kostensteigerung = 0.015,
-
+    baujahr=1925,
+    kaufpreis=100_000,
+    kaufpreis_grundstueck=30_000,
+    kaufpreis_sanierung=7_000,
+    kaufnebenkosten=5_000,
+    renovierungskosten=1_000,
+    mieteinnahmen=5_000,
+    instandhaltungskosten=800,
+    verwaltungskosten=500,
+    mietausfall=0.02,
+    mietsteigerung=0.02,
+    erste_mieterhoehung=5,
+    kostensteigerung=0.015,
     # Finanzierung
-    eigenkapital = 6_500,
-    zinsbindung = 15,
-    disagio = 0.01,
-    zinsatz = 0.0128,
-    tilgungssatz = 0.03,
-    anschlusszinssatz = 0.05,
-
+    eigenkapital=6_500,
+    zinsbindung=15,
+    disagio=0.01,
+    zinsatz=0.0128,
+    tilgungssatz=0.03,
+    anschlusszinssatz=0.05,
     # Steuern
-    alleinstehend = False,  #
-    einkommen = 50_000,  # zu versteuerndes Jahreseinkommen
-    steuerjahr = 2021,  # nur 2015 und 2021 implementiert
-
+    alleinstehend=False,  #
+    einkommen=50_000,  # zu versteuerndes Jahreseinkommen
+    steuerjahr=2021,  # nur 2015 und 2021 implementiert
     # Renditeberechnung
-    anlagehorizont = 30,
-    verkaufsfaktor = 25,
-    
+    anlagehorizont=30,
+    verkaufsfaktor=25,
     # Simulation
-    sim_runs = 1,
-    unsicherheit_mietsteigerung = 0,
-    unsicherheit_kostensteigerung = 0,
-    unsicherheit_mietausfall = 0,
-    unsicherheit_anschlusszinssatz = 0,
-    unsicherheit_verkaufsfaktor = 0,
+    sim_runs=1,
+    unsicherheit_mietsteigerung=0,
+    unsicherheit_kostensteigerung=0,
+    unsicherheit_mietausfall=0,
+    unsicherheit_anschlusszinssatz=0,
+    unsicherheit_verkaufsfaktor=0,
 ):
     """Funktion simuliert die Eigenkapitalrendite, Objektrendite und den 
     Verkaufspreis
@@ -115,7 +112,8 @@ def renditerechner(
     bemessung_abschreibung = (
         kaufpreis
         + kaufnebenkosten
-        - (kaufpreis_grundstueck + kaufpreis_sanierung) * (1 + kaufnebenkosten / kaufpreis)
+        - (kaufpreis_grundstueck + kaufpreis_sanierung)
+        * (1 + kaufnebenkosten / kaufpreis)
     )
     abschreibungsart = "Linear 2,0%" if baujahr > 1924 else "Linear 2,5%"
     bemessung_sonderabschreibung = kaufpreis_sanierung * gesamtkosten / kaufpreis
@@ -201,7 +199,9 @@ def renditerechner(
 
         # Kreditrate
         if hilfsfeld_rate_pj[index_nr] > restschuld_pj[index_nr - 1]:
-            kreditrate_pj.append(restschuld_pj[index_nr - 1] * (1 + zinssatz_pj[index_nr]))
+            kreditrate_pj.append(
+                restschuld_pj[index_nr - 1] * (1 + zinssatz_pj[index_nr])
+            )
         else:
             kreditrate_pj.append(hilfsfeld_rate_pj[index_nr])
 
@@ -368,7 +368,6 @@ def renditerechner(
             + verkaufspreis_pj[index_nr]
         )
 
-
     # Verkaufspreis
     verkaufspreis = sum(verkaufspreis_pj)
 
@@ -377,11 +376,12 @@ def renditerechner(
 
     # Berechnung der Objektrendite : interner Zinsfuß der Zahlungsreihe liquiditaet_pj
     objektrendite = npf.irr(liquiditaet_pj)
-    
-    return verkaufspreis, eigenkapitalrendite, objektrendite
 
-verkaufspreis, eigenkapitalrendite, objektrendite = renditerechner()
+    return int(verkaufspreis), round(eigenkapitalrendite, 4), round(objektrendite, 4)
 
-print(verkaufspreis)
-print(eigenkapitalrendite)
-print(objektrendite)
+
+# verkaufspreis, eigenkapitalrendite, objektrendite = renditerechner()
+
+# print(verkaufspreis)
+# print(eigenkapitalrendite)
+# print(objektrendite)
