@@ -77,7 +77,7 @@ def renditerechner(
         tilgungssatz (float, optional): [description]. Defaults to 0.03.
         anschlusszinssatz (float, optional): [description]. Defaults to 0.05.
         alleinstehend (bool, optional): [description]. Defaults to False.
-        verkaufsfaktor (int, optional): [description]. Defaults to 25.
+        verkaufsfaktor (float, optional): [description]. Defaults to 25.
         sim_runs (int, optional): [description]. Defaults to 1.
         unsicherheit_mietsteigerung (float, optional): [description]. Defaults to 0.
         unsicherheit_kostensteigerung (float, optional): [description]. Defaults to 0.
@@ -123,6 +123,10 @@ def renditerechner(
     objektrendite_runs = []
 
     # Unabhängige Simulation
+    verkaufsfaktor = np.random.normal(
+        verkaufsfaktor, unsicherheit_verkaufsfaktor, sim_runs
+    )
+    
     anschlusszinssatz = np.random.normal(
         anschlusszinssatz, unsicherheit_anschlusszinssatz, sim_runs)
     
@@ -341,14 +345,14 @@ def renditerechner(
             )
 
             # Immobilienpreis
-            immobilienpreis_pj.append(mieteinnahmen_pj[index_nr] * verkaufsfaktor)
+            immobilienpreis_pj.append(mieteinnahmen_pj[index_nr] * verkaufsfaktor[run])
 
             # Verkaufspreis am Ende des Anlagehorizontes
             if jahr_pj[index_nr] == anlagehorizont:
                 verkaufspreis_pj.append(immobilienpreis_pj[index_nr])
             else:
                 verkaufspreis_pj.append(0)
-
+            
                 # fällige Restschuld zum Ende des Anlagehorizontes
             if jahr_pj[index_nr] == anlagehorizont:
                 restschuld_faellig_pj.append(restschuld_pj[index_nr])
