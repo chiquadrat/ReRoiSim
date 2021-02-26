@@ -2,7 +2,7 @@ import unittest
 from formeln import renditerechner
 
 
-class TestSum(unittest.TestCase):
+class Renditeberechnung(unittest.TestCase):
     def test_renditeberechnung_szenario_1(self):
         vk, ekren, objren = renditerechner()
         self.assertEqual(vk, 209177, "Should be 209177")

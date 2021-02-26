@@ -47,10 +47,10 @@ def renditerechner(
     verkaufsfaktor=25,
     # Simulation
     sim_runs=1,
-    unsicherheit_mietsteigerung=0.0,
-    unsicherheit_kostensteigerung=0.0,
-    unsicherheit_mietausfall=0.0,
-    unsicherheit_anschlusszinssatz=0,
+    unsicherheit_mietsteigerung=0,
+    unsicherheit_kostensteigerung=0,
+    unsicherheit_mietausfall=0,
+    unsicherheit_anschlusszinssatz=0.00,
     unsicherheit_verkaufsfaktor=0,
 ):
     """Funktion simuliert die Eigenkapitalrendite, Objektrendite und den 
@@ -106,7 +106,7 @@ def renditerechner(
     # Finanzierung
     darlehen = (gesamtkosten - eigenkapital) / (1 - disagio)
     kreditrate_jahr = darlehen * (zinsatz + tilgungssatz)
-    anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz)
+    #anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz)
 
     # Steuern
     bemessung_abschreibung = (
@@ -123,6 +123,9 @@ def renditerechner(
     objektrendite_runs = []
 
     # Unabhängige Simulation
+    anschlusszinssatz = np.random.normal(
+        anschlusszinssatz, unsicherheit_anschlusszinssatz, sim_runs)
+    
     mietsteigerung = np.random.normal(
         mietsteigerung, unsicherheit_mietsteigerung, sim_runs * anlagehorizont
     ).reshape(anlagehorizont, sim_runs)
@@ -170,6 +173,8 @@ def renditerechner(
         steuern_nachher_objekt_pj = [0]
         steuerwirkung_objekt_pj = [0]
         liquiditaet_pj = [-gesamtkosten]
+        
+        anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz[run])
 
         for index_nr in range(1, anlagehorizont + 1):
             # index_nr = 1
@@ -218,8 +223,8 @@ def renditerechner(
             if jahr_pj[index_nr] <= zinsbindung:
                 zinssatz_pj.append(zinsatz)
             else:
-                zinssatz_pj.append(anschlusszinssatz)
-
+                zinssatz_pj.append(anschlusszinssatz[run])
+                
             # Zins
             zins_pj.append(restschuld_pj[index_nr - 1] * zinssatz_pj[index_nr])
 
@@ -424,8 +429,8 @@ def renditerechner(
         )
 
 
-# verkaufspreis, eigenkapitalrendite, objektrendite = renditerechner()
+verkaufspreis, eigenkapitalrendite, objektrendite = renditerechner()
 
-# print(verkaufspreis)
-# print(eigenkapitalrendite)
-# print(objektrendite)
+print(verkaufspreis)
+print(eigenkapitalrendite)
+print(objektrendite)
