@@ -106,7 +106,7 @@ def renditerechner(
     # Finanzierung
     darlehen = (gesamtkosten - eigenkapital) / (1 - disagio)
     kreditrate_jahr = darlehen * (zinsatz + tilgungssatz)
-    #anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz)
+    # anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz)
 
     # Steuern
     bemessung_abschreibung = (
@@ -121,15 +121,18 @@ def renditerechner(
     verkaufspreis_runs = []
     eigenkapitalrendite_runs = []
     objektrendite_runs = []
+    gewinn_runs = []
+    minimaler_cashflow_runs = []
 
     # Unabhängige Simulation
     verkaufsfaktor = np.random.normal(
         verkaufsfaktor, unsicherheit_verkaufsfaktor, sim_runs
     )
-    
+
     anschlusszinssatz = np.random.normal(
-        anschlusszinssatz, unsicherheit_anschlusszinssatz, sim_runs)
-    
+        anschlusszinssatz, unsicherheit_anschlusszinssatz, sim_runs
+    )
+
     mietsteigerung = np.random.normal(
         mietsteigerung, unsicherheit_mietsteigerung, sim_runs * anlagehorizont
     ).reshape(anlagehorizont, sim_runs)
@@ -177,7 +180,7 @@ def renditerechner(
         steuern_nachher_objekt_pj = [0]
         steuerwirkung_objekt_pj = [0]
         liquiditaet_pj = [-gesamtkosten]
-        
+
         anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz[run])
 
         for index_nr in range(1, anlagehorizont + 1):
@@ -228,7 +231,7 @@ def renditerechner(
                 zinssatz_pj.append(zinsatz)
             else:
                 zinssatz_pj.append(anschlusszinssatz[run])
-                
+
             # Zins
             zins_pj.append(restschuld_pj[index_nr - 1] * zinssatz_pj[index_nr])
 
@@ -352,7 +355,7 @@ def renditerechner(
                 verkaufspreis_pj.append(immobilienpreis_pj[index_nr])
             else:
                 verkaufspreis_pj.append(0)
-            
+
                 # fällige Restschuld zum Ende des Anlagehorizontes
             if jahr_pj[index_nr] == anlagehorizont:
                 restschuld_faellig_pj.append(restschuld_pj[index_nr])
@@ -414,15 +417,22 @@ def renditerechner(
 
         # Berechnung der Eigenkapitalrendite : interner Zinsfuß der Zahlungsreihe ueberschuss_gesamt_pj
         eigenkapitalrendite_runs.append(npf.irr(ueberschuss_gesamt_pj))
+        # print(ueberschuss_gesamt_pj)
 
         # Berechnung der Objektrendite : interner Zinsfuß der Zahlungsreihe liquiditaet_pj
         objektrendite_runs.append(npf.irr(liquiditaet_pj))
+
+        # Gewinn (Summe über die Cashflows)
+        gewinn_runs.append(sum(ueberschuss_gesamt_pj))
+        minimaler_cashflow_runs.append(min(ueberschuss_gesamt_pj[1:]))
 
     if sim_runs == 1:
         return (
             int(verkaufspreis_runs[0]),
             round(eigenkapitalrendite_runs[0], 4),
             round(objektrendite_runs[0], 4),
+            int(gewinn_runs[0]),
+            int(minimaler_cashflow_runs[0]),
         )
 
     if sim_runs > 1:
@@ -430,11 +440,21 @@ def renditerechner(
             verkaufspreis_runs,
             eigenkapitalrendite_runs,
             objektrendite_runs,
+            gewinn_runs,
+            minimaler_cashflow_runs,
         )
 
 
-verkaufspreis, eigenkapitalrendite, objektrendite = renditerechner()
+(
+    verkaufspreis,
+    eigenkapitalrendite,
+    objektrendite,
+    gewinn,
+    minimaler_cashflow,
+) = renditerechner()
 
+print(minimaler_cashflow)
 print(verkaufspreis)
 print(eigenkapitalrendite)
 print(objektrendite)
+print(gewinn)
