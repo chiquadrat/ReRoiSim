@@ -438,6 +438,12 @@ def renditerechner(
             "mietausfall": mietausfall[0][0],
             "anschlusszinsatz": anschlusszinssatz[0],
             "verkaufsfaktor": verkaufsfaktor[0],
+            "gesamtkosten":gesamtkosten,
+            "kaufpreis_miet_verhaeltnis": kaufpreis_miet_verhaeltnis,
+            "anfangs_brutto_mietrendite": anfangs_brutto_mietrendite,
+            "anfangs_netto_mietrendite": anfangs_netto_mietrendite,
+            "darlehen":darlehen,
+            "kreditrate_jahr":kreditrate_jahr,
         }
 
     if sim_runs > 1:
@@ -452,6 +458,12 @@ def renditerechner(
             "mietausfall": mietausfall,
             "anschlusszinsatz": anschlusszinssatz,
             "verkaufsfaktor": verkaufsfaktor,
+            "gesamtkosten":gesamtkosten,
+            "kaufpreis_miet_verhaeltnis": kaufpreis_miet_verhaeltnis,
+            "anfangs_brutto_mietrendite": anfangs_brutto_mietrendite,
+            "anfangs_netto_mietrendite": anfangs_netto_mietrendite,
+            "darlehen":darlehen,
+            "kreditrate_jahr":kreditrate_jahr,
         }
 
 
