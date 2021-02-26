@@ -427,34 +427,34 @@ def renditerechner(
         minimaler_cashflow_runs.append(min(ueberschuss_gesamt_pj[1:]))
 
     if sim_runs == 1:
-        return (
-            int(verkaufspreis_runs[0]),
-            round(eigenkapitalrendite_runs[0], 4),
-            round(objektrendite_runs[0], 4),
-            int(gewinn_runs[0]),
-            int(minimaler_cashflow_runs[0]),
-        )
+        return {
+            "verkaufspreis": int(verkaufspreis_runs[0]),
+            "eigenkapitalrendite": round(eigenkapitalrendite_runs[0], 4),
+            "objektrendite": round(objektrendite_runs[0], 4),
+            "gewinn": int(gewinn_runs[0]),
+            "minimaler_cashflow": int(minimaler_cashflow_runs[0]),
+            "mietsteigerung": mietsteigerung[0][0],
+            "kostensteigerung": kostensteigerung[0][0],
+            "mietausfall": mietausfall[0][0],
+            "anschlusszinsatz": anschlusszinssatz[0],
+            "verkaufsfaktor": verkaufsfaktor[0],
+        }
 
     if sim_runs > 1:
-        return (
-            verkaufspreis_runs,
-            eigenkapitalrendite_runs,
-            objektrendite_runs,
-            gewinn_runs,
-            minimaler_cashflow_runs,
-        )
+        return {
+            "verkaufspreis": verkaufspreis_runs,
+            "eigenkapitalrendite": eigenkapitalrendite_runs,
+            "objektrendite": objektrendite_runs,
+            "gewinn": gewinn_runs,
+            "minimaler_cashflow": minimaler_cashflow_runs,
+            "mietsteigerung": mietsteigerung,
+            "kostensteigerung": kostensteigerung,
+            "mietausfall": mietausfall,
+            "anschlusszinsatz": anschlusszinssatz,
+            "verkaufsfaktor": verkaufsfaktor,
+        }
 
 
-(
-    verkaufspreis,
-    eigenkapitalrendite,
-    objektrendite,
-    gewinn,
-    minimaler_cashflow,
-) = renditerechner()
+# ergebnis = renditerechner()
 
-print(minimaler_cashflow)
-print(verkaufspreis)
-print(eigenkapitalrendite)
-print(objektrendite)
-print(gewinn)
+# print(ergebnis)
