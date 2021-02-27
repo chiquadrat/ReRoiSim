@@ -426,45 +426,24 @@ def renditerechner(
         gewinn_runs.append(sum(ueberschuss_gesamt_pj))
         minimaler_cashflow_runs.append(min(ueberschuss_gesamt_pj[1:]))
 
-    if sim_runs == 1:
-        return {
-            "verkaufspreis": int(verkaufspreis_runs[0]),
-            "eigenkapitalrendite": round(eigenkapitalrendite_runs[0], 4),
-            "objektrendite": round(objektrendite_runs[0], 4),
-            "gewinn": int(gewinn_runs[0]),
-            "minimaler_cashflow": int(minimaler_cashflow_runs[0]),
-            "mietsteigerung": mietsteigerung[0][0],
-            "kostensteigerung": kostensteigerung[0][0],
-            "mietausfall": mietausfall[0][0],
-            "anschlusszinsatz": anschlusszinssatz[0],
-            "verkaufsfaktor": verkaufsfaktor[0],
-            "gesamtkosten":gesamtkosten,
-            "kaufpreis_miet_verhaeltnis": kaufpreis_miet_verhaeltnis,
-            "anfangs_brutto_mietrendite": anfangs_brutto_mietrendite,
-            "anfangs_netto_mietrendite": anfangs_netto_mietrendite,
-            "darlehen":darlehen,
-            "kreditrate_jahr":kreditrate_jahr,
-        }
-
-    if sim_runs > 1:
-        return {
-            "verkaufspreis": verkaufspreis_runs,
-            "eigenkapitalrendite": eigenkapitalrendite_runs,
-            "objektrendite": objektrendite_runs,
-            "gewinn": gewinn_runs,
-            "minimaler_cashflow": minimaler_cashflow_runs,
-            "mietsteigerung": mietsteigerung,
-            "kostensteigerung": kostensteigerung,
-            "mietausfall": mietausfall,
-            "anschlusszinsatz": anschlusszinssatz,
-            "verkaufsfaktor": verkaufsfaktor,
-            "gesamtkosten":gesamtkosten,
-            "kaufpreis_miet_verhaeltnis": kaufpreis_miet_verhaeltnis,
-            "anfangs_brutto_mietrendite": anfangs_brutto_mietrendite,
-            "anfangs_netto_mietrendite": anfangs_netto_mietrendite,
-            "darlehen":darlehen,
-            "kreditrate_jahr":kreditrate_jahr,
-        }
+    return {
+        "verkaufspreis": verkaufspreis_runs,
+        "eigenkapitalrendite": eigenkapitalrendite_runs,
+        "objektrendite": objektrendite_runs,
+        "gewinn": gewinn_runs,
+        "minimaler_cashflow": minimaler_cashflow_runs,
+        "mietsteigerung": mietsteigerung,
+        "kostensteigerung": kostensteigerung,
+        "mietausfall": mietausfall,
+        "anschlusszinsatz": anschlusszinssatz,
+        "verkaufsfaktor": verkaufsfaktor,
+        "gesamtkosten":gesamtkosten,
+        "kaufpreis_miet_verhaeltnis": kaufpreis_miet_verhaeltnis,
+        "anfangs_brutto_mietrendite": anfangs_brutto_mietrendite,
+        "anfangs_netto_mietrendite": anfangs_netto_mietrendite,
+        "darlehen":darlehen,
+        "kreditrate_jahr":kreditrate_jahr,
+    }
 
 
 # ergebnis = renditerechner()

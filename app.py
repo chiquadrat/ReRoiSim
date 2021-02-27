@@ -35,7 +35,7 @@ app.layout = html.Div(
                                     id="sim_runs",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=10,
+                                    value=1,
                                 ),
                                 html.H2(""),
                                 html.Button("Start der Simulation", id='button'),
@@ -102,7 +102,7 @@ app.layout = html.Div(
                                     id="unsicherheit_mietsteigerung",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=0.1,
+                                    value=0,
                                 ),
                                 html.H2(""),
                                 html.P("Erste Mieterhöhung ab Jahr"),
@@ -693,33 +693,55 @@ def custom_figure(
         ]
     )
     
+    #verkaufspreis = np.array(renditerechner(sim_runs=10)["verkaufspreis"])
+    
     verkaufspreis = np.array(ergebnis["verkaufspreis"])
-
-    fig_verkaufspreis = ff.create_distplot([verkaufspreis], ["Verkaufspreis"], show_hist=False)
-    fig_verkaufspreis = fig_verkaufspreis.add_vline(
-        x=verkaufspreis.mean(), line_width=3, line_dash="dash",
-        line_color="black",
-       annotation_text=f"Arithmetisches Mittel: {round(verkaufspreis.mean())} €",
-       annotation_position="top right",
-       annotation_font_size=10,
-       annotation_font_color="black"
-        )
-    fig_verkaufspreis = fig_verkaufspreis.add_vline(
-        x=np.quantile(verkaufspreis, q=.05), line_width=3, line_dash="dash",
-        line_color="red",
-        annotation_text=f"5% Quantil: {round(np.quantile(verkaufspreis, q=.05))} €",
-        annotation_position="bottom right",
+    if np.all(verkaufspreis==verkaufspreis[0])==True:
+            fig_verkaufspreis = go.Figure(
+                data=[
+                    go.Table(
+                        header=dict(values=["Startwerte", ""]),
+                        cells=dict(
+                            values=[
+                                [
+                                    "button",
+                                    "verkaufspreis",
+                                ],
+                                [
+                                    button,
+                                    verkaufspreis[0],
+                                ],
+                            ]
+                        ),
+                    )
+                ]
+            )
+    else:
+        fig_verkaufspreis = ff.create_distplot([verkaufspreis], ["Verkaufspreis"], show_hist=False)
+        fig_verkaufspreis = fig_verkaufspreis.add_vline(
+            x=verkaufspreis.mean(), line_width=3, line_dash="dash",
+            line_color="black",
+        annotation_text=f"Arithmetisches Mittel: {round(verkaufspreis.mean())} €",
+        annotation_position="top right",
         annotation_font_size=10,
-        annotation_font_color="red"
-        )
-    fig_verkaufspreis = fig_verkaufspreis.add_vline(
-        x=np.quantile(verkaufspreis, q=.95), line_width=3, line_dash="dash",
-        line_color="green",
-        annotation_text=f"95% Quantil: {round(np.quantile(verkaufspreis, q=.95))} €",
-        annotation_position="bottom right",
-        annotation_font_size=10,
-        annotation_font_color="green"
-        )
+        annotation_font_color="black"
+            )
+        fig_verkaufspreis = fig_verkaufspreis.add_vline(
+            x=np.quantile(verkaufspreis, q=.05), line_width=3, line_dash="dash",
+            line_color="red",
+            annotation_text=f"5% Quantil: {round(np.quantile(verkaufspreis, q=.05))} €",
+            annotation_position="bottom right",
+            annotation_font_size=10,
+            annotation_font_color="red"
+            )
+        fig_verkaufspreis = fig_verkaufspreis.add_vline(
+            x=np.quantile(verkaufspreis, q=.95), line_width=3, line_dash="dash",
+            line_color="green",
+            annotation_text=f"95% Quantil: {round(np.quantile(verkaufspreis, q=.95))} €",
+            annotation_position="bottom right",
+            annotation_font_size=10,
+            annotation_font_color="green"
+            )
 
     #fig.show()
 
