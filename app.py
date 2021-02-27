@@ -10,6 +10,8 @@ from dash.dependencies import Input, Output, State
 import plotly.figure_factory as ff
 from dash.exceptions import PreventUpdate
 
+from formeln import renditerechner
+
 # Initialize the app
 app = dash.Dash(__name__)
 server = app.server
@@ -248,11 +250,16 @@ app.layout = html.Div(
                                     labelStyle={"display": "inline-block"},
                                 ),
                                 html.H2(""),
-                                html.P("Sonderabschreibung für Neubauwohnung"),
-                                dcc.Checklist(
-                                    id="sonderabschreibung",
-                                    options=[{"label": "Ja", "value": "1"},],
-                                ),
+                                # html.P("Sonderabschreibung für Neubauwohnung"),
+                                # dcc.RadioItems(
+                                #     id="sonderabschreibung",
+                                #     options=[
+                                #         {"label": "Ja", "value": "1"},
+                                #         {"label": "Nein", "value": "0"},
+                                #              ],
+                                #     value="0",
+                                #     labelStyle={"display": "inline-block"},
+                                # ),
                                 html.H2("5. Renditeberechnung"),
                                 html.P("Anlagehorizont"),
                                 dcc.Input(
@@ -287,9 +294,9 @@ app.layout = html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
                         html.H1("Ergebnisse der Simulation"),
-                        html.H2("Kennzahlen"),
+                        html.H2("Kennzahlen (alt)"),
                         dcc.Graph(id="kennzahlen"),
-                        html.H2("Grafiken"),
+                        html.H2("Kennzahlen und Grafiken (neu)"),
                         dcc.Graph(id="kennzahlen2"),
                         #                        dcc.Graph(id="mietentwicklung"),
                         #                        dcc.Graph(id="verkaufspreis"),
@@ -424,7 +431,7 @@ app.layout = html.Div(
     Input("familienstand", "value"),
     Input("einkommen", "value"),
     Input("baujahr", "value"),
-    Input("sonderabschreibung", "value"),
+#    Input("sonderabschreibung", "value"),
     Input("anlagehorizont", "value"),
     Input("verkaufsfaktor", "value"),
     Input("unsicherheit_verkaufsfaktor", "value"),
@@ -457,7 +464,7 @@ def custom_figure(
     familienstand,
     einkommen,
     baujahr,
-    sonderabschreibung,
+#    sonderabschreibung,
     anlagehorizont,
     verkaufsfaktor,
     unsicherheit_verkaufsfaktor,
@@ -517,17 +524,117 @@ def custom_figure(
 @app.callback(
     Output("kennzahlen2", "figure"),
     [Input('button', 'n_clicks')],
-    state=[State('kaufpreis', 'value'),
+    state=[
+     State('kaufpreis', 'value'),
      State('kaufpreis_grundstueck', 'value'),
-     State('kaufpreis_sanierung', 'value')])
+     State('kaufpreis_sanierung', 'value'),
+     State('kaufnebenkosten', 'value'),
+     State('renovierungskosten', 'value'),
+     State('mieteinnahmen', 'value'),
+     State('mietsteigerung', 'value'),
+     State('unsicherheit_mietsteigerung', 'value'),
+     State('erste_mieterhoehung', 'value'),
+     State('instandhaltungskosten', 'value'),
+     State('verwaltungskosten', 'value'),
+     State('mietausfall', 'value'),
+     State('unsicherheit_mietausfall', 'value'),
+     State('kostensteigerung', 'value'),
+     State('unsicherheit_kostensteigerung', 'value'),
+     State('eigenkapital', 'value'),
+     State('zinsbindung', 'value'),
+     State('disagio', 'value'),
+     State('zinsatz', 'value'),
+     State('tilgungssatz', 'value'),
+     State('anschlusszinssatz', 'value'),
+     State('unsicherheit_anschlusszinssatz', 'value'),
+     State('familienstand', 'value'),
+     State('einkommen', 'value'),
+     State('baujahr', 'value'),
+#     State('sonderabschreibung', 'value'),
+     State('anlagehorizont', 'value'),
+     State('verkaufsfaktor', 'value'),
+     State('unsicherheit_verkaufsfaktor', 'value'),
+     State('sim_runs', 'value')
+     ])
 
 def custom_figure(
     button,
     kaufpreis,
     kaufpreis_grundstueck,
     kaufpreis_sanierung,
+    kaufnebenkosten,
+    renovierungskosten,
+    mieteinnahmen,
+    mietsteigerung,
+    unsicherheit_mietsteigerung,
+    erste_mieterhoehung,
+    instandhaltungskosten,
+    verwaltungskosten,
+    mietausfall,
+    unsicherheit_mietausfall,
+    kostensteigerung,
+    unsicherheit_kostensteigerung,
+    eigenkapital,
+    zinsbindung,
+    disagio,
+    zinsatz,
+    tilgungssatz,
+    anschlusszinssatz,
+    unsicherheit_anschlusszinssatz,
+    familienstand,
+    einkommen,
+    baujahr,
+#    sonderabschreibung,
+    anlagehorizont,
+    verkaufsfaktor,
+    unsicherheit_verkaufsfaktor,
+    sim_runs,
 ):
     # Call formeln.py here
+    
+    # Preprocessing arguments
+    if baujahr==0:
+        baujahr=1950
+    else:
+        baujahr=1900
+    
+    if familienstand==0:
+        alleinstehend=True
+    else:
+        alleinstehend=False
+    
+    ergebnis = renditerechner(
+        kaufpreis=kaufpreis, 
+        kaufpreis_grundstueck=kaufpreis_grundstueck,
+        kaufpreis_sanierung=kaufpreis_sanierung,
+        kaufnebenkosten=kaufnebenkosten,
+        renovierungskosten=renovierungskosten,
+        mieteinnahmen=mieteinnahmen,
+        mietsteigerung=(mietsteigerung/100),
+        unsicherheit_mietsteigerung=(unsicherheit_mietsteigerung/100),
+        erste_mieterhoehung=erste_mieterhoehung,
+        instandhaltungskosten=instandhaltungskosten,
+        verwaltungskosten=verwaltungskosten,
+        mietausfall=(mietausfall/100),
+        unsicherheit_mietausfall=(unsicherheit_mietausfall/100),
+        kostensteigerung=(kostensteigerung/100),
+        unsicherheit_kostensteigerung=(unsicherheit_kostensteigerung/100),
+        eigenkapital=eigenkapital,
+        zinsbindung=zinsbindung,
+        disagio=(disagio/100),
+        zinsatz=(zinsatz/100),
+        tilgungssatz=(tilgungssatz/100),
+        anschlusszinssatz=(anschlusszinssatz/100),
+        unsicherheit_anschlusszinssatz=(unsicherheit_anschlusszinssatz/100),
+        alleinstehend=alleinstehend,
+        einkommen=einkommen,
+        baujahr=baujahr,
+        anlagehorizont=anlagehorizont,
+        verkaufsfaktor=verkaufsfaktor,
+        unsicherheit_verkaufsfaktor=unsicherheit_verkaufsfaktor,
+        sim_runs=sim_runs,
+        steuerjahr=2021,
+    )
 
     fig = go.Figure(
         data=[
@@ -537,15 +644,23 @@ def custom_figure(
                     values=[
                         [
                             "button",
+                            "verkaufspreis",
+                            "eigenkapitalrendite",
                             "kaufpreis",
                             "kaufpreis_grundstueck",
                             "kaufpreis_sanierung",
+                            "familienstand",
+                            "baujahr",
                         ],
                         [
                             button,
+                            ergebnis["verkaufspreis"],
+                            ergebnis["eigenkapitalrendite"],
                             kaufpreis,
                             kaufpreis_grundstueck,
                             kaufpreis_sanierung,
+                            familienstand,
+                            baujahr,
                         ],
                     ]
                 ),
