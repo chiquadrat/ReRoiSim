@@ -35,7 +35,7 @@ app.layout = html.Div(
                                     id="sim_runs",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=1,
+                                    value=10,
                                 ),
                                 html.H2(""),
                                 html.Button("Start der Simulation", id='button'),
@@ -102,7 +102,7 @@ app.layout = html.Div(
                                     id="unsicherheit_mietsteigerung",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=0,
+                                    value=0.1,
                                 ),
                                 html.H2(""),
                                 html.P("Erste Mieterhöhung ab Jahr"),
@@ -297,9 +297,10 @@ app.layout = html.Div(
                         html.H2("Kennzahlen (alt)"),
                         dcc.Graph(id="kennzahlen"),
                         html.H2("Kennzahlen und Grafiken (neu)"),
+                        dcc.Graph(id="kennzahlen1"),
                         dcc.Graph(id="kennzahlen2"),
                         #                        dcc.Graph(id="mietentwicklung"),
-                        #                        dcc.Graph(id="verkaufspreis"),
+                        dcc.Graph(id="verkaufspreis"),
                     ],
                 ),
             ],
@@ -522,7 +523,9 @@ def custom_figure(
 
 
 @app.callback(
+    Output("kennzahlen1", "figure"),
     Output("kennzahlen2", "figure"),
+    Output("verkaufspreis", "figure"),
     [Input('button', 'n_clicks')],
     state=[
      State('kaufpreis', 'value'),
@@ -636,7 +639,7 @@ def custom_figure(
         steuerjahr=2021,
     )
 
-    fig = go.Figure(
+    tab1 = go.Figure(
         data=[
             go.Table(
                 header=dict(values=["Startwerte", ""]),
@@ -651,6 +654,7 @@ def custom_figure(
                             "kaufpreis_sanierung",
                             "familienstand",
                             "baujahr",
+                            "sim_runs"
                         ],
                         [
                             button,
@@ -661,13 +665,66 @@ def custom_figure(
                             kaufpreis_sanierung,
                             familienstand,
                             baujahr,
+                            sim_runs
                         ],
                     ]
                 ),
             )
         ]
     )
-    return fig
+    
+    tab2 = go.Figure(
+        data=[
+            go.Table(
+                header=dict(values=["Startwerte", ""]),
+                cells=dict(
+                    values=[
+                        [
+                            "button",
+                            "objektrendite",
+                        ],
+                        [
+                            button,
+                            ergebnis["objektrendite"],
+                        ],
+                    ]
+                ),
+            )
+        ]
+    )
+    
+    verkaufspreis = np.array(ergebnis["verkaufspreis"])
+
+    fig_verkaufspreis = ff.create_distplot([verkaufspreis], ["Verkaufspreis"], show_hist=False)
+    fig_verkaufspreis = fig_verkaufspreis.add_vline(
+        x=verkaufspreis.mean(), line_width=3, line_dash="dash",
+        line_color="black",
+       annotation_text=f"Arithmetisches Mittel: {round(verkaufspreis.mean())} €",
+       annotation_position="top right",
+       annotation_font_size=10,
+       annotation_font_color="black"
+        )
+    fig_verkaufspreis = fig_verkaufspreis.add_vline(
+        x=np.quantile(verkaufspreis, q=.05), line_width=3, line_dash="dash",
+        line_color="red",
+        annotation_text=f"5% Quantil: {round(np.quantile(verkaufspreis, q=.05))} €",
+        annotation_position="bottom right",
+        annotation_font_size=10,
+        annotation_font_color="red"
+        )
+    fig_verkaufspreis = fig_verkaufspreis.add_vline(
+        x=np.quantile(verkaufspreis, q=.95), line_width=3, line_dash="dash",
+        line_color="green",
+        annotation_text=f"95% Quantil: {round(np.quantile(verkaufspreis, q=.95))} €",
+        annotation_position="bottom right",
+        annotation_font_size=10,
+        annotation_font_color="green"
+        )
+
+    #fig.show()
+
+    
+    return tab1, tab2, fig_verkaufspreis
 
 
 
