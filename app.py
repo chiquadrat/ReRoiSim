@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from dash.dependencies import Input, Output, State
 import plotly.figure_factory as ff
+from dash.exceptions import PreventUpdate
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -26,6 +27,16 @@ app.layout = html.Div(
                         html.H2("Simulation der Objektrendite"),
                         html.Div(
                             children=[
+                                html.H2(""),
+                                html.P("Anzahl Simulationsläufe"),
+                                dcc.Input(
+                                    id="sim_runs",
+                                    placeholder="Eingabe...",
+                                    type="number",
+                                    value=1,
+                                ),
+                                html.H2(""),
+                                html.Button("Start der Simulation", id='button'),
                                 html.H2(""),
                                 html.H2("1. Kauf"),
                                 html.P("Kaufpreis in Euro"),
@@ -266,6 +277,8 @@ app.layout = html.Div(
                                     type="number",
                                     value=0,
                                 ),
+                                html.H2(""),
+                                html.H2(""),
                             ],
                         ),
                     ],
@@ -277,6 +290,7 @@ app.layout = html.Div(
                         html.H2("Kennzahlen"),
                         dcc.Graph(id="kennzahlen"),
                         html.H2("Grafiken"),
+                        dcc.Graph(id="kennzahlen2"),
                         #                        dcc.Graph(id="mietentwicklung"),
                         #                        dcc.Graph(id="verkaufspreis"),
                     ],
@@ -414,6 +428,7 @@ app.layout = html.Div(
     Input("anlagehorizont", "value"),
     Input("verkaufsfaktor", "value"),
     Input("unsicherheit_verkaufsfaktor", "value"),
+    Input("sim_runs", "value"),
 )
 # Produce first custom graph
 def custom_figure(
@@ -446,8 +461,8 @@ def custom_figure(
     anlagehorizont,
     verkaufsfaktor,
     unsicherheit_verkaufsfaktor,
+    sim_runs,
 ):
-
     # Call formeln.py here
 
     # Nur zum testen, bleibt natürlich später in dem Formel Modul
@@ -481,6 +496,7 @@ def custom_figure(
                             "Netto-Mietrendite",
                             "Darlehenshöhe",
                             "Kreditrate (Jahr)",
+                            "Test klicken"
                         ],
                         [
                             f"{gesamtkosten}€",
@@ -496,6 +512,50 @@ def custom_figure(
         ]
     )
     return fig
+
+
+@app.callback(
+    Output("kennzahlen2", "figure"),
+    [Input('button', 'n_clicks')],
+    state=[State('kaufpreis', 'value'),
+     State('kaufpreis_grundstueck', 'value'),
+     State('kaufpreis_sanierung', 'value')])
+
+def custom_figure(
+    button,
+    kaufpreis,
+    kaufpreis_grundstueck,
+    kaufpreis_sanierung,
+):
+    # Call formeln.py here
+
+    fig = go.Figure(
+        data=[
+            go.Table(
+                header=dict(values=["Startwerte", ""]),
+                cells=dict(
+                    values=[
+                        [
+                            "button",
+                            "kaufpreis",
+                            "kaufpreis_grundstueck",
+                            "kaufpreis_sanierung",
+                        ],
+                        [
+                            button,
+                            kaufpreis,
+                            kaufpreis_grundstueck,
+                            kaufpreis_sanierung,
+                        ],
+                    ]
+                ),
+            )
+        ]
+    )
+    return fig
+
+
+
 
 
 if __name__ == "__main__":
