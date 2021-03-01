@@ -294,12 +294,12 @@ app.layout = html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
                         html.H1("Ergebnisse der Simulation"),
-                        html.H2("Kennzahlen (alt)"),
+                        html.H2("Startwerte"),
                         dcc.Graph(id="kennzahlen"),
-                        html.H2("Kennzahlen und Grafiken (neu)"),
-                        dcc.Graph(id="kennzahlen1"),
-                        dcc.Graph(id="kennzahlen2"),
-                        #                        dcc.Graph(id="mietentwicklung"),
+                        html.H2("Verteilung der mit Unsicherheit behafteten Eingabeparameter"),
+                        html.H2("(ToDo)"),
+                        html.H2("Ergebnisse der Simmulation"),
+                        #dcc.Graph(id="kennzahlen1"),
                         dcc.Graph(id="verkaufspreis"),
                         dcc.Graph(id="objektrendite"),
                         dcc.Graph(id="eigenkapitalrendite"),
@@ -311,102 +311,6 @@ app.layout = html.Div(
         )
     ]
 )
-
-# Line plot
-# @app.callback(
-#    Output("mietentwicklung", "figure"),
-#    Input("mieteinnahmen", "value"),
-#    Input("mietsteigerung", "value"),
-#    Input("erste_mieterhoehung", "value"),
-#    Input("anlagehorizont", "value"),
-# )
-# def custom_figure(mieteinnahmen, mietsteigerung, erste_mieterhoehung, anlagehorizont):
-#     mietsteigerung = mietsteigerung / 100
-#     runs = 100
-#     df_sim_miete = pd.DataFrame(columns=["Run", "Miete"])
-
-#     for run in list(range(1,runs+1)):
-#         mietsteigerung_pj = np.random.normal(mietsteigerung, 0.01, anlagehorizont)
-#         mieteinnahmen_pj = [mieteinnahmen]  # pj -> pro jahr
-#         for jahr in range(1, anlagehorizont + 1):
-#             if jahr >= erste_mieterhoehung:
-#                 mieteinnahmen_pj.append(mieteinnahmen_pj[-1] * (1 + mietsteigerung_pj[jahr-1]))
-#             else:
-#                 mieteinnahmen_pj.append(mieteinnahmen_pj[-1])
-
-#         df = pd.DataFrame({
-#             "Jahr": np.array(list(range(1, anlagehorizont + 1))),
-#             "Run":np.full((len(np.array(mieteinnahmen_pj)[1:])), run),
-#             "Miete":np.array(mieteinnahmen_pj)[1:]})
-
-#         df_sim_miete = df_sim_miete.append(df)
-
-#     fig = px.line(df_sim_miete, x="Jahr",
-#                   y="Miete", title="Mietentwicklung", color="Run")
-
-#     return fig
-
-# # Density plot
-# @app.callback(
-#    Output("verkaufspreis", "figure"),
-#    Input("mieteinnahmen", "value"),
-#    Input("mietsteigerung", "value"),
-#    Input("erste_mieterhoehung", "value"),
-#    Input("anlagehorizont", "value"),
-# )
-# def custom_figure(mieteinnahmen, mietsteigerung, erste_mieterhoehung, anlagehorizont):
-#     mietsteigerung = mietsteigerung / 100
-#     runs = 100
-#     df_sim_miete = pd.DataFrame(columns=["Run", "Miete"])
-
-#     for run in list(range(1,runs+1)):
-#         mietsteigerung_pj = np.random.normal(mietsteigerung, 0.01, anlagehorizont)
-#         mieteinnahmen_pj = [mieteinnahmen]  # pj -> pro jahr
-#         for jahr in range(1, anlagehorizont + 1):
-#             if jahr >= erste_mieterhoehung:
-#                 mieteinnahmen_pj.append(mieteinnahmen_pj[-1] * (1 + mietsteigerung_pj[jahr-1]))
-#             else:
-#                 mieteinnahmen_pj.append(mieteinnahmen_pj[-1])
-
-#         df = pd.DataFrame({
-#             "Jahr": np.array(list(range(1, anlagehorizont + 1))),
-#             "Run":np.full((len(np.array(mieteinnahmen_pj)[1:])), run),
-#             "Miete":np.array(mieteinnahmen_pj)[1:]})
-
-#         df_sim_miete = df_sim_miete.append(df)
-
-#     df_sim_miete = df_sim_miete.loc[df_sim_miete["Jahr"]==anlagehorizont, ]
-
-
-#     fig = ff.create_distplot([np.array(df_sim_miete["Miete"])], ["Verkaufspreis"], show_hist=False)
-#     fig = fig.add_vline(
-#         x=df_sim_miete["Miete"].mean(), line_width=3, line_dash="dash",
-#         line_color="black",
-#        annotation_text=f"Arithmetisches Mittel: {round(df_sim_miete['Miete'].mean())} €",
-#        annotation_position="top right",
-#        annotation_font_size=10,
-#        annotation_font_color="black"
-#         )
-#     fig = fig.add_vline(
-#         x=df_sim_miete["Miete"].quantile(.05), line_width=3, line_dash="dash",
-#         line_color="red",
-#         annotation_text=f"5% Quantil: {round(df_sim_miete['Miete'].quantile(.05))} €",
-#         annotation_position="bottom right",
-#         annotation_font_size=10,
-#         annotation_font_color="red"
-#         )
-#     fig = fig.add_vline(
-#         x=df_sim_miete["Miete"].quantile(.95), line_width=3, line_dash="dash",
-#         line_color="green",
-#         annotation_text=f"95% Quantil: {round(df_sim_miete['Miete'].quantile(.95))} €",
-#         annotation_position="bottom right",
-#         annotation_font_size=10,
-#         annotation_font_color="green"
-#         )
-
-#     #fig.show()
-
-#     return fig
 
 
 @app.callback(
@@ -442,7 +346,6 @@ app.layout = html.Div(
     Input("unsicherheit_verkaufsfaktor", "value"),
     Input("sim_runs", "value"),
 )
-# Produce first custom graph
 def custom_figure(
     kaufpreis,
     kaufpreis_grundstueck,
@@ -508,7 +411,6 @@ def custom_figure(
                             "Netto-Mietrendite",
                             "Darlehenshöhe",
                             "Kreditrate (Jahr)",
-                            "Test klicken"
                         ],
                         [
                             f"{gesamtkosten}€",
@@ -527,8 +429,7 @@ def custom_figure(
 
 
 @app.callback(
-    Output("kennzahlen1", "figure"),
-    Output("kennzahlen2", "figure"),
+ #   Output("kennzahlen1", "figure"),
     Output("verkaufspreis", "figure"),
     Output("objektrendite", "figure"),
     Output("eigenkapitalrendite", "figure"),
@@ -647,61 +548,42 @@ def custom_figure(
         steuerjahr=2021,
     )
     
-    ergebnis["minimaler_cashflow"]
-
-    tab1 = go.Figure(
-        data=[
-            go.Table(
-                header=dict(values=["Startwerte", ""]),
-                cells=dict(
-                    values=[
-                        [
-                            "button",
-                            "verkaufspreis",
-                            "eigenkapitalrendite",
-                            "kaufpreis",
-                            "kaufpreis_grundstueck",
-                            "kaufpreis_sanierung",
-                            "familienstand",
-                            "baujahr",
-                            "sim_runs"
-                        ],
-                        [
-                            button,
-                            ergebnis["verkaufspreis"],
-                            ergebnis["eigenkapitalrendite"],
-                            kaufpreis,
-                            kaufpreis_grundstueck,
-                            kaufpreis_sanierung,
-                            familienstand,
-                            baujahr,
-                            sim_runs
-                        ],
-                    ]
-                ),
-            )
-        ]
-    )
     
-    tab2 = go.Figure(
-        data=[
-            go.Table(
-                header=dict(values=["Startwerte", ""]),
-                cells=dict(
-                    values=[
-                        [
-                            "button",
-                            "objektrendite",
-                        ],
-                        [
-                            button,
-                            ergebnis["objektrendite"],
-                        ],
-                    ]
-                ),
-            )
-        ]
-    )
+
+    # tab1 = go.Figure(
+    #     data=[
+    #         go.Table(
+    #             header=dict(values=["Startwerte", ""]),
+    #             cells=dict(
+    #                 values=[
+    #                     [
+    #                         "button",
+    #                         "verkaufspreis",
+    #                         "eigenkapitalrendite",
+    #                         "kaufpreis",
+    #                         "kaufpreis_grundstueck",
+    #                         "kaufpreis_sanierung",
+    #                         "familienstand",
+    #                         "baujahr",
+    #                         "sim_runs"
+    #                     ],
+    #                     [
+    #                         button,
+    #                         ergebnis["verkaufspreis"],
+    #                         ergebnis["eigenkapitalrendite"],
+    #                         kaufpreis,
+    #                         kaufpreis_grundstueck,
+    #                         kaufpreis_sanierung,
+    #                         familienstand,
+    #                         baujahr,
+    #                         sim_runs
+    #                     ],
+    #                 ]
+    #             ),
+    #         )
+    #     ]
+    # )
+    
     
     
     # Geschätzter Verkaufspreis
@@ -821,8 +703,8 @@ def custom_figure(
     # Geschätzte Gewinn
     gewinn = np.array(ergebnis["gewinn"])
     gewinn = gewinn[~np.isnan(gewinn)]
-    print(gewinn)
-    print(gewinn.shape)
+    #print(gewinn)
+    #print(gewinn.shape)
     if np.all(gewinn==gewinn[0])==True:
             fig_gewinn = go.Figure(
                 data=[
@@ -902,7 +784,7 @@ def custom_figure(
 
     
     
-    return tab1, tab2, fig_verkaufspreis, fig_objektrendite, fig_eigenkapitalrendite, fig_gewinn, fig_minimaler_cashflow
+    return fig_verkaufspreis, fig_objektrendite, fig_eigenkapitalrendite, fig_gewinn, fig_minimaler_cashflow
 
 
 
