@@ -293,12 +293,12 @@ app.layout = html.Div(
                 html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
-                        html.H1("Ergebnisse der Simulation"),
+                        html.H1("Berechnungen"),
                         html.H2("Startwerte"),
                         dcc.Graph(id="kennzahlen"),
                         html.H2("Verteilung der mit Unsicherheit behafteten Eingabeparameter"),
                         html.H2("(ToDo)"),
-                        html.H2("Ergebnisse der Simmulation"),
+                        html.H2("Ergebnisse der Simulation"),
                         #dcc.Graph(id="kennzahlen1"),
                         dcc.Graph(id="verkaufspreis"),
                         dcc.Graph(id="objektrendite"),
