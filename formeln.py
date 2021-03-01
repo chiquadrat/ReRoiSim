@@ -50,7 +50,7 @@ def renditerechner(
     unsicherheit_mietsteigerung=0,
     unsicherheit_kostensteigerung=0,
     unsicherheit_mietausfall=0,
-    unsicherheit_anschlusszinssatz=0.00,
+    unsicherheit_anschlusszinssatz=0,
     unsicherheit_verkaufsfaktor=0,
 ):
     """Funktion simuliert die Eigenkapitalrendite, Objektrendite und den 
@@ -443,9 +443,9 @@ def renditerechner(
         "anfangs_netto_mietrendite": anfangs_netto_mietrendite,
         "darlehen":darlehen,
         "kreditrate_jahr":kreditrate_jahr,
+        "verkaufsfaktor":verkaufsfaktor,
+        "anschlusszinssatz":anschlusszinssatz,
+        "mietsteigerung":mietsteigerung.flatten(),
+        "kostensteigerung":kostensteigerung.flatten(),
+        "mietausfall":mietausfall.flatten(),
     }
-
-
-# ergebnis = renditerechner()
-
-# print(ergebnis)

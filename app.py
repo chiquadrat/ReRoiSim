@@ -94,7 +94,7 @@ app.layout = html.Div(
                                     id="mietsteigerung",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=1,
+                                    value=2,
                                 ),
                                 html.H2(""),
                                 html.P("Unsicherheit Mietsteigerung"),
@@ -150,7 +150,7 @@ app.layout = html.Div(
                                     id="kostensteigerung",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=1,
+                                    value=1.5,
                                 ),
                                 html.H2(""),
                                 html.P("Unsicherheit Kostensteigerung"),
@@ -158,7 +158,7 @@ app.layout = html.Div(
                                     id="unsicherheit_kostensteigerung",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=3,
+                                    value=2,
                                 ),
                                 html.H2("3. Finanzierung"),
                                 html.P("Eigenkapital"),
@@ -206,7 +206,7 @@ app.layout = html.Div(
                                     id="anschlusszinssatz",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=2.5,
+                                    value=4,
                                 ),
                                 html.H2(""),
                                 html.P("Unsicherheit Anschlusszinssatz"),
@@ -214,7 +214,7 @@ app.layout = html.Div(
                                     id="unsicherheit_anschlusszinssatz",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=4,
+                                    value=1.5,
                                 ),
                                 html.H2("4. Steuern"),
                                 html.P("Familienstand"),
@@ -297,7 +297,11 @@ app.layout = html.Div(
                         html.H2("Startwerte"),
                         dcc.Graph(id="kennzahlen"),
                         html.H2("Verteilung der mit Unsicherheit behafteten Eingabeparameter"),
-                        html.H2("(ToDo)"),
+                        dcc.Graph(id="eingabe_verkaufsfaktor"),
+                        dcc.Graph(id="eingabe_anschlusszinssatz"),
+                        dcc.Graph(id="eingabe_mietsteigerung"),
+                        dcc.Graph(id="eingabe_kostensteigerung"),
+                        dcc.Graph(id="eingabe_mietausfall"),
                         html.H2("Ergebnisse der Simulation"),
                         #dcc.Graph(id="kennzahlen1"),
                         dcc.Graph(id="verkaufspreis"),
@@ -430,6 +434,11 @@ def custom_figure(
 
 @app.callback(
  #   Output("kennzahlen1", "figure"),
+    Output("eingabe_verkaufsfaktor", "figure"),
+    Output("eingabe_anschlusszinssatz", "figure"),
+    Output("eingabe_mietsteigerung", "figure"),
+    Output("eingabe_kostensteigerung", "figure"),
+    Output("eingabe_mietausfall", "figure"),
     Output("verkaufspreis", "figure"),
     Output("objektrendite", "figure"),
     Output("eigenkapitalrendite", "figure"),
@@ -584,6 +593,77 @@ def custom_figure(
     #     ]
     # )
     
+    def figure_eingabeparameter(eingabeparameter, name, zeichen,x, runden):
+        # Geschätzter Verkaufspreis
+        eingabeparameter = np.array(ergebnis[eingabeparameter])
+        eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
+        if np.all(eingabeparameter==eingabeparameter[0])==True:
+                fig_eingabeparameter = go.Figure(
+                    data=[
+                        go.Table(
+                        
+                        )
+                    ]
+                )
+        else:
+            fig_eingabeparameter = ff.create_distplot([eingabeparameter], [name], show_hist=False)
+            fig_eingabeparameter = fig_eingabeparameter.add_vline(
+                x=np.quantile(eingabeparameter, q=0.5), line_width=3, line_dash="dash",
+                line_color="black",
+            annotation_text=f"Median: {round(np.quantile(eingabeparameter, q=0.5)*x,runden)} {zeichen}",
+            annotation_position="top right",
+            annotation_font_size=10,
+            annotation_font_color="black"
+                )
+            fig_eingabeparameter = fig_eingabeparameter.add_vline(
+                x=np.quantile(eingabeparameter, q=.05), line_width=3, line_dash="dash",
+                line_color="red",
+                annotation_text=f"5% Quantil: {round(np.quantile(eingabeparameter, q=.05)*x,runden)} {zeichen}",
+                annotation_position="bottom right",
+                annotation_font_size=10,
+                annotation_font_color="red"
+                )
+            fig_eingabeparameter = fig_eingabeparameter.add_vline(
+                x=np.quantile(eingabeparameter, q=.95), line_width=3, line_dash="dash",
+                line_color="green",
+                annotation_text=f"95% Quantil: {round(np.quantile(eingabeparameter, q=.95)*x,runden)} {zeichen}",
+                annotation_position="bottom right",
+                annotation_font_size=10,
+                annotation_font_color="green"
+                )
+        return fig_eingabeparameter
+    
+    
+    fig_verkaufsfaktor = figure_eingabeparameter(eingabeparameter="verkaufsfaktor", 
+                                                   name="Verkaufsfaktor", 
+                                                   zeichen="",
+                                                   x=1,
+                                                   runden=0)
+    
+    fig_anschlusszinssatz = figure_eingabeparameter(eingabeparameter="anschlusszinssatz", 
+                                                name="Anschlusszinssatz", 
+                                                zeichen="%",
+                                                x=100,
+                                                runden=2)
+    
+    fig_mietsteigerung = figure_eingabeparameter(eingabeparameter="mietsteigerung", 
+                                            name="Mietsteigerung pro Jahr", 
+                                            zeichen="%",
+                                            x=100,
+                                            runden=2)
+
+    fig_kostensteigerung = figure_eingabeparameter(eingabeparameter="kostensteigerung", 
+                                            name="Kostensteigerung pro Jahr", 
+                                            zeichen="%",
+                                            x=100,
+                                            runden=2)
+
+    fig_mietausfall = figure_eingabeparameter(eingabeparameter="mietausfall", 
+                                            name="Mietausfall pro Jahr", 
+                                            zeichen="%",
+                                            x=100,
+                                            runden=2)
+
     
     
     # Geschätzter Verkaufspreis
@@ -640,7 +720,7 @@ def custom_figure(
         fig_objektrendite = fig_objektrendite.add_vline(
             x=np.quantile(objektrendite, q=0.5), line_width=3, line_dash="dash",
             line_color="black",
-        annotation_text=f"Median: {round(np.quantile(objektrendite, q=0.5), 2)} %",
+        annotation_text=f"Median: {round(np.quantile(objektrendite, q=0.5)*100, 2)} %",
         annotation_position="top right",
         annotation_font_size=10,
         annotation_font_color="black"
@@ -678,7 +758,7 @@ def custom_figure(
         fig_eigenkapitalrendite = fig_eigenkapitalrendite.add_vline(
             x=np.quantile(eigenkapitalrendite, q=0.5), line_width=3, line_dash="dash",
             line_color="black",
-        annotation_text=f"Median: {round(np.quantile(eigenkapitalrendite, q=0.2), 2)} %",
+        annotation_text=f"Median: {round(np.quantile(eigenkapitalrendite, q=0.2)*100, 2)} %",
         annotation_position="top right",
         annotation_font_size=10,
         annotation_font_color="black"
@@ -784,7 +864,7 @@ def custom_figure(
 
     
     
-    return fig_verkaufspreis, fig_objektrendite, fig_eigenkapitalrendite, fig_gewinn, fig_minimaler_cashflow
+    return fig_verkaufsfaktor, fig_anschlusszinssatz, fig_mietsteigerung, fig_kostensteigerung, fig_mietausfall, fig_verkaufspreis, fig_objektrendite, fig_eigenkapitalrendite, fig_gewinn, fig_minimaler_cashflow
 
 
 
