@@ -758,7 +758,7 @@ def custom_figure(
         fig_eigenkapitalrendite = fig_eigenkapitalrendite.add_vline(
             x=np.quantile(eigenkapitalrendite, q=0.5), line_width=3, line_dash="dash",
             line_color="black",
-        annotation_text=f"Median: {round(np.quantile(eigenkapitalrendite, q=0.2)*100, 2)} %",
+        annotation_text=f"Median: {round(np.quantile(eigenkapitalrendite, q=0.5)*100, 2)} %",
         annotation_position="top right",
         annotation_font_size=10,
         annotation_font_color="black"
