@@ -45,6 +45,9 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=250,
+                                    min=2,
+                                    max=10_000,
+                                    required=True, 
                                 ),
                                 html.H2(""),
                                 html.Button("Start der Simulation", id="button"),
@@ -55,7 +58,9 @@ app.layout = html.Div(
                                     id="kaufpreis",
                                     placeholder="Eingabe...",
                                     value=300_000,
+                                    min=1,
                                     type="number",
+                                    required=True, 
                                 ),
                                 html.H2(""),
                                 html.P("-> davon Grundstücksanteil"),
@@ -64,6 +69,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     value=100_000,
                                     type="number",
+                                    min=0,
+                                    required=True
                                 ),
                                 html.H2(""),
                                 html.P("-> davon Sanierungskosten"),
@@ -72,6 +79,7 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     value=0,
                                     type="number",
+                                    required=True
                                 ),
                                 html.H2(""),
                                 html.P("Kaufnebenkosten"),
@@ -80,6 +88,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     value=40_000,
                                     type="number",
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Renovierungskosten"),
@@ -88,6 +98,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     value=1_000,
                                     type="number",
+                                    min=0, 
+                                    required=True,
                                 ),
                                 html.H2("2. Miete und laufende Kosten"),
                                 html.P("Mieteinahmen pro Jahr"),
@@ -96,6 +108,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     value=12_000,
                                     type="number",
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Geschätzte Mietsteigerung pro Jahr"),
@@ -104,6 +118,7 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=2,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Unsicherheit Mietsteigerung"),
@@ -112,6 +127,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=1,
+                                    min=0.1,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Erste Mieterhöhung ab Jahr"),
@@ -120,6 +137,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     value=5,
                                     type="number",
+                                    min=1,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Instandhaltungskosten pro Jahr "),
@@ -128,6 +147,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=1_200,
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Verwaltungskosten pro Jahr"),
@@ -136,6 +157,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=600,
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Pauschale für Mietausfall "),
@@ -144,6 +167,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=2,
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Unsicherheit Mietausfall "),
@@ -152,6 +177,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=2,
+                                    min=0.1,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Geschätzte Kostensteigerung pro Jahr"),
@@ -160,6 +187,7 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=1.5,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Unsicherheit Kostensteigerung"),
@@ -168,6 +196,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=2,
+                                    min=0.1,
+                                    required=True,
                                 ),
                                 html.H2("3. Finanzierung"),
                                 html.P("Eigenkapital"),
@@ -176,6 +206,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=100_000,
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Zinsbindung"),
@@ -184,6 +216,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=20,
+                                    min=1,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Disagio"),
@@ -192,6 +226,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=0,
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Zinssatz"),
@@ -200,6 +236,7 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=1.5,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Tilgungssatz"),
@@ -208,6 +245,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=2.5,
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Geschätzter Anschlusszinssatz"),
@@ -216,6 +255,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=4,
+                                    min=0,
+                                    required=True,
                                 ),
                                 html.H2(""),
                                 html.P("Unsicherheit Anschlusszinssatz"),
@@ -224,6 +265,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=1.5,
+                                    min=0.1,
+                                    required=True,                                    
                                 ),
                                 html.H2("4. Steuern"),
                                 html.P("Familienstand"),
@@ -246,6 +289,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=100_000,
+                                    min=0,
+                                    required=True,                                    
                                 ),
                                 html.H2(""),
                                 html.P("Baujahr"),
@@ -276,6 +321,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=15,
+                                    min=10,
+                                    required=True,                                    
                                 ),
                                 html.H2(""),
                                 html.P("Geschätzter Verkaufsfaktor"),
@@ -284,6 +331,8 @@ app.layout = html.Div(
                                     placeholder="Eingabe...",
                                     type="number",
                                     value=22,
+                                    min=1,
+                                    required=True,                                    
                                 ),
                                 html.H2(""),
                                 html.P("Unsicherheit Verkaufsfaktor"),
@@ -291,7 +340,9 @@ app.layout = html.Div(
                                     id="unsicherheit_verkaufsfaktor",
                                     placeholder="Eingabe...",
                                     type="number",
-                                    value=5,
+                                    value=4,
+                                    min=0.1,
+                                    required=True,                                                                        
                                 ),
                                 html.H2(""),
                                 html.H2(""),
@@ -568,83 +619,49 @@ def custom_figure(
         steuerjahr=2021,
     )
 
-    # tab1 = go.Figure(
-    #     data=[
-    #         go.Table(
-    #             header=dict(values=["Startwerte", ""]),
-    #             cells=dict(
-    #                 values=[
-    #                     [
-    #                         "button",
-    #                         "verkaufspreis",
-    #                         "eigenkapitalrendite",
-    #                         "kaufpreis",
-    #                         "kaufpreis_grundstueck",
-    #                         "kaufpreis_sanierung",
-    #                         "familienstand",
-    #                         "baujahr",
-    #                         "sim_runs"
-    #                     ],
-    #                     [
-    #                         button,
-    #                         ergebnis["verkaufspreis"],
-    #                         ergebnis["eigenkapitalrendite"],
-    #                         kaufpreis,
-    #                         kaufpreis_grundstueck,
-    #                         kaufpreis_sanierung,
-    #                         familienstand,
-    #                         baujahr,
-    #                         sim_runs
-    #                     ],
-    #                 ]
-    #             ),
-    #         )
-    #     ]
-    # )
-
-    def figure_eingabeparameter(eingabeparameter, name, zeichen, x, runden):
+    def figure_ein_aus_gabeparameter(eingabeparameter, name, zeichen, x, runden):
         # Geschätzter Verkaufspreis
         eingabeparameter = np.array(ergebnis[eingabeparameter])
         eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
         if np.all(eingabeparameter == eingabeparameter[0]) == True:
-            fig_eingabeparameter = go.Figure(data=[go.Table()])
+            fig = go.Figure(data=[go.Table()])
         else:
-            fig_eingabeparameter = ff.create_distplot(
+            fig = ff.create_distplot(
                 [eingabeparameter], [name], show_hist=False
             )
-            fig_eingabeparameter = fig_eingabeparameter.add_vline(
+            fig = fig.add_vline(
                 x=np.quantile(eingabeparameter, q=0.5),
                 line_width=3,
                 line_dash="dash",
                 line_color="black",
                 annotation_text=f"Median: {round(np.quantile(eingabeparameter, q=0.5)*x,runden)} {zeichen}",
                 annotation_position="top right",
-                annotation_font_size=10,
+                annotation_font_size=12,
                 annotation_font_color="black",
             )
-            fig_eingabeparameter = fig_eingabeparameter.add_vline(
+            fig = fig.add_vline(
                 x=np.quantile(eingabeparameter, q=0.05),
                 line_width=3,
                 line_dash="dash",
                 line_color="red",
                 annotation_text=f"5% Quantil: {round(np.quantile(eingabeparameter, q=.05)*x,runden)} {zeichen}",
                 annotation_position="bottom right",
-                annotation_font_size=10,
+                annotation_font_size=12,
                 annotation_font_color="red",
             )
-            fig_eingabeparameter = fig_eingabeparameter.add_vline(
+            fig = fig.add_vline(
                 x=np.quantile(eingabeparameter, q=0.95),
                 line_width=3,
                 line_dash="dash",
                 line_color="green",
                 annotation_text=f"95% Quantil: {round(np.quantile(eingabeparameter, q=.95)*x,runden)} {zeichen}",
                 annotation_position="bottom right",
-                annotation_font_size=10,
+                annotation_font_size=12,
                 annotation_font_color="green",
             )
-        return fig_eingabeparameter
+        return fig
 
-    fig_verkaufsfaktor = figure_eingabeparameter(
+    fig_verkaufsfaktor = figure_ein_aus_gabeparameter(
         eingabeparameter="verkaufsfaktor",
         name="Verkaufsfaktor",
         zeichen="",
@@ -652,7 +669,7 @@ def custom_figure(
         runden=0,
     )
 
-    fig_anschlusszinssatz = figure_eingabeparameter(
+    fig_anschlusszinssatz = figure_ein_aus_gabeparameter(
         eingabeparameter="anschlusszinssatz",
         name="Anschlusszinssatz",
         zeichen="%",
@@ -660,7 +677,7 @@ def custom_figure(
         runden=2,
     )
 
-    fig_mietsteigerung = figure_eingabeparameter(
+    fig_mietsteigerung = figure_ein_aus_gabeparameter(
         eingabeparameter="mietsteigerung",
         name="Mietsteigerung pro Jahr",
         zeichen="%",
@@ -668,7 +685,7 @@ def custom_figure(
         runden=2,
     )
 
-    fig_kostensteigerung = figure_eingabeparameter(
+    fig_kostensteigerung = figure_ein_aus_gabeparameter(
         eingabeparameter="kostensteigerung",
         name="Kostensteigerung pro Jahr",
         zeichen="%",
@@ -676,215 +693,54 @@ def custom_figure(
         runden=2,
     )
 
-    fig_mietausfall = figure_eingabeparameter(
+    fig_mietausfall = figure_ein_aus_gabeparameter(
         eingabeparameter="mietausfall",
         name="Mietausfall pro Jahr",
         zeichen="%",
         x=100,
         runden=2,
     )
+    
+    fig_verkaufspreis = figure_ein_aus_gabeparameter(
+        eingabeparameter="verkaufspreis",
+        name="Verkaufspreis",
+        zeichen="€",
+        x=1,
+        runden=0,
+    )
+    
+    fig_objektrendite = figure_ein_aus_gabeparameter(
+        eingabeparameter="objektrendite",
+        name="Objektrendite",
+        zeichen="%",
+        x=100,
+        runden=2,
+    )
+    
+    fig_eigenkapitalrendite = figure_ein_aus_gabeparameter(
+        eingabeparameter="eigenkapitalrendite",
+        name="Eigenkapitalrendite",
+        zeichen="%",
+        x=100,
+        runden=2,
+    )
+    
+    fig_gewinn = figure_ein_aus_gabeparameter(
+        eingabeparameter="gewinn",
+        name="Gewinn",
+        zeichen="€",
+        x=1,
+        runden=0,
+    )
+    
+    fig_minimaler_cashflow = figure_ein_aus_gabeparameter(
+        eingabeparameter="minimaler_cashflow",
+        name="Minimaler Cashflow",
+        zeichen="€",
+        x=1,
+        runden=0,
+    )
 
-    # Geschätzter Verkaufspreis
-    verkaufspreis = np.array(ergebnis["verkaufspreis"])
-    verkaufspreis = verkaufspreis[~np.isnan(verkaufspreis)]
-    if np.all(verkaufspreis == verkaufspreis[0]) == True:
-        fig_verkaufspreis = go.Figure(data=[go.Table()])
-    else:
-        fig_verkaufspreis = ff.create_distplot(
-            [verkaufspreis], ["Verkaufspreis"], show_hist=False
-        )
-        fig_verkaufspreis = fig_verkaufspreis.add_vline(
-            x=np.quantile(verkaufspreis, q=0.5),
-            line_width=3,
-            line_dash="dash",
-            line_color="black",
-            annotation_text=f"Median: {round(np.quantile(verkaufspreis, q=0.5))} €",
-            annotation_position="top right",
-            annotation_font_size=10,
-            annotation_font_color="black",
-        )
-        fig_verkaufspreis = fig_verkaufspreis.add_vline(
-            x=np.quantile(verkaufspreis, q=0.05),
-            line_width=3,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"5% Quantil: {round(np.quantile(verkaufspreis, q=.05))} €",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="red",
-        )
-        fig_verkaufspreis = fig_verkaufspreis.add_vline(
-            x=np.quantile(verkaufspreis, q=0.95),
-            line_width=3,
-            line_dash="dash",
-            line_color="green",
-            annotation_text=f"95% Quantil: {round(np.quantile(verkaufspreis, q=.95))} €",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="green",
-        )
-
-    # Geschätzte Objektrendite
-    objektrendite = np.array(ergebnis["objektrendite"])
-    objektrendite = objektrendite[~np.isnan(objektrendite)]
-    if np.all(objektrendite == objektrendite[0]) == True:
-        fig_objektrendite = go.Figure(data=[go.Table()])
-    else:
-        fig_objektrendite = ff.create_distplot(
-            [objektrendite], ["Objektrendite"], show_hist=False
-        )
-        fig_objektrendite = fig_objektrendite.add_vline(
-            x=np.quantile(objektrendite, q=0.5),
-            line_width=3,
-            line_dash="dash",
-            line_color="black",
-            annotation_text=f"Median: {round(np.quantile(objektrendite, q=0.5)*100, 2)} %",
-            annotation_position="top right",
-            annotation_font_size=10,
-            annotation_font_color="black",
-        )
-        fig_objektrendite = fig_objektrendite.add_vline(
-            x=np.quantile(objektrendite, q=0.05),
-            line_width=3,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"5% Quantil: {round(np.quantile(objektrendite, q=.05)*100, 2)} %",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="red",
-        )
-        fig_objektrendite = fig_objektrendite.add_vline(
-            x=np.quantile(objektrendite, q=0.95),
-            line_width=3,
-            line_dash="dash",
-            line_color="green",
-            annotation_text=f"95% Quantil: {round(np.quantile(objektrendite, q=.95)*100, 2)} %",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="green",
-        )
-
-    # Geschätzte Eigenkapitalrendite
-    eigenkapitalrendite = np.array(ergebnis["eigenkapitalrendite"])
-    eigenkapitalrendite = eigenkapitalrendite[~np.isnan(eigenkapitalrendite)]
-    if np.all(eigenkapitalrendite == eigenkapitalrendite[0]) == True:
-        fig_eigenkapitalrendite = go.Figure(data=[go.Table()])
-    else:
-        fig_eigenkapitalrendite = ff.create_distplot(
-            [eigenkapitalrendite], ["Eigenkapitalrendite"], show_hist=False
-        )
-        fig_eigenkapitalrendite = fig_eigenkapitalrendite.add_vline(
-            x=np.quantile(eigenkapitalrendite, q=0.5),
-            line_width=3,
-            line_dash="dash",
-            line_color="black",
-            annotation_text=f"Median: {round(np.quantile(eigenkapitalrendite, q=0.5)*100, 2)} %",
-            annotation_position="top right",
-            annotation_font_size=10,
-            annotation_font_color="black",
-        )
-        fig_eigenkapitalrendite = fig_eigenkapitalrendite.add_vline(
-            x=np.quantile(eigenkapitalrendite, q=0.05),
-            line_width=3,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"5% Quantil: {round(np.quantile(eigenkapitalrendite, q=.05)*100, 2)} %",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="red",
-        )
-        fig_eigenkapitalrendite = fig_eigenkapitalrendite.add_vline(
-            x=np.quantile(eigenkapitalrendite, q=0.95),
-            line_width=3,
-            line_dash="dash",
-            line_color="green",
-            annotation_text=f"95% Quantil: {round(np.quantile(eigenkapitalrendite, q=.95)*100, 2)} %",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="green",
-        )
-
-    # Geschätzte Gewinn
-    gewinn = np.array(ergebnis["gewinn"])
-    gewinn = gewinn[~np.isnan(gewinn)]
-    # print(gewinn)
-    # print(gewinn.shape)
-    if np.all(gewinn == gewinn[0]) == True:
-        fig_gewinn = go.Figure(data=[go.Table()])
-    else:
-        fig_gewinn = ff.create_distplot([gewinn], ["Gewinn"], show_hist=False)
-        fig_gewinn = fig_gewinn.add_vline(
-            x=np.quantile(gewinn, q=0.5),
-            line_width=3,
-            line_dash="dash",
-            line_color="black",
-            annotation_text=f"Median: {round(np.quantile(gewinn, q=0.5))} €",
-            annotation_position="top right",
-            annotation_font_size=10,
-            annotation_font_color="black",
-        )
-        fig_gewinn = fig_gewinn.add_vline(
-            x=np.quantile(gewinn, q=0.05),
-            line_width=3,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"5% Quantil: {round(np.quantile(gewinn, q=.05))} €",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="red",
-        )
-        fig_gewinn = fig_gewinn.add_vline(
-            x=np.quantile(gewinn, q=0.95),
-            line_width=3,
-            line_dash="dash",
-            line_color="green",
-            annotation_text=f"95% Quantil: {round(np.quantile(gewinn, q=.95))} €",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="green",
-        )
-
-    # Geschätzter minimaler Cashflow
-    minimaler_cashflow = np.array(ergebnis["minimaler_cashflow"])
-    minimaler_cashflow = minimaler_cashflow[~np.isnan(minimaler_cashflow)]
-    # print(minimaler_cashflow)
-    # print(minimaler_cashflow.shape)
-    if np.all(minimaler_cashflow == minimaler_cashflow[0]) == True:
-        fig_minimaler_cashflow = go.Figure(data=[go.Table()])
-    else:
-        fig_minimaler_cashflow = ff.create_distplot(
-            [minimaler_cashflow], ["Minimaler Cashflow"], show_hist=False
-        )
-        fig_minimaler_cashflow = fig_minimaler_cashflow.add_vline(
-            x=np.quantile(minimaler_cashflow, q=0.5),
-            line_width=3,
-            line_dash="dash",
-            line_color="black",
-            annotation_text=f"Median: {round(np.quantile(minimaler_cashflow, q=0.5))} €",
-            annotation_position="top right",
-            annotation_font_size=10,
-            annotation_font_color="black",
-        )
-        fig_minimaler_cashflow = fig_minimaler_cashflow.add_vline(
-            x=np.quantile(minimaler_cashflow, q=0.05),
-            line_width=3,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"5% Quantil: {round(np.quantile(minimaler_cashflow, q=.05))} €",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="red",
-        )
-        fig_minimaler_cashflow = fig_minimaler_cashflow.add_vline(
-            x=np.quantile(minimaler_cashflow, q=0.95),
-            line_width=3,
-            line_dash="dash",
-            line_color="green",
-            annotation_text=f"95% Quantil: {round(np.quantile(minimaler_cashflow, q=.95))} €",
-            annotation_position="bottom right",
-            annotation_font_size=10,
-            annotation_font_color="green",
-        )
 
     return (
         fig_verkaufsfaktor,
