@@ -4,6 +4,7 @@
 
 import numpy as np
 import numpy_financial as npf
+import truncated_normal
 import steuerberechnung
 
 # Todo: Verkaufsfaktor durch Immobilienpreissteierung ersetzen
@@ -141,10 +142,16 @@ def renditerechner(
         kostensteigerung, unsicherheit_kostensteigerung, sim_runs * anlagehorizont
     ).reshape(anlagehorizont, sim_runs)
 
-    mietausfall = np.random.normal(
-        mietausfall, unsicherheit_mietausfall, sim_runs * anlagehorizont
+    if unsicherheit_mietausfall == 0:
+        mietausfall = np.random.normal(
+            mietausfall, unsicherheit_mietausfall, sim_runs * anlagehorizont
+        ).reshape(anlagehorizont, sim_runs)
+    else:
+        mietausfall = truncated_normal.trunc_samples(
+        mu=mietausfall, sigma=unsicherheit_mietausfall,
+        lower=0, upper=100, num_samples=sim_runs * anlagehorizont
     ).reshape(anlagehorizont, sim_runs)
-
+   
     for run in range(sim_runs):
         jahr_pj = [0]
         mieteinnahmen_pj = [0]  # pj -> pro jahr
@@ -449,3 +456,7 @@ def renditerechner(
         "kostensteigerung":kostensteigerung.flatten(),
         "mietausfall":mietausfall.flatten(),
     }
+
+
+# ergebnis = renditerechner()
+# print(ergebnis)
