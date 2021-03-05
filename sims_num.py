@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import numpy_financial as npf
 
 # asset value
 def sim_value(start_val, n_sims=1000, n_years=25, mean=0.01, var=0.015, final_values=False):
@@ -151,71 +151,173 @@ def eink_steuer_vect(eink_array, alleinstehend=True, jahr=2021):
 # steuerwirkung, eink_vorher, steuer_vorher, eink_nachher, steuer_nachher = steuern_calc(steuer_ergebnis)
 
 
-## -- calculate -- ##
+def renditerechner_vect(
+    # Objekt
+    baujahr=1925,
+    kaufpreis=100_000,
+    kaufpreis_grundstueck=30_000,
+    kaufpreis_sanierung=7_000,
+    kaufnebenkosten=5_000,
+    renovierungskosten=1_000,
+    mieteinnahmen=5_000,
+    instandhaltungskosten=800,
+    verwaltungskosten=500,
+    mietausfall=0.02,
+    mietsteigerung=0.02,
+    erste_mieterhoehung=5,
+    kostensteigerung=0.015,
+    # Finanzierung
+    eigenkapital=6_500,
+    zinsbindung=15,
+    disagio=0.01,
+    zinsatz=0.0128,
+    tilgungssatz=0.03,
+    anschlusszinssatz=0.05,
+    # Steuern
+    alleinstehend=False,  #
+    einkommen=50_000,  # zu versteuerndes Jahreseinkommen
+    steuerjahr=2021,  # nur 2015 und 2021 implementiert
+    # Renditeberechnung
+    anlagehorizont=30,
+    verkaufsfaktor=25,
+    # Simulation
+    sim_runs=1,
+    unsicherheit_mietsteigerung=0,
+    unsicherheit_kostensteigerung=0,
+    unsicherheit_mietausfall=0,
+    unsicherheit_anschlusszinssatz=0,
+    unsicherheit_verkaufsfaktor=0,
+):
+    """Dokumentation Eingabe/Ausgabeparameter siehe formeln.py"""
 
-n_sims = 1000
-n_years = 25
+    ## -- Abgeleitete Parameter -- ##
 
-eink = 60000
-alleinstehend = True
-kreditrate=24000
-zinsbindung=15000
-zinsrate=0.015
-kaufpreis=400000
-disagio=0.03
-sonderabschreibung=20000
-abschreibung=30000
-kosten_pa=2000
-baujahr=1920
+    n_sims = sim_runs
+    n_years = anlagehorizont
 
-# Miete
-rent = sim_rent(15000)
+    # Objekt
+    gesamtkosten = kaufpreis + kaufnebenkosten + renovierungskosten
+    jahresreinertrag = (
+        mieteinnahmen
+        - instandhaltungskosten
+        - verwaltungskosten
+        - mieteinnahmen * mietausfall
+    )
+    kaufpreis_miet_verhaeltnis = (kaufpreis + renovierungskosten) / mieteinnahmen
+    anfangs_brutto_mietrendite = 1 / kaufpreis_miet_verhaeltnis
+    anfangs_netto_mietrendite = jahresreinertrag / gesamtkosten
 
-# Kosten
-costs = sim_value(kosten_pa, mean=0.02, var=0.02)
+    # Finanzierung
+    darlehen = (gesamtkosten - eigenkapital) / (1 - disagio)
+    kreditrate_jahr = darlehen * (zinsatz + tilgungssatz)
+    # anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz)
 
-mietausfall = sim_mietausfall()
+    # Steuern
+    bemessung_abschreibung = (
+        kaufpreis
+        + kaufnebenkosten
+        - (kaufpreis_grundstueck + kaufpreis_sanierung)
+        * (1 + kaufnebenkosten / kaufpreis)
+    )
+    bemessung_sonderabschreibung = kaufpreis_sanierung * gesamtkosten / kaufpreis
 
-# "Jahresreinertrag"
-ertrag = rent * mietausfall - costs
 
-# Darlehen
-restschuld, zins, tilgung = get_darlehen_values(kaufpreis, zinsrate=zinsrate, kreditrate=kreditrate)
+    ## Simulation
 
-# Afa
-afa_s = afa_sanierung(bemessung_sonderabschreibung=sonderabschreibung)
-afa_g = afa_gebaude(baujahr, abschreibung)
+    # Miete
+    # rent = sim_rent(mieteinnahmen, n_sims, n_years, flat_years=erste_mieterhoehung, 
+    #                 mean=mietsteigerung, var=unsicherheit_mietsteigerung)
+    rent_increase = sim_rent(1, n_sims, n_years, mean=mietsteigerung, var=unsicherheit_mietsteigerung)
+    rent = np.multiply(np.full((n_sims, n_years), fill_value=mieteinnahmen), rent_increase)
 
-# Werbungskosten
-werbung = werbungskosten(kaufpreis, sonderabschreibung, disagio, zinsbindung)
+    # Kosten
+    # costs = sim_value(verwaltungskosten + instandhaltungskosten, 
+    #                   n_sims, n_years,
+    #                   mean=kostensteigerung, 
+    #                   var=unsicherheit_kostensteigerung)
+    cost_increase = sim_value(1, n_sims, n_years, mean=kostensteigerung, var=unsicherheit_kostensteigerung)
+    costs = np.multiply(np.full((n_sims, n_years), fill_value=verwaltungskosten+instandhaltungskosten), cost_increase)
 
-# Steuerl. Ergebnis
-steuer_ergebnis = (((ertrag - zins) - afa_g) - afa_s ) - werbung
+    mietausfall = sim_mietausfall(mietausfall, n_sims, n_years)
 
-# Einkommen(steuer)
-steuer_vorher = np.full((n_sims, n_years), fill_value=steuerberechnung(eink, alleinstehend, 2021))
-eink_vorher = np.full((n_sims, n_years), fill_value=eink)
+    # "Jahresreinertrag"
+    ertrag = rent * mietausfall - costs
 
-eink_nachher = eink_vorher + steuer_ergebnis
-steuer_nachher = eink_steuer_vect(eink_nachher)
+    # Darlehen
+    restschuld, zins, tilgung = get_darlehen_values(kaufpreis, n_sims, n_years, zinsrate=zinsatz, kreditrate=kreditrate_jahr)
 
-steuerwirkung = steuer_vorher - steuer_nachher
+    anschlusszinssatz = sim_value(zinsatz, mean=0.1, var=unsicherheit_anschlusszinssatz, n_sims=n_sims, n_years=1).flatten()
 
-# "Überschuss"
-kreditrate_full = zins + tilgung
-ueberschuss = ertrag - (kreditrate_full - steuerwirkung)
+    # Afa
+    afa_s = afa_sanierung(bemessung_sonderabschreibung, n_sims, n_years)
+    afa_g = afa_gebaude(baujahr, bemessung_abschreibung, n_sims, n_years)
 
-# Immobilienwert
-asset = sim_value(kaufpreis, final_values=True)
+    # Werbungskosten
+    werbung = werbungskosten(kaufpreis, bemessung_sonderabschreibung, disagio, zinsbindung, n_sims, n_years)
 
-# Ergebnisse nach Anlagehorizont
-ueberschuss_final = ueberschuss[:, -1] + asset - restschuld[:, -1]
+    # Steuerl. Ergebnis
+    steuer_ergebnis = (((ertrag - zins) - afa_g) - afa_s ) - werbung
 
-steuer_ergebnis_object = (((ertrag - zins) - afa_g) - afa_s )
-eink_nachher_object = eink_vorher + steuer_ergebnis_object
-steuer_nachher_object = eink_steuer_vect(eink_nachher_object)
+    # Einkommen(steuer)
+    steuer_vorher = np.full((n_sims, n_years), fill_value=steuerberechnung(einkommen, alleinstehend, steuerjahr))
+    eink_vorher = np.full((n_sims, n_years), fill_value=einkommen)
 
-steuerwirkung_obj = steuer_nachher_object - steuer_vorher
+    eink_nachher = eink_vorher + steuer_ergebnis
+    steuer_nachher = eink_steuer_vect(eink_nachher)
 
-liquid = (ertrag + steuerwirkung_obj)
-liquid[:, -1] += asset
+    steuerwirkung = steuer_vorher - steuer_nachher
+
+    # "Überschuss"
+    kreditrate_full = zins + tilgung
+    ueberschuss = ertrag - (kreditrate_full - steuerwirkung)
+
+    # Immobilienwert
+    # TODO: unsicherheit_verkaufsfaktor korrekt umrechnen
+    asset = sim_value(kaufpreis, n_sims, n_years, final_values=True)
+
+    # Ergebnisse nach Anlagehorizont
+    ueberschuss[:, -1] = ueberschuss[:, -1] + asset - restschuld[:, -1]
+
+    steuer_ergebnis_object = (((ertrag - zins) - afa_g) - afa_s )
+    eink_nachher_object = eink_vorher + steuer_ergebnis_object
+    steuer_nachher_object = eink_steuer_vect(eink_nachher_object)
+
+    steuerwirkung_obj = steuer_nachher_object - steuer_vorher
+
+    liquid = (ertrag + steuerwirkung_obj)
+    liquid[:, -1] += asset
+
+    ## finale Werte pro Sim
+    verkaufspreis = asset
+    verkaufsfaktor = asset / rent[:, -1]
+
+    gewinn = np.sum(ueberschuss, axis=1)
+    min_cashflow = np.min(ueberschuss, axis=1)
+
+    ek_rendite = np.apply_along_axis(npf.irr, axis=1, arr=ueberschuss)
+    obj_rendite = np.apply_along_axis(npf.irr, axis=1, arr=liquid)
+
+    return {
+        "verkaufspreis": verkaufspreis, #.tolist(), # 1d
+        "eigenkapitalrendite": ek_rendite, #.tolist(), # 1d
+        "objektrendite": obj_rendite, #.tolist(), # 1d
+        "gewinn": gewinn, #.tolist(), # 1d
+        "minimaler_cashflow": min_cashflow, #.tolist(), # 1d
+        "mietsteigerung": rent_increase.flatten(), # 2d -> 1d
+        "kostensteigerung": cost_increase.flatten(), # 2d -> 1d
+        "mietausfall": mietausfall.flatten(), # 2d -> 1d
+        "anschlusszinsatz": anschlusszinssatz, # 1d
+        "verkaufsfaktor": verkaufsfaktor, # 1d
+        "gesamtkosten": gesamtkosten, # scalar
+        "kaufpreis_miet_verhaeltnis": kaufpreis_miet_verhaeltnis, # scalar
+        "anfangs_brutto_mietrendite": anfangs_brutto_mietrendite, # scalar
+        "anfangs_netto_mietrendite": anfangs_netto_mietrendite, # scalar
+        "darlehen": darlehen, # scalar
+        "kreditrate_jahr": kreditrate_jahr, # scalar
+    }
+
+
+if __name__=="__main__":
+
+    result = renditerechner_vect()
+    print(result)
