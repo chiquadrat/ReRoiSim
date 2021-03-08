@@ -3,6 +3,7 @@ import pandas as pd
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
+from dash_table import DataTable
 import dash_table
 import dash_auth
 import plotly.graph_objects as go
@@ -155,7 +156,7 @@ app.layout = html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("2. Jährliche Miete und laufende Kosten"),],
+                    children=[html.H4("2. Miete und laufende Kosten (pro Jahr)"),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -169,18 +170,18 @@ app.layout = html.Div(
         # forth row
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Mieteinahmen"),
-                                dcc.Input(
-                                    id="mieteinnahmen",
-                                    placeholder="Eingabe...",
-                                    value=12_000,
-                                    type="number",
-                                    min=0,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="mieteinnahmen",
+                            placeholder="Eingabe...",
+                            value=12_000,
+                            type="number",
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -193,13 +194,13 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Mietsteigerung"),
-                                dcc.Input(
-                                    id="mietsteigerung",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=2,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="mietsteigerung",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=2,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -212,14 +213,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Unsicherheit Mietsteigerung"),
-                                dcc.Input(
-                                    id="unsicherheit_mietsteigerung",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=1,
-                                    min=0.1,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="unsicherheit_mietsteigerung",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=1,
+                            min=0.1,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -231,21 +232,21 @@ app.layout = html.Div(
             ],
             className="row",
         ),
-            # fith row
+        # fith row
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Erste Mieterhöhung ab Jahr"),
-                                dcc.Input(
-                                    id="erste_mieterhoehung",
-                                    placeholder="Eingabe...",
-                                    value=5,
-                                    type="number",
-                                    min=1,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="erste_mieterhoehung",
+                            placeholder="Eingabe...",
+                            value=5,
+                            type="number",
+                            min=1,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -258,14 +259,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Instandhaltungskosten Jahr "),
-                                dcc.Input(
-                                    id="instandhaltungskosten",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=1_200,
-                                    min=0,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="instandhaltungskosten",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=1_200,
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -278,14 +279,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Verwaltungskosten Jahr"),
-                                dcc.Input(
-                                    id="verwaltungskosten",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=600,
-                                    min=0,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="verwaltungskosten",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=600,
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -300,18 +301,18 @@ app.layout = html.Div(
         # row six
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Pauschale für Mietausfall"),
-                                dcc.Input(
-                                    id="mietausfall",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=2,
-                                    min=0,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="mietausfall",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=2,
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -324,14 +325,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Unsicherheit Mietausfall"),
-                                dcc.Input(
-                                    id="unsicherheit_mietausfall",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=2,
-                                    min=0.1,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="unsicherheit_mietausfall",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=2,
+                            min=0.1,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -344,13 +345,13 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Geschätzte Kostensteigerung"),
-                                dcc.Input(
-                                    id="kostensteigerung",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=1.5,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="kostensteigerung",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=1.5,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -365,18 +366,19 @@ app.layout = html.Div(
         # row seven
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Unsicherheit Kostensteigerung"),
-                                dcc.Input(
-                                    id="unsicherheit_kostensteigerung",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=2,
-                                    min=0.1,
-                                    required=True,
-                                ),                    ],
+                        dcc.Input(
+                            id="unsicherheit_kostensteigerung",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=2,
+                            min=0.1,
+                            required=True,
+                        ),
+                    ],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -406,18 +408,18 @@ app.layout = html.Div(
         # row nine
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Eigenkapital"),
-                                dcc.Input(
-                                    id="eigenkapital",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=100_000,
-                                    min=0,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="eigenkapital",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=100_000,
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -430,14 +432,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Zinsbindung"),
-                                dcc.Input(
-                                    id="zinsbindung",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=20,
-                                    min=1,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="zinsbindung",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=20,
+                            min=1,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -450,14 +452,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Disagio"),
-                                dcc.Input(
-                                    id="disagio",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=0,
-                                    min=0,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="disagio",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=0,
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -472,17 +474,17 @@ app.layout = html.Div(
         # row ten
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Zinssatz"),
-                                dcc.Input(
-                                    id="zinsatz",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=1.5,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="zinsatz",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=1.5,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -495,14 +497,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Tilgungssatz"),
-                                dcc.Input(
-                                    id="tilgungssatz",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=2.5,
-                                    min=0,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="tilgungssatz",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=2.5,
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -515,14 +517,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Anschlusszinssatz"),
-                                dcc.Input(
-                                    id="anschlusszinssatz",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=4,
-                                    min=0,
-                                    required=True,
-                                ),
+                        dcc.Input(
+                            id="anschlusszinssatz",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=4,
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -537,18 +539,18 @@ app.layout = html.Div(
         # row eleven
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Unsicherheit Anschlusszinssatz"),
-                                dcc.Input(
-                                    id="unsicherheit_anschlusszinssatz",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=1.5,
-                                    min=0.1,
-                                    required=True,                                    
-                                ),
+                        dcc.Input(
+                            id="unsicherheit_anschlusszinssatz",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=1.5,
+                            min=0.1,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -579,21 +581,21 @@ app.layout = html.Div(
         # row thirteen
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Familienstand"),
-                                dcc.RadioItems(
-                                    id="familienstand",
-                                    options=[
-                                        {"label": "Alleinstehend", "value": "0"},
-                                        {
-                                            "label": "Ehepaar (zusammen veranlagt)",
-                                            "value": "1",
-                                        },
-                                    ],
-                                    value="0",
-                                ),
+                        dcc.RadioItems(
+                            id="familienstand",
+                            options=[
+                                {"label": "Alleinstehend", "value": "0"},
+                                {
+                                    "label": "Ehepaar (zusammen veranlagt)",
+                                    "value": "1",
+                                },
+                            ],
+                            value="0",
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -606,14 +608,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Zu versteuerndes Einkommen"),
-                                dcc.Input(
-                                    id="einkommen",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=100_000,
-                                    min=0,
-                                    required=True,                                    
-                                ),
+                        dcc.Input(
+                            id="einkommen",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=100_000,
+                            min=0,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -626,14 +628,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Baujahr"),
-                                dcc.RadioItems(
-                                    id="baujahr",
-                                    options=[
-                                        {"label": "nach 1924", "value": "0"},
-                                        {"label": "bis 1924", "value": "1"},
-                                    ],
-                                    value="0",
-                                ),
+                        dcc.RadioItems(
+                            id="baujahr",
+                            options=[
+                                {"label": "nach 1924", "value": "0"},
+                                {"label": "bis 1924", "value": "1"},
+                            ],
+                            value="0",
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -664,18 +666,18 @@ app.layout = html.Div(
         # row fiveteen
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Anlagehorizont"),
-                                dcc.Input(
-                                    id="anlagehorizont",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=15,
-                                    min=10,
-                                    required=True,                                    
-                                ),
+                        dcc.Input(
+                            id="anlagehorizont",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=15,
+                            min=10,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -688,14 +690,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Geschätzter Verkaufsfaktor"),
-                                dcc.Input(
-                                    id="verkaufsfaktor",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=22,
-                                    min=1,
-                                    required=True,                                    
-                                ),
+                        dcc.Input(
+                            id="verkaufsfaktor",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=22,
+                            min=1,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -708,14 +710,14 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Unsicherheit Verkaufsfaktor"),
-                                dcc.Input(
-                                    id="unsicherheit_verkaufsfaktor",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=4,
-                                    min=0.1,
-                                    required=True,                                                                        
-                                ),
+                        dcc.Input(
+                            id="unsicherheit_verkaufsfaktor",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=4,
+                            min=0.1,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -746,19 +748,19 @@ app.layout = html.Div(
         # row seventeen
         html.Div(
             children=[
-                # first column 
+                # first column
                 html.Div(
                     children=[
                         html.Label("Anzahl der Simulationsläufe"),
-                                dcc.Input(
-                                    id="sim_runs",
-                                    placeholder="Eingabe...",
-                                    type="number",
-                                    value=250,
-                                    min=2,
-                                    max=10_000,
-                                    required=True, 
-                                ),
+                        dcc.Input(
+                            id="sim_runs",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=250,
+                            min=2,
+                            max=10_000,
+                            required=True,
+                        ),
                     ],
                     style={
                         "display": "inline-block",
@@ -771,11 +773,16 @@ app.layout = html.Div(
             className="row",
         ),
         # row eighteen
-            html.Div(
+        html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.Button("Start der Simulation", id="button"),],
+                    children=[html.Button("Start der Simulation", id="button"),
+                                      dcc.Loading(
+            id="loading-1",
+            type="default",
+            children=html.Div(id="loading-output-1")
+        ),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -786,19 +793,33 @@ app.layout = html.Div(
             ],
             className="row",
         ),
-         # row 20
+        # row 20
         html.Div(
             children=[
                 # first column of third row
                 html.Div(
                     children=[
                         html.H4("Berechnete Kennzahlen"),
-                        dcc.Graph(id="kennzahlen"),],
+                        dash_table.DataTable(
+                            id="table",
+                            style_cell={
+                                "textAlign": "left",
+                                "fontSize": 14,
+                                "font-family": "sans-serif",
+                            },
+                            style_as_list_view=True,
+                            style_header={
+                                "backgroundColor": "white",
+                                "fontWeight": "bold",
+                            },
+                        ),
+                    ],
                     style={
-                      #  "display": "inline-block",
+                        #  "display": "inline-block",
                         "vertical-align": "top",
                         "margin-left": "3vw",
                         "margin-top": "3vw",
+                        "margin-right": "15vw",
                     },
                 ),
             ],
@@ -810,38 +831,42 @@ app.layout = html.Div(
                 # first column of third row
                 html.Div(
                     children=[
-                        html.H4("Verteilung der mit Unsicherheit behafteten Eingabeparameter"),
+                        html.H4(
+                            "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
+                        ),
                         dcc.Graph(id="eingabe_verkaufsfaktor"),
                         dcc.Graph(id="eingabe_anschlusszinssatz"),
                         dcc.Graph(id="eingabe_mietsteigerung"),
                         dcc.Graph(id="eingabe_kostensteigerung"),
                         dcc.Graph(id="eingabe_mietausfall"),
                         html.H4("Ergebnisse der Simulation"),
+                        dcc.Markdown(id='ergebnisse'),
                         dcc.Graph(id="verkaufspreis"),
                         dcc.Graph(id="objektrendite"),
                         dcc.Graph(id="eigenkapitalrendite"),
                         dcc.Graph(id="gewinn"),
                         dcc.Graph(id="minimaler_cashflow"),
-                        ],
-                    
+                    ],
                     style={
-                       # "display": "inline-block",
+                        # "display": "inline-block",
                         "vertical-align": "top",
                         "margin-left": "3vw",
-                        "margin-top": "0vw",
+                        "margin-top": "3vw",
+                        "margin-right": "10vw",
                     },
                 ),
             ],
             className="row",
         ),
-
     ],
-    className="container"
+    className="container",
 )
 
 
+
 @app.callback(
-    Output("kennzahlen", "figure"),
+    Output("table", "columns"),
+    Output("table", "data"),
     Input("kaufpreis", "value"),
     Input("kaufpreis_grundstueck", "value"),
     Input("kaufpreis_sanierung", "value"),
@@ -873,7 +898,7 @@ app.layout = html.Div(
     Input("unsicherheit_verkaufsfaktor", "value"),
     Input("sim_runs", "value"),
 )
-def custom_figure(
+def updateTable(
     kaufpreis,
     kaufpreis_grundstueck,
     kaufpreis_sanierung,
@@ -905,7 +930,6 @@ def custom_figure(
     unsicherheit_verkaufsfaktor,
     sim_runs,
 ):
-    # Call formeln.py here
 
     # Nur zum testen, bleibt natürlich später in dem Formel Modul
     gesamtkosten = kaufpreis + kaufnebenkosten + renovierungskosten
@@ -925,38 +949,36 @@ def custom_figure(
     darlehen = (gesamtkosten - eigenkapital) / (1 - disagio)
     kreditrate_jahr = darlehen * ((zinsatz / 100) + (tilgungssatz / 100))
 
-    fig = go.Figure(
-        data=[
-            go.Table(
-                header=dict(values=["Startwerte", ""]),
-                cells=dict(
-                    values=[
-                        [
-                            "Gesamtkosten",
-                            "Kaufpreis-Miet-Verhältnis",
-                            "Brutto-Mietrendite",
-                            "Netto-Mietrendite",
-                            "Darlehenshöhe",
-                            "Kreditrate (Jahr)",
-                        ],
-                        [
-                            f"{gesamtkosten}€",
-                            kaufpreis_miet_verhaeltnis,
-                            f"{anfangs_brutto_mietrendite}%",
-                            f"{anfangs_netto_mietrendite}%",
-                            f"{int(darlehen)}€",
-                            f"{int(kreditrate_jahr)}€",
-                        ],
-                    ]
-                ),
-            )
-        ]
+    df = pd.DataFrame(
+        {
+            "Kennzahlen": [
+                "Gesamtkosten",
+                "Kaufpreis-Miet-Verhältnis",
+                "Brutto-Mietrendite",
+                "Netto-Mietrendite",
+                "Darlehenshöhe",
+                "Kreditrate (Jahr)",
+            ],
+            "Berechnungen": [
+                f"{gesamtkosten}€",
+                kaufpreis_miet_verhaeltnis,
+                f"{anfangs_brutto_mietrendite}%",
+                f"{anfangs_netto_mietrendite}%",
+                f"{int(darlehen)}€",
+                f"{int(kreditrate_jahr)}€",
+            ],
+        }
     )
-    return fig
+    data = df.to_dict("records")
+    columns = [{"name": i, "id": i} for i in df.columns]
+
+    return columns, data
 
 
 @app.callback(
     #   Output("kennzahlen1", "figure"),
+    Output('ergebnisse', 'children'),
+    Output("loading-output-1", "children"),
     Output("eingabe_verkaufsfaktor", "figure"),
     Output("eingabe_anschlusszinssatz", "figure"),
     Output("eingabe_mietsteigerung", "figure"),
@@ -1087,9 +1109,7 @@ def custom_figure(
         if np.all(eingabeparameter == eingabeparameter[0]) == True:
             fig = go.Figure(data=[go.Table()])
         else:
-            fig = ff.create_distplot(
-                [eingabeparameter], [name], show_hist=False
-            )
+            fig = ff.create_distplot([eingabeparameter], [name], show_hist=False)
             fig = fig.add_vline(
                 x=np.quantile(eingabeparameter, q=0.5),
                 line_width=3,
@@ -1120,6 +1140,11 @@ def custom_figure(
                 annotation_font_size=12,
                 annotation_font_color="green",
             )
+            fig.update_layout(plot_bgcolor="white")
+            fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+            fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+            fig.update_layout(showlegend=False)
+            fig.update_layout(title=name)
         return fig
 
     fig_verkaufsfaktor = figure_ein_aus_gabeparameter(
@@ -1187,11 +1212,7 @@ def custom_figure(
     )
 
     fig_gewinn = figure_ein_aus_gabeparameter(
-        eingabeparameter="gewinn",
-        name="Gewinn",
-        zeichen="€",
-        x=1,
-        runden=0,
+        eingabeparameter="gewinn", name="Gewinn", zeichen="€", x=1, runden=0,
     )
 
     fig_minimaler_cashflow = figure_ein_aus_gabeparameter(
@@ -1201,9 +1222,21 @@ def custom_figure(
         x=1,
         runden=0,
     )
-
+    
+    antwort = "Fertig :)"
+    
+    verk_text = np.array(ergebnis["verkaufspreis"])
+    verk_text = verk_text[~np.isnan(verk_text)]
+    ekr_text = np.array(ergebnis["eigenkapitalrendite"])
+    ekr_text = ekr_text[~np.isnan(ekr_text)]
+    
+    ergebnisse = f"""Nach **{anlagehorizont} Jahren** werden Sie einen durchschnittlichen
+    Verkaufspreis von **{round(verk_text.mean())} €** erzielen. Ihre durchschnittliche
+    Eigenkapitalrendite liegt bei **{round(ekr_text.mean()*100, 2)} %** usw...."""
 
     return (
+        ergebnisse,
+        antwort,
         fig_verkaufsfaktor,
         fig_anschlusszinssatz,
         fig_mietsteigerung,
