@@ -840,6 +840,7 @@ app.layout = html.Div(
                         dcc.Graph(id="eingabe_kostensteigerung"),
                         dcc.Graph(id="eingabe_mietausfall"),
                         html.H4("Ergebnisse der Simulation"),
+                        dcc.Markdown(id='ergebnisse'),
                         dcc.Graph(id="verkaufspreis"),
                         dcc.Graph(id="objektrendite"),
                         dcc.Graph(id="eigenkapitalrendite"),
@@ -851,6 +852,7 @@ app.layout = html.Div(
                         "vertical-align": "top",
                         "margin-left": "3vw",
                         "margin-top": "3vw",
+                        "margin-right": "10vw",
                     },
                 ),
             ],
@@ -975,6 +977,7 @@ def updateTable(
 
 @app.callback(
     #   Output("kennzahlen1", "figure"),
+    Output('ergebnisse', 'children'),
     Output("loading-output-1", "children"),
     Output("eingabe_verkaufsfaktor", "figure"),
     Output("eingabe_anschlusszinssatz", "figure"),
@@ -1137,6 +1140,11 @@ def custom_figure(
                 annotation_font_size=12,
                 annotation_font_color="green",
             )
+            fig.update_layout(plot_bgcolor="white")
+            fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+            fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+            fig.update_layout(showlegend=False)
+            fig.update_layout(title=name)
         return fig
 
     fig_verkaufsfaktor = figure_ein_aus_gabeparameter(
@@ -1216,8 +1224,18 @@ def custom_figure(
     )
     
     antwort = "Fertig :)"
+    
+    verk_text = np.array(ergebnis["verkaufspreis"])
+    verk_text = verk_text[~np.isnan(verk_text)]
+    ekr_text = np.array(ergebnis["eigenkapitalrendite"])
+    ekr_text = ekr_text[~np.isnan(ekr_text)]
+    
+    ergebnisse = f"""Nach **{anlagehorizont} Jahren** werden Sie einen durchschnittlichen
+    Verkaufspreis von **{round(verk_text.mean())} €** erzielen. Ihre durchschnittliche
+    Eigenkapitalrendite liegt bei **{round(ekr_text.mean()*100, 2)} %** usw...."""
 
     return (
+        ergebnisse,
         antwort,
         fig_verkaufsfaktor,
         fig_anschlusszinssatz,
