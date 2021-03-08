@@ -2,6 +2,8 @@ import numpy as np
 import scipy.stats as stats
 import scipy.optimize
 
+# https://en.wikipedia.org/wiki/Truncated_normal_distribution
+
 def truncated_mean_std(mu, sigma, lower, upper):
     alpha = (lower - mu)/sigma
     beta = (upper - mu)/sigma
@@ -31,3 +33,4 @@ def corrector(mu, sigma, lower, upper):
 # print(sample.max())
 # print(sample.mean())
 # print(sample.var())
+
