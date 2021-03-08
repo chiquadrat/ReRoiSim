@@ -777,7 +777,12 @@ app.layout = html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.Button("Start der Simulation", id="button"),],
+                    children=[html.Button("Start der Simulation", id="button"),
+                                      dcc.Loading(
+            id="loading-1",
+            type="default",
+            children=html.Div(id="loading-output-1")
+        ),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -845,7 +850,7 @@ app.layout = html.Div(
                         # "display": "inline-block",
                         "vertical-align": "top",
                         "margin-left": "3vw",
-                        "margin-top": "2vw",
+                        "margin-top": "3vw",
                     },
                 ),
             ],
@@ -855,22 +860,6 @@ app.layout = html.Div(
     className="container",
 )
 
-
-# @app.callback(
-#     Output("table", "columns"),
-#     Output("table", "data"),
-#     Input("kaufpreis", "value")
-# )
-# def updateTable(kaufpreis):
-#     test = pd.DataFrame({
-#         "Kennzahlen":["Gesamtkosten", "Kaufpreis-Miet-Verhältnis"],
-#         "Berechnungen":[kaufpreis,kaufpreis]
-
-#     })
-#     data = test.to_dict("records")
-#     columns = [{"name": i, "id": i} for i in test.columns]
-
-#     return columns, data
 
 
 @app.callback(
@@ -984,90 +973,9 @@ def updateTable(
     return columns, data
 
 
-# def custom_figure(
-#     kaufpreis,
-#     kaufpreis_grundstueck,
-#     kaufpreis_sanierung,
-#     kaufnebenkosten,
-#     renovierungskosten,
-#     mieteinnahmen,
-#     mietsteigerung,
-#     unsicherheit_mietsteigerung,
-#     erste_mieterhoehung,
-#     instandhaltungskosten,
-#     verwaltungskosten,
-#     mietausfall,
-#     unsicherheit_mietausfall,
-#     kostensteigerung,
-#     unsicherheit_kostensteigerung,
-#     eigenkapital,
-#     zinsbindung,
-#     disagio,
-#     zinsatz,
-#     tilgungssatz,
-#     anschlusszinssatz,
-#     unsicherheit_anschlusszinssatz,
-#     familienstand,
-#     einkommen,
-#     baujahr,
-#     #    sonderabschreibung,
-#     anlagehorizont,
-#     verkaufsfaktor,
-#     unsicherheit_verkaufsfaktor,
-#     sim_runs,
-# ):
-#     # Call formeln.py here
-
-#     # Nur zum testen, bleibt natürlich später in dem Formel Modul
-#     gesamtkosten = kaufpreis + kaufnebenkosten + renovierungskosten
-#     jahresreinertrag = (
-#         mieteinnahmen
-#         - instandhaltungskosten
-#         - verwaltungskosten
-#         - (mieteinnahmen * (mietausfall / 100))
-#     )
-#     kaufpreis_miet_verhaeltnis = round(
-#         (kaufpreis + renovierungskosten) / mieteinnahmen, 1
-#     )
-#     anfangs_brutto_mietrendite = round((1 / kaufpreis_miet_verhaeltnis) * 100, 2)
-#     anfangs_netto_mietrendite = round((jahresreinertrag / gesamtkosten) * 100, 2)
-
-#     # Finanzierung
-#     darlehen = (gesamtkosten - eigenkapital) / (1 - disagio)
-#     kreditrate_jahr = darlehen * ((zinsatz / 100) + (tilgungssatz / 100))
-
-#     fig = go.Figure(
-#         data=[
-#             go.Table(
-#                 header=dict(values=["Startwerte", ""]),
-#                 cells=dict(
-#                     values=[
-#                         [
-#                             "Gesamtkosten",
-#                             "Kaufpreis-Miet-Verhältnis",
-#                             "Brutto-Mietrendite",
-#                             "Netto-Mietrendite",
-#                             "Darlehenshöhe",
-#                             "Kreditrate (Jahr)",
-#                         ],
-#                         [
-#                             f"{gesamtkosten}€",
-#                             kaufpreis_miet_verhaeltnis,
-#                             f"{anfangs_brutto_mietrendite}%",
-#                             f"{anfangs_netto_mietrendite}%",
-#                             f"{int(darlehen)}€",
-#                             f"{int(kreditrate_jahr)}€",
-#                         ],
-#                     ]
-#                 ),
-#             )
-#         ]
-#     )
-#     return fig
-
-
 @app.callback(
     #   Output("kennzahlen1", "figure"),
+    Output("loading-output-1", "children"),
     Output("eingabe_verkaufsfaktor", "figure"),
     Output("eingabe_anschlusszinssatz", "figure"),
     Output("eingabe_mietsteigerung", "figure"),
@@ -1306,8 +1214,11 @@ def custom_figure(
         x=1,
         runden=0,
     )
+    
+    antwort = "Fertig :)"
 
     return (
+        antwort,
         fig_verkaufsfaktor,
         fig_anschlusszinssatz,
         fig_mietsteigerung,
