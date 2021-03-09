@@ -793,6 +793,69 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+        # row sixteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[html.H4("7. Import/Export der Eingabeparameter"),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
+        # row sixteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[
+                            dcc.Upload(
+        id='upload-data',
+        children=html.Div([
+            'Daten importieren',
+            #html.A('Select Files')
+        ]),
+        style={
+            'width': "210px",
+            'height': '38px',
+            'lineHeight': '35px',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '4px',
+            'textAlign': 'center',
+            'margin': '10px'
+        },
+        # Allow multiple files to be uploaded
+        multiple=False
+    ),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "0vw",
+                    },
+                ),
+                                html.Div(
+                    children=[
+           dcc.Markdown(id='upload-status')
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                ),
+            
+            ],
+            className="row",
+        ),
         # row 20
         html.Div(
             children=[
@@ -977,6 +1040,7 @@ def updateTable(
 
 @app.callback(
     #   Output("kennzahlen1", "figure"),
+#    Output('kaufpreis', 'value'),
     Output('ergebnisse', 'children'),
     Output("loading-output-1", "children"),
     Output("eingabe_verkaufsfaktor", "figure"),
@@ -1233,8 +1297,11 @@ def custom_figure(
     ergebnisse = f"""Nach **{anlagehorizont} Jahren** werden Sie einen durchschnittlichen
     Verkaufspreis von **{round(verk_text.mean())} €** erzielen. Ihre durchschnittliche
     Eigenkapitalrendite liegt bei **{round(ekr_text.mean()*100, 2)} %** usw...."""
+    
+ #   bla=300_000
 
     return (
+#        bla,
         ergebnisse,
         antwort,
         fig_verkaufsfaktor,
@@ -1248,6 +1315,43 @@ def custom_figure(
         fig_gewinn,
         fig_minimaler_cashflow,
     )
+
+import base64
+import io
+import xlrd
+def parse_contents(contents, filename, date):
+    content_type, content_string = contents.split(',')
+
+    decoded = base64.b64decode(content_string)
+    try:
+        if 'csv' in filename:
+        # Assume that the user uploaded a CSV file
+            df = pd.read_csv(
+                io.StringIO(decoded.decode('utf-8')))
+        elif 'xls' in filename:
+        # Assume that the user uploaded an excel file
+            df = pd.read_excel(io.BytesIO(decoded)) 
+    except Exception as e:
+        return print("Upload nich erfolgreich")
+
+    return df
+
+@app.callback(Output('upload-status', 'children'),
+              Output('kaufpreis', 'value'),
+              [Input('upload-data', 'contents')],
+              [State('upload-data', 'filename'),
+               State('upload-data', 'last_modified')])
+def update_output(list_of_contents, list_of_names, list_of_dates):    
+    text_message = ""
+    if list_of_contents is not None:
+        df = parse_contents(list_of_contents, list_of_names, list_of_dates)        
+        if isinstance(df, pd.DataFrame):
+            return "**Upload erfolgreich**", df["Kaufpreis"][0]
+        else:
+            text_message = df
+    else:
+        return text_message, 300_000
+
 
 
 if __name__ == "__main__":
