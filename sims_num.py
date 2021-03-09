@@ -60,9 +60,9 @@ def get_darlehen_values(start_val, n_sims=1000, n_years=25, zinsrate=0.015, kred
     zinsrate_full = np.full((n_sims, n_years), fill_value=zinsrate)
     interest = np.multiply(restschuld_full, zinsrate_full)
 
-    # TODO: adjust last year of tilgung to be the same as restschuld
     tilgung = np.full((n_sims, n_years), fill_value=kreditrate) - interest
-    tilgung[kreditrate == tilgung] = 0
+    # tilgung can only be as high as restschuld
+    tilgung = tilgung.clip(None, restschuld_full)
 
     return restschuld_full, interest, tilgung
 
@@ -181,7 +181,7 @@ def renditerechner_vect(
     anlagehorizont=30,
     verkaufsfaktor=25,
     # Simulation
-    sim_runs=1,
+    sim_runs=1000,
     unsicherheit_mietsteigerung=0,
     unsicherheit_kostensteigerung=0,
     unsicherheit_mietausfall=0,
