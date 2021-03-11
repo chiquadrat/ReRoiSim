@@ -832,7 +832,7 @@ app.layout = html.Div(
             'margin': '10px'
         },
         # Allow multiple files to be uploaded
-        multiple=False
+        multiple=True
     ),],
                     style={
                         "display": "inline-block",
@@ -1323,19 +1323,25 @@ def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
-    try:
-        if 'csv' in filename:
-        # Assume that the user uploaded a CSV file
-            df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')))
-        elif 'xls' in filename:
-        # Assume that the user uploaded an excel file
-            df = pd.read_excel(io.BytesIO(decoded)) 
-    except Exception as e:
-        return print("Upload nich erfolgreich")
-
+#    try:
+    if 'csv' in filename:
+# Assume that the user uploaded a CSV file
+        df = pd.read_csv(
+        io.StringIO(decoded.decode('utf-8')))
+    elif 'xls' in filename:
+# Assume that the user uploaded an excel file
+        df = pd.read_excel(io.BytesIO(decoded)) 
+    else:
+        df = "Keine csv oder xls Datei"
+ #   except Exception as e:
+#        return print("Upload nich erfolgreich")
     return df
 
+# Upload component: The same file can NOT be uploaded twice in a row. It will not
+# get recognized. This is something we need to live with right now. In the future we 
+# could checkout:
+# https://community.plotly.com/t/reuploading-same-file/42178
+# https://community.plotly.com/t/can-i-upload-the-same-file-twice-in-a-row/40526/3
 @app.callback(Output('upload-status', 'children'),
               Output('kaufpreis', 'value'),
               [Input('upload-data', 'contents')],
@@ -1344,11 +1350,19 @@ def parse_contents(contents, filename, date):
 def update_output(list_of_contents, list_of_names, list_of_dates):    
     text_message = ""
     if list_of_contents is not None:
-        df = parse_contents(list_of_contents, list_of_names, list_of_dates)        
-        if isinstance(df, pd.DataFrame):
-            return "**Upload erfolgreich**", df["Kaufpreis"][0]
+        #print(list_of_contents[-1])
+        print(list_of_names[-1])
+        print(list_of_dates[-1])
+        df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
+        #print(list(df.columns))
+        if isinstance(df, pd.DataFrame): 
+            if list(df.columns)==["Kaufpreis", "test"]:
+                return "**Upload erfolgreich**", df["Kaufpreis"][0]
+            if list(df.columns)!=["Kaufpreis", "test"]:
+                return "**Falsches Format**", 300_000
         else:
             text_message = df
+            return text_message, 300_000
     else:
         return text_message, 300_000
 
