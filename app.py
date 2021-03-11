@@ -1343,28 +1343,71 @@ def parse_contents(contents, filename, date):
 # https://community.plotly.com/t/reuploading-same-file/42178
 # https://community.plotly.com/t/can-i-upload-the-same-file-twice-in-a-row/40526/3
 @app.callback(Output('upload-status', 'children'),
-              Output('kaufpreis', 'value'),
+                Output("kaufpreis", "value"),
+                Output("kaufpreis_grundstueck", "value"),
+                Output("kaufpreis_sanierung", "value"),
+                Output("kaufnebenkosten", "value"),
+                Output("renovierungskosten", "value"),
+                Output("mieteinnahmen", "value"),
+                Output("mietsteigerung", "value"),
+                Output("unsicherheit_mietsteigerung", "value"),
+                Output("erste_mieterhoehung", "value"),
+                Output("instandhaltungskosten", "value"),
+                Output("verwaltungskosten", "value"),
+                Output("mietausfall", "value"),
+                Output("unsicherheit_mietausfall", "value"),
+                Output("kostensteigerung", "value"),
+                Output("unsicherheit_kostensteigerung", "value"),
+                Output("eigenkapital", "value"),
+                Output("zinsbindung", "value"),
+                Output("disagio", "value"),
+                Output("zinsatz", "value"),
+                Output("tilgungssatz", "value"),
+                Output("anschlusszinssatz", "value"),
+                Output("unsicherheit_anschlusszinssatz", "value"),
+                Output("familienstand", "value"),
+                Output("einkommen", "value"),
+                Output("baujahr", "value"),
+                #    Input("sonderabschreibung", "value"),
+                Output("anlagehorizont", "value"),
+                Output("verkaufsfaktor", "value"),
+                Output("unsicherheit_verkaufsfaktor", "value"),
               [Input('upload-data', 'contents')],
               [State('upload-data', 'filename'),
                State('upload-data', 'last_modified')])
-def update_output(list_of_contents, list_of_names, list_of_dates):    
+def update_output(list_of_contents, list_of_names, list_of_dates):
+    default_input = [
+        300_000, 100_000, 0, 40_000, 1_000, 12_000, 2, 1, 5, 1_200, 600, 2, 2, 1.5,
+        2, 100_000, 20, 0, 1.5, 2.5, 4, 1.5, "0", 100_000, "0", 15, 22, 4
+    ]   
+    default_column = [
+        'Kaufpreis', 'davon Grundstücksanteil', 'davon Sanierungskosten', 
+        'Kaufnebenkosten', 'Renovierungskosten', 'Mieteinahmen', 'Mietsteigerung', 
+        'Unsicherheit Mietsteigerung', 'Erste Mieterhöhung ab Jahr', 'Instandhaltungskosten Jahr', 
+        'Verwaltungskosten Jahr', 'Pauschale für Mietausfall', 'Unsicherheit Mietausfall', 
+        'Geschätzte Kostensteigerung', 'Unsicherheit Kostensteigerung', 'Eigenkapital', 
+        'Zinsbindung', 'Disagio', 'Zinssatz', 'Tilgungssatz', 'Anschlusszinssatz', 
+        'Unsicherheit Anschlusszinssatz', 'Familienstand', 'Zu versteuerndes Einkommen', 
+        'Baujahr', 'Anlagehorizont', 'Geschätzter Verkaufsfaktor', 'Unsicherheit Verkaufsfaktor'
+    ] 
     text_message = ""
     if list_of_contents is not None:
         #print(list_of_contents[-1])
         print(list_of_names[-1])
         print(list_of_dates[-1])
         df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
-        #print(list(df.columns))
+        print(list(df.columns))
+        print(df)
         if isinstance(df, pd.DataFrame): 
-            if list(df.columns)==["Kaufpreis", "test"]:
-                return "**Upload erfolgreich**", df["Kaufpreis"][0]
-            if list(df.columns)!=["Kaufpreis", "test"]:
-                return "**Falsches Format**", 300_000
+            if list(df.columns)==default_column:
+                return "**Upload erfolgreich**", *default_input # Change value of input fields if upload is succesfull
+            if list(df.columns)!=default_column:
+                return "**Falsches Format**", *default_input
         else:
             text_message = df
-            return text_message, 300_000
+            return text_message, *default_input
     else:
-        return text_message, 300_000
+        return text_message, *default_input
 
 
 
