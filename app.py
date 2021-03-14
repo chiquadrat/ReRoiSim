@@ -12,6 +12,16 @@ from dash.dependencies import Input, Output, State
 import plotly.figure_factory as ff
 from dash.exceptions import PreventUpdate
 
+# Import
+import base64
+import io
+import xlrd
+
+# Export
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
+import openpyxl
+
 from formeln import renditerechner
 
 VALID_USERNAME_PASSWORD_PAIRS = {"Trump": "Tower"}
@@ -778,11 +788,100 @@ app.layout = html.Div(
                 # first column of third row
                 html.Div(
                     children=[html.Button("Start der Simulation", id="button"),
-                                      dcc.Loading(
+],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                ),
+            html.Div(
+                children=[
+                                                          dcc.Loading(
             id="loading-1",
             type="default",
             children=html.Div(id="loading-output-1")
-        ),],
+        ),
+                    
+                ],
+                                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+            )
+            ],
+            className="row",
+        ),
+        # row sixteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[html.H4("7. Import/Export der Eingabeparameter"),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
+        # row sixteen
+        html.Div(
+            children=[
+                    # third column
+                    html.Div(
+            children=[
+                # first column of third row
+                html.Button("Eingabe exportieren", id='download-results-button'),
+                Download(id='download'),                
+            ],                    
+            style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                    ),
+                # first column of third row
+                html.Div(
+                    children=[
+                            dcc.Upload(
+        id='upload-data',
+        children=html.Div([
+            'Daten importieren',
+            #html.A('Select Files')
+        ]),
+        style={
+            'width': "210px",
+            'height': '38px',
+            'lineHeight': '35px',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '4px',
+            'textAlign': 'center',
+            'margin': '10px'
+        },
+        # Allow multiple files to be uploaded
+        multiple=True
+    ),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "2.3vw",
+                        "margin-top": "0vw",
+                    },
+                ),
+                # second column
+                                html.Div(
+                    children=[
+           dcc.Markdown(id='upload-status')
+                    ],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -793,6 +892,21 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+        # Next row
+        # html.Div(
+        #     children=[
+        #         # first column of third row
+        #         html.Button("Daten exportieren", id='download-results-button'),
+        #         Download(id='download'),                
+        #     ],                    
+        #     style={
+        #                 "display": "inline-block",
+        #                 "vertical-align": "top",
+        #                 "margin-left": "3vw",
+        #                 "margin-top": "1vw",
+        #             },
+        #     className="row",
+        # ),
         # row 20
         html.Div(
             children=[
@@ -977,6 +1091,7 @@ def updateTable(
 
 @app.callback(
     #   Output("kennzahlen1", "figure"),
+#    Output('kaufpreis', 'value'),
     Output('ergebnisse', 'children'),
     Output("loading-output-1", "children"),
     Output("eingabe_verkaufsfaktor", "figure"),
@@ -1223,7 +1338,7 @@ def custom_figure(
         runden=0,
     )
     
-    antwort = "Fertig :)"
+    antwort = ""
     
     verk_text = np.array(ergebnis["verkaufspreis"])
     verk_text = verk_text[~np.isnan(verk_text)]
@@ -1233,8 +1348,11 @@ def custom_figure(
     ergebnisse = f"""Nach **{anlagehorizont} Jahren** werden Sie einen durchschnittlichen
     Verkaufspreis von **{round(verk_text.mean())} €** erzielen. Ihre durchschnittliche
     Eigenkapitalrendite liegt bei **{round(ekr_text.mean()*100, 2)} %** usw...."""
+    
+ #   bla=300_000
 
     return (
+#        bla,
         ergebnisse,
         antwort,
         fig_verkaufsfaktor,
@@ -1248,6 +1366,206 @@ def custom_figure(
         fig_gewinn,
         fig_minimaler_cashflow,
     )
+    
+#
+# CSV/Excel Import
+#
+
+def parse_contents(contents, filename, date):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    if 'csv' in filename:
+# Assume that the user uploaded a CSV file
+        df = pd.read_csv(
+        io.StringIO(decoded.decode('utf-8')))
+    elif 'xls' in filename:
+# Assume that the user uploaded an excel file
+        df = pd.read_excel(io.BytesIO(decoded)) 
+    else:
+        df = "**Keine csv oder xlsx Datei**"
+    return df
+
+# Upload component: The same file can NOT be uploaded twice in a row. It will not
+# get recognized. This is something we need to live with right now. In the future we 
+# could checkout:
+# https://community.plotly.com/t/reuploading-same-file/42178
+# https://community.plotly.com/t/can-i-upload-the-same-file-twice-in-a-row/40526/3
+@app.callback(Output('upload-status', 'children'),
+                Output("kaufpreis", "value"),
+                Output("kaufpreis_grundstueck", "value"),
+                Output("kaufpreis_sanierung", "value"),
+                Output("kaufnebenkosten", "value"),
+                Output("renovierungskosten", "value"),
+                Output("mieteinnahmen", "value"),
+                Output("mietsteigerung", "value"),
+                Output("unsicherheit_mietsteigerung", "value"),
+                Output("erste_mieterhoehung", "value"),
+                Output("instandhaltungskosten", "value"),
+                Output("verwaltungskosten", "value"),
+                Output("mietausfall", "value"),
+                Output("unsicherheit_mietausfall", "value"),
+                Output("kostensteigerung", "value"),
+                Output("unsicherheit_kostensteigerung", "value"),
+                Output("eigenkapital", "value"),
+                Output("zinsbindung", "value"),
+                Output("disagio", "value"),
+                Output("zinsatz", "value"),
+                Output("tilgungssatz", "value"),
+                Output("anschlusszinssatz", "value"),
+                Output("unsicherheit_anschlusszinssatz", "value"),
+                Output("familienstand", "value"),
+                Output("einkommen", "value"),
+                Output("baujahr", "value"),
+                #    Input("sonderabschreibung", "value"),
+                Output("anlagehorizont", "value"),
+                Output("verkaufsfaktor", "value"),
+                Output("unsicherheit_verkaufsfaktor", "value"),
+              [Input('upload-data', 'contents')],
+              [State('upload-data', 'filename'),
+               State('upload-data', 'last_modified')])
+def update_output(list_of_contents, list_of_names, list_of_dates):
+    default_input = [
+        300_000, 100_000, 0, 40_000, 1_000, 12_000, 2, 1, 5, 1_200, 600, 2, 2, 1.5,
+        2, 100_000, 20, 0, 1.5, 2.5, 4, 1.5, "0", 100_000, "0", 15, 22, 4
+    ]   
+    default_column = [
+        'Kaufpreis', 'davon Grundstücksanteil', 'davon Sanierungskosten', 
+        'Kaufnebenkosten', 'Renovierungskosten', 'Mieteinahmen', 'Mietsteigerung', 
+        'Unsicherheit Mietsteigerung', 'Erste Mieterhöhung ab Jahr', 'Instandhaltungskosten Jahr', 
+        'Verwaltungskosten Jahr', 'Pauschale für Mietausfall', 'Unsicherheit Mietausfall', 
+        'Geschätzte Kostensteigerung', 'Unsicherheit Kostensteigerung', 'Eigenkapital', 
+        'Zinsbindung', 'Disagio', 'Zinssatz', 'Tilgungssatz', 'Anschlusszinssatz', 
+        'Unsicherheit Anschlusszinssatz', 'Familienstand', 'Zu versteuerndes Einkommen', 
+        'Baujahr', 'Anlagehorizont', 'Geschätzter Verkaufsfaktor', 'Unsicherheit Verkaufsfaktor'
+    ] 
+    text_message = ""
+    if list_of_contents is not None:
+        df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
+        if isinstance(df, pd.DataFrame): 
+            if "Unnamed: 0" in list(df.columns):                
+                df.drop(["Unnamed: 0"], axis=1, inplace=True)
+            imported_input = (
+                str(df[i][0]) 
+                if i in ["Familienstand", "Baujahr"] 
+                else df[i][0] 
+                for i in list(df.columns)
+            )
+            #print(list(df.columns))
+            if list(df.columns)==default_column:
+                return "**Upload erfolgreich**", *imported_input 
+            if list(df.columns)!=default_column:
+                return "**Falsches Format**", *default_input
+        else:
+            text_message = df
+            return text_message, *default_input
+    else:
+        return text_message, *default_input
+
+#
+# CSV Export
+#
+
+@app.callback(Output('download', 'data'),
+             [Input('download-results-button', 'n_clicks')],
+             state=[
+            State("kaufpreis", "value"),
+            State("kaufpreis_grundstueck", "value"),
+            State("kaufpreis_sanierung", "value"),
+            State("kaufnebenkosten", "value"),
+            State("renovierungskosten", "value"),
+            State("mieteinnahmen", "value"),
+            State("mietsteigerung", "value"),
+            State("unsicherheit_mietsteigerung", "value"),
+            State("erste_mieterhoehung", "value"),
+            State("instandhaltungskosten", "value"),
+            State("verwaltungskosten", "value"),
+            State("mietausfall", "value"),
+            State("unsicherheit_mietausfall", "value"),
+            State("kostensteigerung", "value"),
+            State("unsicherheit_kostensteigerung", "value"),
+            State("eigenkapital", "value"),
+            State("zinsbindung", "value"),
+            State("disagio", "value"),
+            State("zinsatz", "value"),
+            State("tilgungssatz", "value"),
+            State("anschlusszinssatz", "value"),
+            State("unsicherheit_anschlusszinssatz", "value"),
+            State("familienstand", "value"),
+            State("einkommen", "value"),
+            State("baujahr", "value"),
+            #    Input("sonderabschreibung", "value"),
+            State("anlagehorizont", "value"),
+            State("verkaufsfaktor", "value"),
+            State("unsicherheit_verkaufsfaktor", "value"),
+            ],
+            )
+def download_data(n_clicks, 
+                kaufpreis,
+                kaufpreis_grundstueck,
+                kaufpreis_sanierung,
+                kaufnebenkosten,
+                renovierungskosten,
+                mieteinnahmen,
+                mietsteigerung,
+                unsicherheit_mietsteigerung,
+                erste_mieterhoehung,
+                instandhaltungskosten,
+                verwaltungskosten,
+                mietausfall,
+                unsicherheit_mietausfall,
+                kostensteigerung,
+                unsicherheit_kostensteigerung,
+                eigenkapital,
+                zinsbindung,
+                disagio,
+                zinsatz,
+                tilgungssatz,
+                anschlusszinssatz,
+                unsicherheit_anschlusszinssatz,
+                familienstand,
+                einkommen,
+                baujahr,
+                #    sonderabschreibung,
+                anlagehorizont,
+                verkaufsfaktor,
+                unsicherheit_verkaufsfaktor,
+):
+    #print(n_clicks)
+    if n_clicks != None:
+        df = pd.DataFrame({"Kaufpreis": [kaufpreis], 
+                           "davon Grundstücksanteil": [kaufpreis_grundstueck],
+                            "davon Sanierungskosten":[kaufpreis_sanierung],
+                "Kaufnebenkosten":[kaufnebenkosten],
+                "Renovierungskosten":[renovierungskosten],
+                "Mieteinahmen":[mieteinnahmen],
+                "Mietsteigerung":[mietsteigerung],
+                'Unsicherheit Mietsteigerung':[unsicherheit_mietsteigerung],
+                'Erste Mieterhöhung ab Jahr':[erste_mieterhoehung],
+                'Instandhaltungskosten Jahr':[instandhaltungskosten],
+                'Verwaltungskosten Jahr':[verwaltungskosten],
+                'Pauschale für Mietausfall':[mietausfall],
+                'Unsicherheit Mietausfall':[unsicherheit_mietausfall],
+                'Geschätzte Kostensteigerung':[kostensteigerung],
+                'Unsicherheit Kostensteigerung':[unsicherheit_kostensteigerung],
+                'Eigenkapital':[eigenkapital],
+                'Zinsbindung':[zinsbindung],
+                'Disagio':[disagio],
+                'Zinssatz':[zinsatz],
+                'Tilgungssatz':[tilgungssatz],
+                'Anschlusszinssatz':[anschlusszinssatz],
+                'Unsicherheit Anschlusszinssatz':[unsicherheit_anschlusszinssatz],
+                'Familienstand':[familienstand],
+                'Zu versteuerndes Einkommen':[einkommen],
+                'Baujahr':[baujahr],
+                #    sonderabschreibung,
+                'Anlagehorizont':[anlagehorizont],
+                'Geschätzter Verkaufsfaktor':[verkaufsfaktor],
+                'Unsicherheit Verkaufsfaktor':[unsicherheit_verkaufsfaktor],
+                           },
+                          index=["Daten"]
+        )
+        #print(df)
+        return send_data_frame(df.to_csv, filename='data.csv')
 
 
 if __name__ == "__main__":
