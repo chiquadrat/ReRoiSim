@@ -834,6 +834,20 @@ app.layout = html.Div(
         # row sixteen
         html.Div(
             children=[
+                    # third column
+                    html.Div(
+            children=[
+                # first column of third row
+                html.Button("Eingabe exportieren", id='download-results-button'),
+                Download(id='download'),                
+            ],                    
+            style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                    ),
                 # first column of third row
                 html.Div(
                     children=[
@@ -863,6 +877,7 @@ app.layout = html.Div(
                         "margin-top": "0vw",
                     },
                 ),
+                # second column
                                 html.Div(
                     children=[
            dcc.Markdown(id='upload-status')
@@ -874,25 +889,24 @@ app.layout = html.Div(
                         "margin-top": "1vw",
                     },
                 ),
-            
             ],
             className="row",
         ),
         # Next row
-        html.Div(
-            children=[
-                # first column of third row
-                html.Button("Daten exportieren", id='download-results-button'),
-                Download(id='download'),                
-            ],                    
-            style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
-                    },
-            className="row",
-        ),
+        # html.Div(
+        #     children=[
+        #         # first column of third row
+        #         html.Button("Daten exportieren", id='download-results-button'),
+        #         Download(id='download'),                
+        #     ],                    
+        #     style={
+        #                 "display": "inline-block",
+        #                 "vertical-align": "top",
+        #                 "margin-left": "3vw",
+        #                 "margin-top": "1vw",
+        #             },
+        #     className="row",
+        # ),
         # row 20
         html.Div(
             children=[
@@ -1324,7 +1338,7 @@ def custom_figure(
         runden=0,
     )
     
-    antwort = "Fertig :)"
+    antwort = ""
     
     verk_text = np.array(ergebnis["verkaufspreis"])
     verk_text = verk_text[~np.isnan(verk_text)]
@@ -1427,15 +1441,16 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     text_message = ""
     if list_of_contents is not None:
         df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
-        df.drop(["Unnamed: 0"], axis=1, inplace=True)
-        print(df.head())
         if isinstance(df, pd.DataFrame): 
+            if "Unnamed: 0" in list(df.columns):                
+                df.drop(["Unnamed: 0"], axis=1, inplace=True)
             imported_input = (
                 str(df[i][0]) 
                 if i in ["Familienstand", "Baujahr"] 
                 else df[i][0] 
                 for i in list(df.columns)
             )
+            #print(list(df.columns))
             if list(df.columns)==default_column:
                 return "**Upload erfolgreich**", *imported_input 
             if list(df.columns)!=default_column:
