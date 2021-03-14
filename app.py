@@ -1427,7 +1427,8 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     text_message = ""
     if list_of_contents is not None:
         df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
-
+        df.drop(["Unnamed: 0"], axis=1, inplace=True)
+        print(df.head())
         if isinstance(df, pd.DataFrame): 
             imported_input = (
                 str(df[i][0]) 
@@ -1548,8 +1549,7 @@ def download_data(n_clicks,
                            },
                           index=["Daten"]
         )
-        print(df)
-        #test = df.to_csv(index=False)
+        #print(df)
         return send_data_frame(df.to_csv, filename='data.csv')
 
 
