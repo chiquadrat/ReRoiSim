@@ -12,6 +12,16 @@ from dash.dependencies import Input, Output, State
 import plotly.figure_factory as ff
 from dash.exceptions import PreventUpdate
 
+# Import
+import base64
+import io
+import xlrd
+
+# Export
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
+import openpyxl
+
 from formeln import renditerechner
 
 VALID_USERNAME_PASSWORD_PAIRS = {"Trump": "Tower"}
@@ -778,11 +788,7 @@ app.layout = html.Div(
                 # first column of third row
                 html.Div(
                     children=[html.Button("Start der Simulation", id="button"),
-                                      dcc.Loading(
-            id="loading-1",
-            type="default",
-            children=html.Div(id="loading-output-1")
-        ),],
+],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -790,6 +796,22 @@ app.layout = html.Div(
                         "margin-top": "1vw",
                     },
                 ),
+            html.Div(
+                children=[
+                                                          dcc.Loading(
+            id="loading-1",
+            type="default",
+            children=html.Div(id="loading-output-1")
+        ),
+                    
+                ],
+                                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+            )
             ],
             className="row",
         ),
@@ -837,7 +859,7 @@ app.layout = html.Div(
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
-                        "margin-left": "3vw",
+                        "margin-left": "2.3vw",
                         "margin-top": "0vw",
                     },
                 ),
@@ -854,6 +876,21 @@ app.layout = html.Div(
                 ),
             
             ],
+            className="row",
+        ),
+        # Next row
+        html.Div(
+            children=[
+                # first column of third row
+                html.Button("Daten exportieren", id='download-results-button'),
+                Download(id='download'),                
+            ],                    
+            style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
             className="row",
         ),
         # row 20
@@ -1315,10 +1352,11 @@ def custom_figure(
         fig_gewinn,
         fig_minimaler_cashflow,
     )
+    
+#
+# CSV/Excel Import
+#
 
-import base64
-import io
-import xlrd
 def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
@@ -1407,6 +1445,112 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     else:
         return text_message, *default_input
 
+#
+# CSV Export
+#
+
+@app.callback(Output('download', 'data'),
+             [Input('download-results-button', 'n_clicks')],
+             state=[
+            State("kaufpreis", "value"),
+            State("kaufpreis_grundstueck", "value"),
+            State("kaufpreis_sanierung", "value"),
+            State("kaufnebenkosten", "value"),
+            State("renovierungskosten", "value"),
+            State("mieteinnahmen", "value"),
+            State("mietsteigerung", "value"),
+            State("unsicherheit_mietsteigerung", "value"),
+            State("erste_mieterhoehung", "value"),
+            State("instandhaltungskosten", "value"),
+            State("verwaltungskosten", "value"),
+            State("mietausfall", "value"),
+            State("unsicherheit_mietausfall", "value"),
+            State("kostensteigerung", "value"),
+            State("unsicherheit_kostensteigerung", "value"),
+            State("eigenkapital", "value"),
+            State("zinsbindung", "value"),
+            State("disagio", "value"),
+            State("zinsatz", "value"),
+            State("tilgungssatz", "value"),
+            State("anschlusszinssatz", "value"),
+            State("unsicherheit_anschlusszinssatz", "value"),
+            State("familienstand", "value"),
+            State("einkommen", "value"),
+            State("baujahr", "value"),
+            #    Input("sonderabschreibung", "value"),
+            State("anlagehorizont", "value"),
+            State("verkaufsfaktor", "value"),
+            State("unsicherheit_verkaufsfaktor", "value"),
+            ],
+            )
+def download_data(n_clicks, 
+                kaufpreis,
+                kaufpreis_grundstueck,
+                kaufpreis_sanierung,
+                kaufnebenkosten,
+                renovierungskosten,
+                mieteinnahmen,
+                mietsteigerung,
+                unsicherheit_mietsteigerung,
+                erste_mieterhoehung,
+                instandhaltungskosten,
+                verwaltungskosten,
+                mietausfall,
+                unsicherheit_mietausfall,
+                kostensteigerung,
+                unsicherheit_kostensteigerung,
+                eigenkapital,
+                zinsbindung,
+                disagio,
+                zinsatz,
+                tilgungssatz,
+                anschlusszinssatz,
+                unsicherheit_anschlusszinssatz,
+                familienstand,
+                einkommen,
+                baujahr,
+                #    sonderabschreibung,
+                anlagehorizont,
+                verkaufsfaktor,
+                unsicherheit_verkaufsfaktor,
+):
+    #print(n_clicks)
+    if n_clicks != None:
+        df = pd.DataFrame({"Kaufpreis": [kaufpreis], 
+                           "davon Grundstücksanteil": [kaufpreis_grundstueck],
+                            "davon Sanierungskosten":[kaufpreis_sanierung],
+                "Kaufnebenkosten":[kaufnebenkosten],
+                "Renovierungskosten":[renovierungskosten],
+                "Mieteinahmen":[mieteinnahmen],
+                "Mietsteigerung":[mietsteigerung],
+                'Unsicherheit Mietsteigerung':[unsicherheit_mietsteigerung],
+                'Erste Mieterhöhung ab Jahr':[erste_mieterhoehung],
+                'Instandhaltungskosten Jahr':[instandhaltungskosten],
+                'Verwaltungskosten Jahr':[verwaltungskosten],
+                'Pauschale für Mietausfall':[mietausfall],
+                'Unsicherheit Mietausfall':[unsicherheit_mietausfall],
+                'Geschätzte Kostensteigerung':[kostensteigerung],
+                'Unsicherheit Kostensteigerung':[unsicherheit_kostensteigerung],
+                'Eigenkapital':[eigenkapital],
+                'Zinsbindung':[zinsbindung],
+                'Disagio':[disagio],
+                'Zinssatz':[zinsatz],
+                'Tilgungssatz':[tilgungssatz],
+                'Anschlusszinssatz':[anschlusszinssatz],
+                'Unsicherheit Anschlusszinssatz':[unsicherheit_anschlusszinssatz],
+                'Familienstand':[familienstand],
+                'Zu versteuerndes Einkommen':[einkommen],
+                'Baujahr':[baujahr],
+                #    sonderabschreibung,
+                'Anlagehorizont':[anlagehorizont],
+                'Geschätzter Verkaufsfaktor':[verkaufsfaktor],
+                'Unsicherheit Verkaufsfaktor':[unsicherheit_verkaufsfaktor],
+                           },
+                          index=["Daten"]
+        )
+        print(df)
+        #test = df.to_csv(index=False)
+        return send_data_frame(df.to_csv, filename='data.csv')
 
 
 if __name__ == "__main__":
