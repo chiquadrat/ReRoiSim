@@ -1321,9 +1321,7 @@ import io
 import xlrd
 def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
-
     decoded = base64.b64decode(content_string)
-#    try:
     if 'csv' in filename:
 # Assume that the user uploaded a CSV file
         df = pd.read_csv(
@@ -1332,9 +1330,7 @@ def parse_contents(contents, filename, date):
 # Assume that the user uploaded an excel file
         df = pd.read_excel(io.BytesIO(decoded)) 
     else:
-        df = "Keine csv oder xls Datei"
- #   except Exception as e:
-#        return print("Upload nich erfolgreich")
+        df = "**Keine csv oder xlsx Datei**"
     return df
 
 # Upload component: The same file can NOT be uploaded twice in a row. It will not
@@ -1392,15 +1388,17 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     ] 
     text_message = ""
     if list_of_contents is not None:
-        #print(list_of_contents[-1])
-        print(list_of_names[-1])
-        print(list_of_dates[-1])
         df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
-        print(list(df.columns))
-        print(df)
+
         if isinstance(df, pd.DataFrame): 
+            imported_input = (
+                str(df[i][0]) 
+                if i in ["Familienstand", "Baujahr"] 
+                else df[i][0] 
+                for i in list(df.columns)
+            )
             if list(df.columns)==default_column:
-                return "**Upload erfolgreich**", *default_input # Change value of input fields if upload is succesfull
+                return "**Upload erfolgreich**", *imported_input 
             if list(df.columns)!=default_column:
                 return "**Falsches Format**", *default_input
         else:
