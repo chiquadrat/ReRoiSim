@@ -23,6 +23,7 @@ from dash_extensions.snippets import send_data_frame
 import openpyxl
 
 from formeln import renditerechner
+from text import text_generator
 
 VALID_USERNAME_PASSWORD_PAIRS = {"Trump": "Tower"}
 
@@ -951,6 +952,7 @@ app.layout = html.Div(
                         dcc.Graph(id="eingabe_verkaufsfaktor"),
                         dcc.Markdown(id='verkaufsfaktor_text'),
                         dcc.Graph(id="eingabe_anschlusszinssatz"),
+                        dcc.Markdown(id='anschlusszinssatz_text'),
                         dcc.Graph(id="eingabe_mietsteigerung"),
                         dcc.Graph(id="eingabe_kostensteigerung"),
                         dcc.Graph(id="eingabe_mietausfall"),
@@ -1093,6 +1095,7 @@ def updateTable(
 @app.callback(
     #   Output("kennzahlen1", "figure"),
 #    Output('kaufpreis', 'value'),
+    Output('anschlusszinssatz_text', 'children'),
     Output('verkaufsfaktor_text', 'children'),
     Output('ergebnisse', 'children'),
     Output("loading-output-1", "children"),
@@ -1226,7 +1229,7 @@ def custom_figure(
         if np.all(eingabeparameter == eingabeparameter[0]) == True:
             fig = go.Figure(data=[go.Table()])
         else:
-            fig = ff.create_distplot([eingabeparameter], [name], show_hist=False)
+            fig = ff.create_distplot([eingabeparameter], [name], show_hist=False, show_rug=False)
             fig = fig.add_vline(
                 x=np.quantile(eingabeparameter, q=0.5),
                 line_width=3,
@@ -1262,6 +1265,7 @@ def custom_figure(
             fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
             fig.update_layout(showlegend=False)
             fig.update_layout(title=name)
+                
         return fig
 
     fig_verkaufsfaktor = figure_ein_aus_gabeparameter(
@@ -1342,20 +1346,16 @@ def custom_figure(
     
     antwort = ""
     
-    verk_text = np.array(ergebnis["verkaufspreis"])
-    verk_text = verk_text[~np.isnan(verk_text)]
-    ekr_text = np.array(ergebnis["eigenkapitalrendite"])
-    ekr_text = ekr_text[~np.isnan(ekr_text)]
-    
-    ergebnisse = f"""Nach **{anlagehorizont} Jahren** werden Sie einen durchschnittlichen
-    Verkaufspreis von **{round(verk_text.mean())} €** erzielen. Ihre durchschnittliche
-    Eigenkapitalrendite liegt bei **{round(ekr_text.mean()*100, 2)} %** usw...."""
-    
-    verkaufsfaktor_text = f"Hier folgt der sicke Text"
- #   bla=300_000
+    # Generate text output
+    ergebnisse, verkaufsfaktor_text, anschlusszinssatz_text = text_generator(
+        ergebnis,
+        zinsbindung,
+        anlagehorizont
+        )
 
     return (
 #        bla,
+        anschlusszinssatz_text,
         verkaufsfaktor_text,
         ergebnisse,
         antwort,
