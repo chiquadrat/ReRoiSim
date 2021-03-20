@@ -949,6 +949,7 @@ app.layout = html.Div(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
                         dcc.Graph(id="eingabe_verkaufsfaktor"),
+                        dcc.Markdown(id='verkaufsfaktor_text'),
                         dcc.Graph(id="eingabe_anschlusszinssatz"),
                         dcc.Graph(id="eingabe_mietsteigerung"),
                         dcc.Graph(id="eingabe_kostensteigerung"),
@@ -1092,6 +1093,7 @@ def updateTable(
 @app.callback(
     #   Output("kennzahlen1", "figure"),
 #    Output('kaufpreis', 'value'),
+    Output('verkaufsfaktor_text', 'children'),
     Output('ergebnisse', 'children'),
     Output("loading-output-1", "children"),
     Output("eingabe_verkaufsfaktor", "figure"),
@@ -1349,10 +1351,12 @@ def custom_figure(
     Verkaufspreis von **{round(verk_text.mean())} €** erzielen. Ihre durchschnittliche
     Eigenkapitalrendite liegt bei **{round(ekr_text.mean()*100, 2)} %** usw...."""
     
+    verkaufsfaktor_text = f"Hier folgt der sicke Text"
  #   bla=300_000
 
     return (
 #        bla,
+        verkaufsfaktor_text,
         ergebnisse,
         antwort,
         fig_verkaufsfaktor,
