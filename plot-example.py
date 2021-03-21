@@ -33,7 +33,7 @@ fig = fig.add_vline(
     line_dash="dash",
     line_color="green",
     annotation_text=f"95% Quantil: {round(np.quantile(data, q=.95))}",
-    annotation_position="bottom right",
+    annotation_position="bottom left",
     annotation_font_size=12,
     annotation_font_color="green",
 )
@@ -42,5 +42,15 @@ fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
 fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
 fig.update_layout(showlegend=False)
 fig.update_layout(title=name)
+
+xl = np.quantile(data, q=0.05)
+xr = np.quantile(data, q=0.95)
+x1   = [xc   for xc in fig.data[0].x if xc <xl]
+y1   = fig.data[0].y[:len(x1)]
+
+x2   = [xc   for xc in fig.data[0].x if xc > xr]
+y2   = fig.data[0].y[-len(x2):]
+fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+fig.add_scatter(x=x2, y=y2,fill='tozeroy', mode='none' , fillcolor='green')
 
 fig
