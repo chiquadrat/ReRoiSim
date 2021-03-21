@@ -14,7 +14,7 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung):
      durchschnittlichen Verkaufsfaktor von ** {int(np.array(ergebnis["verkaufsfaktor"]).mean())}**
      erzielen werden. Bei der von Ihnen gewählten Unsicherheit wird in 90 % der Simulationsläufe ein 
      Verkaufsfaktor zwischen **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.05), 1)}** und
-     **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.95), 1)}** für die Berechnung der 
+     **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.95), 1)}** (blau schraffierter Bereich) für die Berechnung der 
      Renditeergebnisse  angenommen. 
      Historische Werte finde sie unter: LINK"""
 
@@ -30,7 +30,7 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung):
         durchschnittlichen Anschlusszinsatz von ** {round(np.array(ergebnis["anschlusszinssatz"]*100).mean(),2)} %**
         zahlen müssen. Bei der von Ihnen gewählten Unsicherheit wird in 90 % der Simulationsläufe ein 
         Anschlusszinsatz zwischen **{round(np.quantile(np.array(ergebnis["anschlusszinssatz"])*100, q=0.05), 2)} %** und
-        **{round(np.quantile(np.array(ergebnis["anschlusszinssatz"])*100, q=0.95), 2)} %** für 
+        **{round(np.quantile(np.array(ergebnis["anschlusszinssatz"])*100, q=0.95), 2)} %** (blau schraffierter Bereich) für 
         die Berechnung der Renditeergebnisse angenommen. Historische Werte 
         finde sie unter: LINK"""
 
@@ -44,16 +44,28 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung):
         Mietsteigerung von ** {round(np.array(ergebnis["mietsteigerung"]*100).mean(),2)} %** ausgegangen. 
         Bei der von Ihnen gewählten Unsicherheit liegt die jährliche Mietsteigerung in der Simulation
         in 90% der Fälle zwischen **{round(np.quantile(np.array(ergebnis["mietsteigerung"])*100, q=0.05), 2)} %** und
-        **{round(np.quantile(np.array(ergebnis["mietsteigerung"])*100, q=0.95), 2)} %**. 
+        **{round(np.quantile(np.array(ergebnis["mietsteigerung"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
         Historische Werte finde sie unter: LINK"""
 
-    kostensteigerung_text = "Sicke Kostensteigerung"
+    kostensteigerung_text = f"""In der Simulation wird von einer jährlichen durchschnittlichen
+        Kostensteigerung von ** {round(np.array(ergebnis["kostensteigerung"]*100).mean(),2)} %** ausgegangen. 
+        Bei der von Ihnen gewählten Unsicherheit liegt die jährliche Kostensteogerung in der Simulation
+        in 90% der Fälle zwischen **{round(np.quantile(np.array(ergebnis["kostensteigerung"])*100, q=0.05), 2)} %** und
+        **{round(np.quantile(np.array(ergebnis["kostensteigerung"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
+        Historische Werte finde sie unter: LINK"""
+
+    mietausfall_text = f"""In der Simulation wird von einem jährlichen durchschnittlichen
+        Mietausfall von ** {round(np.array(ergebnis["mietausfall"]*100).mean(),2)} %** ausgegangen. 
+        Bei der von Ihnen gewählten Unsicherheit liegt der jährliche Mietausfalls in der Simulation
+        in 90% der Fälle zwischen **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.05), 2)} %** und
+        **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
+        Historische Werte finde sie unter: LINK"""
+   
     verkaufspreis_text = "Sicker Verkaufspreis"
     objektrendite_text = "Sicke Objektrendite"
     eigenkapitalrendite_text = "Sicke Eigenkapitalrendite"
     gewinn_text = "Sicker Gewinn"
     minimaler_cashflow_text = "Sicker minimaler Cashflow"
-    mietausfall_text = "Sicker Mietausfall"
     
     text = {
         "ergebnisse": ergebnisse,

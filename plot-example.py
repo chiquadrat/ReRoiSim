@@ -53,4 +53,8 @@ y2   = fig.data[0].y[-len(x2):]
 fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
 fig.add_scatter(x=x2, y=y2,fill='tozeroy', mode='none' , fillcolor='green')
 
+x3 = [xc   for xc in fig.data[0].x if (xc > xl) and (xc < xr)]
+y3 = fig.data[0].y[len(x1):-len(x2)]
+fig.add_scatter(x=x3, y=y3,fill='tozeroy', mode='none' , fillcolor='lightblue')
 fig
+
