@@ -25,7 +25,7 @@ import openpyxl
 from formeln import renditerechner
 from text import text_generator
 
-VALID_USERNAME_PASSWORD_PAIRS = {"Trump": "Tower"}
+VALID_USERNAME_PASSWORD_PAIRS = {"Christoph": "Groener"}
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -949,27 +949,27 @@ app.layout = html.Div(
                         html.H4(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
-                        dcc.Graph(id="eingabe_verkaufsfaktor", style={'height': '38vh'}),
+                        dcc.Graph(id="eingabe_verkaufsfaktor", style={'height': '35vh'}),
                         dcc.Markdown(id='verkaufsfaktor_text'),
-                        dcc.Graph(id="eingabe_anschlusszinssatz", style={'height': '38vh'}),
+                        dcc.Graph(id="eingabe_anschlusszinssatz", style={'height': '35vh'}),
                         dcc.Markdown(id='anschlusszinssatz_text'),                        
-                        dcc.Graph(id="eingabe_mietsteigerung", style={'height': '38vh'}),
+                        dcc.Graph(id="eingabe_mietsteigerung", style={'height': '35vh'}),
                         dcc.Markdown(id='mietsteigerung_text'),
-                        dcc.Graph(id="eingabe_kostensteigerung", style={'height': '38vh'}),
+                        dcc.Graph(id="eingabe_kostensteigerung", style={'height': '35vh'}),
                         dcc.Markdown(id='kostensteigerung_text'),
-                        dcc.Graph(id="eingabe_mietausfall", style={'height': '38vh'}),
+                        dcc.Graph(id="eingabe_mietausfall", style={'height': '35vh'}),
                         dcc.Markdown(id='mietausfall_text'),
                         html.H4("Ergebnisse der Simulation"),
                         dcc.Markdown(id='ergebnisse_text'),
-                        dcc.Graph(id="verkaufspreis", style={'height': '38vh'}),
+                        dcc.Graph(id="verkaufspreis", style={'height': '35vh'}),
                         dcc.Markdown(id='verkaufspreis_text'),
-                        dcc.Graph(id="objektrendite", style={'height': '38vh'}),
+                        dcc.Graph(id="objektrendite", style={'height': '35vh'}),
                         dcc.Markdown(id='objektrendite_text'),
-                        dcc.Graph(id="eigenkapitalrendite", style={'height': '38vh'}),
+                        dcc.Graph(id="eigenkapitalrendite", style={'height': '35vh'}),
                         dcc.Markdown(id='eigenkapitalrendite_text'),
-                        dcc.Graph(id="gewinn", style={'height': '38vh'}),
+                        dcc.Graph(id="gewinn", style={'height': '35vh'}),
                         dcc.Markdown(id='gewinn_text'),
-                        dcc.Graph(id="minimaler_cashflow", style={'height': '38vh'}),
+                        dcc.Graph(id="minimaler_cashflow", style={'height': '35vh'}),
                         dcc.Markdown(id='minimaler_cashflow_text'),
                     ],
                     style={
