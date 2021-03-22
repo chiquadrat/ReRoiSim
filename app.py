@@ -23,8 +23,9 @@ from dash_extensions.snippets import send_data_frame
 import openpyxl
 
 from formeln import renditerechner
+from text import text_generator
 
-VALID_USERNAME_PASSWORD_PAIRS = {"Trump": "Tower"}
+VALID_USERNAME_PASSWORD_PAIRS = {"Christoph": "Groener"}
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -948,18 +949,28 @@ app.layout = html.Div(
                         html.H4(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
-                        dcc.Graph(id="eingabe_verkaufsfaktor"),
-                        dcc.Graph(id="eingabe_anschlusszinssatz"),
-                        dcc.Graph(id="eingabe_mietsteigerung"),
-                        dcc.Graph(id="eingabe_kostensteigerung"),
-                        dcc.Graph(id="eingabe_mietausfall"),
+                        dcc.Graph(id="eingabe_verkaufsfaktor", style={'height': '35vh'}),
+                        dcc.Markdown(id='verkaufsfaktor_text'),
+                        dcc.Graph(id="eingabe_anschlusszinssatz", style={'height': '35vh'}),
+                        dcc.Markdown(id='anschlusszinssatz_text'),                        
+                        dcc.Graph(id="eingabe_mietsteigerung", style={'height': '35vh'}),
+                        dcc.Markdown(id='mietsteigerung_text'),
+                        dcc.Graph(id="eingabe_kostensteigerung", style={'height': '35vh'}),
+                        dcc.Markdown(id='kostensteigerung_text'),
+                        dcc.Graph(id="eingabe_mietausfall", style={'height': '35vh'}),
+                        dcc.Markdown(id='mietausfall_text'),
                         html.H4("Ergebnisse der Simulation"),
-                        dcc.Markdown(id='ergebnisse'),
-                        dcc.Graph(id="verkaufspreis"),
-                        dcc.Graph(id="objektrendite"),
-                        dcc.Graph(id="eigenkapitalrendite"),
-                        dcc.Graph(id="gewinn"),
-                        dcc.Graph(id="minimaler_cashflow"),
+                        dcc.Markdown(id='ergebnisse_text'),
+                        dcc.Graph(id="verkaufspreis", style={'height': '35vh'}),
+                        dcc.Markdown(id='verkaufspreis_text'),
+                        dcc.Graph(id="objektrendite", style={'height': '35vh'}),
+                        dcc.Markdown(id='objektrendite_text'),
+                        dcc.Graph(id="eigenkapitalrendite", style={'height': '35vh'}),
+                        dcc.Markdown(id='eigenkapitalrendite_text'),
+                        dcc.Graph(id="gewinn", style={'height': '35vh'}),
+                        dcc.Markdown(id='gewinn_text'),
+                        dcc.Graph(id="minimaler_cashflow", style={'height': '35vh'}),
+                        dcc.Markdown(id='minimaler_cashflow_text'),
                     ],
                     style={
                         # "display": "inline-block",
@@ -1092,7 +1103,17 @@ def updateTable(
 @app.callback(
     #   Output("kennzahlen1", "figure"),
 #    Output('kaufpreis', 'value'),
-    Output('ergebnisse', 'children'),
+    Output('anschlusszinssatz_text', 'children'),
+    Output('verkaufsfaktor_text', 'children'),
+    Output('mietsteigerung_text', 'children'),
+    Output('kostensteigerung_text', 'children'),
+    Output('mietausfall_text', 'children'),
+    Output('ergebnisse_text', 'children'),
+    Output('verkaufspreis_text', 'children'),
+    Output('objektrendite_text', 'children'),
+    Output('eigenkapitalrendite_text', 'children'),
+    Output('gewinn_text', 'children'),
+    Output('minimaler_cashflow_text', 'children'),
     Output("loading-output-1", "children"),
     Output("eingabe_verkaufsfaktor", "figure"),
     Output("eingabe_anschlusszinssatz", "figure"),
@@ -1217,49 +1238,123 @@ def custom_figure(
         steuerjahr=2021,
     )
 
-    def figure_ein_aus_gabeparameter(eingabeparameter, name, zeichen, x, runden):
-        # Geschätzter Verkaufspreis
+    def figure_ein_aus_gabeparameter(eingabeparameter, name, zeichen, x, runden, area):
+        
         eingabeparameter = np.array(ergebnis[eingabeparameter])
         eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
         if np.all(eingabeparameter == eingabeparameter[0]) == True:
             fig = go.Figure(data=[go.Table()])
         else:
-            fig = ff.create_distplot([eingabeparameter], [name], show_hist=False)
-            fig = fig.add_vline(
-                x=np.quantile(eingabeparameter, q=0.5),
+            fig = ff.create_distplot([eingabeparameter], [name], show_hist=False, show_rug=False)
+            
+            if (name=="Verkaufspreis") and (eingabeparameter.min() < kaufpreis):
+                #print(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter))
+                fig = fig.add_vline(
+                x=kaufpreis,
                 line_width=3,
                 line_dash="dash",
                 line_color="black",
-                annotation_text=f"Median: {round(np.quantile(eingabeparameter, q=0.5)*x,runden)} {zeichen}",
-                annotation_position="top right",
-                annotation_font_size=12,
-                annotation_font_color="black",
-            )
-            fig = fig.add_vline(
-                x=np.quantile(eingabeparameter, q=0.05),
-                line_width=3,
-                line_dash="dash",
-                line_color="red",
-                annotation_text=f"5% Quantil: {round(np.quantile(eingabeparameter, q=.05)*x,runden)} {zeichen}",
+                annotation_text=f"{round(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter)*100,2)} % Quantil",
                 annotation_position="bottom right",
                 annotation_font_size=12,
-                annotation_font_color="red",
-            )
-            fig = fig.add_vline(
-                x=np.quantile(eingabeparameter, q=0.95),
+                annotation_font_color="black",)
+            elif (name=="Gewinn") and (eingabeparameter.min() < 0):
+                #print(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter))
+                fig = fig.add_vline(
+                x=0,
                 line_width=3,
                 line_dash="dash",
-                line_color="green",
-                annotation_text=f"95% Quantil: {round(np.quantile(eingabeparameter, q=.95)*x,runden)} {zeichen}",
+                line_color="black",
+                annotation_text=f"{round(len(eingabeparameter[eingabeparameter<0])/len(eingabeparameter)*100,2)} % Quantil",
                 annotation_position="bottom right",
                 annotation_font_size=12,
-                annotation_font_color="green",
-            )
+                annotation_font_color="black",)
+            elif (name=="Objektrendite" or name=="Eigenkapitalrendite") and (eingabeparameter.min()<0):
+                fig = fig.add_vline(
+                x=0,
+                line_width=3,
+                line_dash="dash",
+                line_color="black",
+                annotation_text=f"{round(len(eingabeparameter[eingabeparameter<0])/len(eingabeparameter)*100,2)} % Quantil",
+                annotation_position="bottom right",
+                annotation_font_size=12,
+                annotation_font_color="black",)                
+            else:
+                fig = fig.add_vline(
+                    x=np.quantile(eingabeparameter, q=0.05),
+                    line_width=3,
+                    line_dash="dash",
+                    line_color="black",
+                    annotation_text=f"5% Quantil: {round(np.quantile(eingabeparameter, q=.05)*x,runden)} {zeichen}",
+                    annotation_position="bottom right",
+                    annotation_font_size=12,
+                    annotation_font_color="black",
+                )
+                
+            fig = fig.add_vline(
+                    x=np.quantile(eingabeparameter, q=0.95),
+                    line_width=3,
+                    line_dash="dash",
+                    line_color="black",
+                    annotation_text=f"95% Quantil: {round(np.quantile(eingabeparameter, q=.95)*x,runden)} {zeichen}",
+                    annotation_position="bottom right",
+                    annotation_font_size=12,
+                    annotation_font_color="black",
+                )
+                #fig.update_layout(yaxis_range=[0,4])
+            fig = fig.add_vline(
+                    x=np.quantile(eingabeparameter, q=0.5),
+                    line_width=3,
+                    line_dash="dash",
+                    line_color="black",
+                    annotation_text=f"Median: {round(np.quantile(eingabeparameter, q=0.5)*x,runden)} {zeichen}",
+                    annotation_position="top right",
+                    annotation_font_size=12,
+                    annotation_font_color="black",
+                )
+
+            fig.update_yaxes(rangemode="tozero")
             fig.update_layout(plot_bgcolor="white")
             fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
             fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
             fig.update_layout(showlegend=False)
             fig.update_layout(title=name)
+            
+            
+            if area == "middle":
+                xl = np.quantile(eingabeparameter, q=0.05)
+                xr = np.quantile(eingabeparameter, q=0.95)
+                x1   = [xc   for xc in fig.data[0].x if xc <xl]
+                y1   = fig.data[0].y[:len(x1)]
+
+                x2   = [xc   for xc in fig.data[0].x if xc > xr]
+                y2   = fig.data[0].y[-len(x2):]
+
+                x3 = [xc   for xc in fig.data[0].x if (xc > xl) and (xc < xr)]
+                y3 = fig.data[0].y[len(x1):-len(x2)]
+
+                fig.add_scatter(x=x3, y=y3,fill='tozeroy', mode='none' , fillcolor='lightblue')
+            
+                #fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+                #fig.add_scatter(x=x2, y=y2,fill='tozeroy', mode='none' , fillcolor='green')
+            if name=="Verkaufspreis":
+                x1   = [xc   for xc in fig.data[0].x if xc <kaufpreis]
+                y1   = fig.data[0].y[:len(x1)]            
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+
+            if ((name=="Objektrendite") or 
+                (name=="Eigenkapitalrendite") or
+                (name=="Gewinn")):
+                x1   = [xc   for xc in fig.data[0].x if xc <0]
+                y1   = fig.data[0].y[:len(x1)]            
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+                
+            if name=="Minimaler Cashflow":
+                xl = np.quantile(eingabeparameter, q=0.05)
+                x1   = [xc   for xc in fig.data[0].x if xc <xl]
+                y1   = fig.data[0].y[:len(x1)]
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor='red')
+                
         return fig
 
     fig_verkaufsfaktor = figure_ein_aus_gabeparameter(
@@ -1268,6 +1363,7 @@ def custom_figure(
         zeichen="",
         x=1,
         runden=0,
+        area="middle"
     )
 
     fig_anschlusszinssatz = figure_ein_aus_gabeparameter(
@@ -1276,6 +1372,7 @@ def custom_figure(
         zeichen="%",
         x=100,
         runden=2,
+        area="middle"
     )
 
     fig_mietsteigerung = figure_ein_aus_gabeparameter(
@@ -1284,6 +1381,7 @@ def custom_figure(
         zeichen="%",
         x=100,
         runden=2,
+        area="middle"
     )
 
     fig_kostensteigerung = figure_ein_aus_gabeparameter(
@@ -1292,6 +1390,7 @@ def custom_figure(
         zeichen="%",
         x=100,
         runden=2,
+        area="middle"
     )
 
     fig_mietausfall = figure_ein_aus_gabeparameter(
@@ -1300,7 +1399,10 @@ def custom_figure(
         zeichen="%",
         x=100,
         runden=2,
+        area="middle"
     )
+
+
 
     fig_verkaufspreis = figure_ein_aus_gabeparameter(
         eingabeparameter="verkaufspreis",
@@ -1308,6 +1410,7 @@ def custom_figure(
         zeichen="€",
         x=1,
         runden=0,
+        area="nothing"
     )
 
     fig_objektrendite = figure_ein_aus_gabeparameter(
@@ -1316,6 +1419,7 @@ def custom_figure(
         zeichen="%",
         x=100,
         runden=2,
+        area="nothing"
     )
 
     fig_eigenkapitalrendite = figure_ein_aus_gabeparameter(
@@ -1324,10 +1428,12 @@ def custom_figure(
         zeichen="%",
         x=100,
         runden=2,
+        area="nothing"
     )
 
     fig_gewinn = figure_ein_aus_gabeparameter(
         eingabeparameter="gewinn", name="Gewinn", zeichen="€", x=1, runden=0,
+        area="nothing"
     )
 
     fig_minimaler_cashflow = figure_ein_aus_gabeparameter(
@@ -1336,25 +1442,34 @@ def custom_figure(
         zeichen="€",
         x=1,
         runden=0,
+        area="nothing"
     )
+        
+        
+    loading_antwort = ""
     
-    antwort = ""
-    
-    verk_text = np.array(ergebnis["verkaufspreis"])
-    verk_text = verk_text[~np.isnan(verk_text)]
-    ekr_text = np.array(ergebnis["eigenkapitalrendite"])
-    ekr_text = ekr_text[~np.isnan(ekr_text)]
-    
-    ergebnisse = f"""Nach **{anlagehorizont} Jahren** werden Sie einen durchschnittlichen
-    Verkaufspreis von **{round(verk_text.mean())} €** erzielen. Ihre durchschnittliche
-    Eigenkapitalrendite liegt bei **{round(ekr_text.mean()*100, 2)} %** usw...."""
-    
- #   bla=300_000
+    # Generate text output
+    text = text_generator(
+        ergebnis,
+        zinsbindung,
+        anlagehorizont,
+        erste_mieterhoehung,
+        kaufpreis,
+        )
 
     return (
-#        bla,
-        ergebnisse,
-        antwort,
+        text["anschlusszinssatz"],
+        text["verkaufsfaktor"],
+        text["mietsteigerung"],
+        text["kostensteigerung"],
+        text["mietausfall"],
+        text["ergebnisse"],
+        text["verkaufspreis"],
+        text["objektrendite"],
+        text["eigenkapitalrendite"],
+        text["gewinn"],
+        text["minimaler_cashflow"],
+        loading_antwort,
         fig_verkaufsfaktor,
         fig_anschlusszinssatz,
         fig_mietsteigerung,
