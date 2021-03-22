@@ -1258,7 +1258,18 @@ def custom_figure(
                 annotation_position="bottom right",
                 annotation_font_size=12,
                 annotation_font_color="black",)
-            elif (name=="Objektrendite") and (eingabeparameter.min()<0):
+            elif (name=="Gewinn") and (eingabeparameter.min() < 0):
+                #print(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter))
+                fig = fig.add_vline(
+                x=0,
+                line_width=3,
+                line_dash="dash",
+                line_color="black",
+                annotation_text=f"{round(len(eingabeparameter[eingabeparameter<0])/len(eingabeparameter)*100,2)} % Quantil",
+                annotation_position="bottom right",
+                annotation_font_size=12,
+                annotation_font_color="black",)
+            elif (name=="Objektrendite" or name=="Eigenkapitalrendite") and (eingabeparameter.min()<0):
                 fig = fig.add_vline(
                 x=0,
                 line_width=3,
@@ -1331,10 +1342,18 @@ def custom_figure(
                 y1   = fig.data[0].y[:len(x1)]            
                 fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
 
-            if name=="Objektrendite":
+            if ((name=="Objektrendite") or 
+                (name=="Eigenkapitalrendite") or
+                (name=="Gewinn")):
                 x1   = [xc   for xc in fig.data[0].x if xc <0]
                 y1   = fig.data[0].y[:len(x1)]            
                 fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+                
+            if name=="Minimaler Cashflow":
+                xl = np.quantile(eingabeparameter, q=0.05)
+                x1   = [xc   for xc in fig.data[0].x if xc <xl]
+                y1   = fig.data[0].y[:len(x1)]
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor='red')
                 
         return fig
 
@@ -1435,6 +1454,7 @@ def custom_figure(
         zinsbindung,
         anlagehorizont,
         erste_mieterhoehung,
+        kaufpreis,
         )
 
     return (

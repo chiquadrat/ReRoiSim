@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung):
+def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, kaufpreis):
     """Function that generates interactive text outputs for all plots.
 
     Args:
@@ -61,8 +61,36 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung):
         **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
         Historische Werte finde sie unter: LINK"""
    
-    verkaufspreis_text = "Sicker Verkaufspreis"
-    objektrendite_text = "Sicke Objektrendite"
+    verkaufspreis = np.array(ergebnis["verkaufspreis"])
+    verkaufspreis = verkaufspreis[~np.isnan(verkaufspreis)]
+    if verkaufspreis.min() < kaufpreis:
+        verkaufspreis_text = f"""Im durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont}** Jahren für 
+        **{int(np.array(ergebnis["verkaufspreis"]).mean())}** Euro verkaufen können. Ihr durchschnittlicher Verkaufsgewinn/verlust
+        beträgt somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)}** Euro. In 
+        **{round(len(verkaufspreis[verkaufspreis<kaufpreis])/len(verkaufspreis)*100,2)}** % der Fälle werden Sie 
+        das Objekt für einen Preis verkaufen der unter dem Einkaufspreis liegt
+        """
+    else:
+        verkaufspreis_text = f"""Im durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont}** Jahren für 
+        **{int(np.array(ergebnis["verkaufspreis"]).mean())}** Euro verkaufen können. Ihr durchschnittlicher Verkaufsgewinn/verlust
+        beträgt somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)}** Euro. 
+        """
+
+    objektrendite = np.array(ergebnis["objektrendite"])
+    objektrendite = objektrendite[~np.isnan(objektrendite)]
+    
+    if objektrendite.min() < 0:
+        objektrendite_text = f"""Ihre durchschnittliche Objektrendite nach **{anlagehorizont}** Jahren
+        beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. In 
+        **{round(len(objektrendite[objektrendite<0])/len(objektrendite)*100,2)}** % der Fälle
+        wird Ihre Objektrendite negativ sein.
+        """
+    else:
+        objektrendite_text = f"""Ihre durchschnittliche Objektrendite nach **{anlagehorizont}** Jahren
+        beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. 
+        """
+    
+    
     eigenkapitalrendite_text = "Sicke Eigenkapitalrendite"
     gewinn_text = "Sicker Gewinn"
     minimaler_cashflow_text = "Sicker minimaler Cashflow"
