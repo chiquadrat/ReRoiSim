@@ -80,8 +80,7 @@ app.layout = html.Div(
                 # first column of first row
                 html.Div(
                     children=[
-                        html.Label("Kaufpreis (Euro) *",
-                                   title="Hier ist eine sicke Erklärung"),
+                        html.Label("Kaufpreis (Euro)"),
                         dcc.Input(
                             id="kaufpreis",
                             placeholder="Eingabe...",
@@ -122,7 +121,8 @@ app.layout = html.Div(
                 # third column of first row
                 html.Div(
                     children=[
-                        html.Label("davon Sanierungskosten (Euro)"),
+                        html.Label("davon Sanierungskosten (Euro)*",
+                                   title="nach § 7h oder § 7i EStG: Nur für die Sanierung von Baudenkmälern und Gebäuden in Sanierungsgebieten"),
                         dcc.Input(
                             id="kaufpreis_sanierung",
                             placeholder="Eingabe...",
@@ -147,7 +147,8 @@ app.layout = html.Div(
                 # first column of second row
                 html.Div(
                     children=[
-                        html.Label("Kaufnebenkosten"),
+                        html.Label("Kaufnebenkosten (Euro)*",
+                                   title="Umfassen Makler und Notarkosten sowie die Grunderwerbssteuer."),
                         dcc.Input(
                             id="kaufnebenkosten",
                             placeholder="Eingabe...",
@@ -167,7 +168,8 @@ app.layout = html.Div(
                 # second column of second row
                 html.Div(
                     children=[
-                        html.Label("Renovierungskosten"),
+                        html.Label("Renovierungskosten (Euro)*",
+                                   title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."),
                         dcc.Input(
                             id="renovierungskosten",
                             placeholder="Eingabe...",
@@ -209,7 +211,8 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Mieteinahmen"),
+                        html.Label("Mieteinahmen (Euro)*",
+                                   title="Nettokaltmiete"),
                         dcc.Input(
                             id="mieteinnahmen",
                             placeholder="Eingabe...",
@@ -229,7 +232,8 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Mietsteigerung"),
+                        html.Label("Mietsteigerung (%)*",
+                                   title="Erwartungswert"),
                         dcc.Input(
                             id="mietsteigerung",
                             placeholder="Eingabe...",
@@ -248,7 +252,8 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Mietsteigerung"),
+                        html.Label("Unsicherheit Mietsteigerung*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_mietsteigerung",
                             placeholder="Eingabe...",
@@ -294,7 +299,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Instandhaltungskosten Jahr "),
+                        html.Label("Instandhaltungskosten (Euro)"),
                         dcc.Input(
                             id="instandhaltungskosten",
                             placeholder="Eingabe...",
@@ -314,7 +319,7 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Verwaltungskosten Jahr"),
+                        html.Label("Verwaltungskosten (Euro)"),
                         dcc.Input(
                             id="verwaltungskosten",
                             placeholder="Eingabe...",
@@ -340,7 +345,8 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Pauschale für Mietausfall"),
+                        html.Label("Pauschale für Mietausfall (%)*",
+                                   title="Erwartungswert"),
                         dcc.Input(
                             id="mietausfall",
                             placeholder="Eingabe...",
@@ -360,7 +366,8 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Mietausfall"),
+                        html.Label("Unsicherheit Mietausfall*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_mietausfall",
                             placeholder="Eingabe...",
@@ -380,7 +387,8 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Geschätzte Kostensteigerung"),
+                        html.Label("Geschätzte Kostensteigerung (%)*",
+                                   title="Erwartungswert"),
                         dcc.Input(
                             id="kostensteigerung",
                             placeholder="Eingabe...",
@@ -405,7 +413,8 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Kostensteigerung"),
+                        html.Label("Unsicherheit Kostensteigerung*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_kostensteigerung",
                             placeholder="Eingabe...",
@@ -447,7 +456,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Eigenkapital"),
+                        html.Label("Eigenkapital (Euro)"),
                         dcc.Input(
                             id="eigenkapital",
                             placeholder="Eingabe...",
@@ -467,7 +476,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Zinsbindung"),
+                        html.Label("Zinsbindung (Jahre)"),
                         dcc.Input(
                             id="zinsbindung",
                             placeholder="Eingabe...",
@@ -487,7 +496,7 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Disagio"),
+                        html.Label("Disagio (%)"),
                         dcc.Input(
                             id="disagio",
                             placeholder="Eingabe...",
@@ -513,7 +522,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Zinssatz"),
+                        html.Label("Zinssatz (%)"),
                         dcc.Input(
                             id="zinsatz",
                             placeholder="Eingabe...",
@@ -532,7 +541,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Tilgungssatz"),
+                        html.Label("Tilgungssatz (%)"),
                         dcc.Input(
                             id="tilgungssatz",
                             placeholder="Eingabe...",
@@ -552,7 +561,8 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Anschlusszinssatz"),
+                        html.Label("Anschlusszinssatz (%)*",
+                                   title="Erwartungswert"),
                         dcc.Input(
                             id="anschlusszinssatz",
                             placeholder="Eingabe...",
@@ -578,7 +588,8 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Anschlusszinssatz"),
+                        html.Label("Unsicherheit Anschlusszinssatz*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_anschlusszinssatz",
                             placeholder="Eingabe...",
@@ -643,7 +654,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Zu versteuerndes Einkommen"),
+                        html.Label("Zu versteuerndes Einkommen (Euro)"),
                         dcc.Input(
                             id="einkommen",
                             placeholder="Eingabe...",
@@ -705,7 +716,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Anlagehorizont"),
+                        html.Label("Anlagehorizont (Jahre)"),
                         dcc.Input(
                             id="anlagehorizont",
                             placeholder="Eingabe...",
@@ -725,7 +736,8 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Geschätzter Verkaufsfaktor"),
+                        html.Label("Geschätzter Verkaufsfaktor*",
+                                   title="Kaufpreis-Miet-Verhältnis (Erwartungswert)"),
                         dcc.Input(
                             id="verkaufsfaktor",
                             placeholder="Eingabe...",
@@ -745,7 +757,8 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Verkaufsfaktor"),
+                        html.Label("Unsicherheit Verkaufsfaktor*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_verkaufsfaktor",
                             placeholder="Eingabe...",
@@ -1373,7 +1386,8 @@ def custom_figure(
                 x3 = [xc   for xc in fig.data[0].x if (xc > xl) and (xc < xr)]
                 y3 = fig.data[0].y[len(x1):-len(x2)]
 
-                fig.add_scatter(x=x3, y=y3,fill='tozeroy', mode='none' , fillcolor='lightblue')
+                fig.add_scatter(x=x3, y=y3,fill='tozeroy', 
+                                mode='none' , fillcolor='lightblue')
             
                 #fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
                 #fig.add_scatter(x=x2, y=y2,fill='tozeroy', mode='none' , fillcolor='green')
