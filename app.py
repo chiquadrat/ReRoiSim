@@ -23,7 +23,7 @@ from dash_extensions.snippets import send_data_frame
 import openpyxl
 
 from formeln import renditerechner
-from text import text_generator
+from text import text_generator, text_static
 
 VALID_USERNAME_PASSWORD_PAIRS = {"Christoph": "Groener"}
 
@@ -33,8 +33,31 @@ server = app.server
 auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
 # app.config.suppress_callback_exceptions = True
 
+#
+# Statische Texte
+#
+
+text_statisch = text_static()
+
 app.layout = html.Div(
     [
+                # row zero
+        html.Div(
+            children=[
+                # first column of row zero
+                html.Div(
+                    children=[html.H3("Immobilienrendite-Simulator"),
+                              dcc.Markdown(text_statisch["einleitung"]),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
         # row zero
         html.Div(
             children=[
@@ -57,7 +80,8 @@ app.layout = html.Div(
                 # first column of first row
                 html.Div(
                     children=[
-                        html.Label("Kaufpreis"),
+                        html.Label("Kaufpreis (Euro) *",
+                                   title="Hier ist eine sicke Erklärung"),
                         dcc.Input(
                             id="kaufpreis",
                             placeholder="Eingabe...",
@@ -65,6 +89,7 @@ app.layout = html.Div(
                             min=1,
                             type="number",
                             required=True,
+                            
                         ),
                     ],
                     style={
@@ -77,7 +102,7 @@ app.layout = html.Div(
                 # second column of first row
                 html.Div(
                     children=[
-                        html.Label("-> davon Grundstücksanteil"),
+                        html.Label("davon Grundstücksanteil (Euro)"),
                         dcc.Input(
                             id="kaufpreis_grundstueck",
                             placeholder="Eingabe...",
@@ -97,7 +122,7 @@ app.layout = html.Div(
                 # third column of first row
                 html.Div(
                     children=[
-                        html.Label("-> davon Sanierungskosten"),
+                        html.Label("davon Sanierungskosten (Euro)"),
                         dcc.Input(
                             id="kaufpreis_sanierung",
                             placeholder="Eingabe...",
@@ -740,93 +765,53 @@ app.layout = html.Div(
             ],
             className="row",
         ),
-        # row sixteen
+        # Berechnete Kennzahlen
+        # row 20
         html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("6. Simulation"),],
-                    style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
-                    },
-                ),
-            ],
-            className="row",
-        ),
-        # row seventeen
-        html.Div(
-            children=[
-                # first column
-                html.Div(
                     children=[
-                        html.Label("Anzahl der Simulationsläufe"),
-                        dcc.Input(
-                            id="sim_runs",
-                            placeholder="Eingabe...",
-                            type="number",
-                            value=250,
-                            min=2,
-                            max=10_000,
-                            required=True,
+                        html.H4("Berechnete Kennzahlen"),
+                        dcc.Markdown(text_statisch["berechnete_kennzahlen"]),
+                        dash_table.DataTable(
+                            id="table",
+                            style_cell={
+                                "textAlign": "left",
+                                "fontSize": 14,
+                                "font-family": "sans-serif",
+                            },
+                            style_as_list_view=True,
+                            style_header={
+                                "backgroundColor": "white",
+                                "fontWeight": "bold",
+                            },
                         ),
                     ],
                     style={
-                        "display": "inline-block",
+                        #  "display": "inline-block",
                         "vertical-align": "top",
                         "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "margin-top": "3vw",
+                        "margin-right": "15vw",
                     },
                 ),
             ],
             className="row",
-        ),
-        # row eighteen
-        html.Div(
-            children=[
-                # first column of third row
-                html.Div(
-                    children=[html.Button("Start der Simulation", id="button"),
-],
-                    style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
-                    },
-                ),
-            html.Div(
-                children=[
-                                                          dcc.Loading(
-            id="loading-1",
-            type="default",
-            children=html.Div(id="loading-output-1")
-        ),
-                    
-                ],
-                                    style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
-                    },
-            )
-            ],
-            className="row",
-        ),
+        ),        
         # row sixteen
         html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("7. Import/Export der Eingabeparameter"),],
+                    children=[html.H4("6. Import/Export der Eingabeparameter"),
+                              dcc.Markdown(text_statisch["export_import"]),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
                         "margin-left": "3vw",
                         "margin-top": "3vw",
+                        "margin-right": "10vw",
                     },
                 ),
             ],
@@ -893,6 +878,86 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+        
+        # row sixteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[html.H4("7. Simulation"),
+                              dcc.Markdown(text_statisch["simulation"]),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                        "margin-right": "10vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
+        # row seventeen
+        html.Div(
+            children=[
+                # first column
+                html.Div(
+                    children=[
+                        html.Label("Anzahl der Simulationsläufe"),
+                        dcc.Input(
+                            id="sim_runs",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=250,
+                            min=2,
+                            max=10_000,
+                            required=True,
+                        ),
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
+        # row eighteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[html.Button("Start der Simulation", id="button"),
+],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                ),
+            html.Div(
+                children=[
+                                                          dcc.Loading(
+            id="loading-1",
+            type="default",
+            children=html.Div(id="loading-output-1")
+        ),
+                    
+                ],
+                                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+            )
+            ],
+            className="row",
+        ),
+        
         # Next row
         # html.Div(
         #     children=[
@@ -908,38 +973,7 @@ app.layout = html.Div(
         #             },
         #     className="row",
         # ),
-        # row 20
-        html.Div(
-            children=[
-                # first column of third row
-                html.Div(
-                    children=[
-                        html.H4("Berechnete Kennzahlen"),
-                        dash_table.DataTable(
-                            id="table",
-                            style_cell={
-                                "textAlign": "left",
-                                "fontSize": 14,
-                                "font-family": "sans-serif",
-                            },
-                            style_as_list_view=True,
-                            style_header={
-                                "backgroundColor": "white",
-                                "fontWeight": "bold",
-                            },
-                        ),
-                    ],
-                    style={
-                        #  "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
-                        "margin-right": "15vw",
-                    },
-                ),
-            ],
-            className="row",
-        ),
+
         # 21
         html.Div(
             children=[
@@ -949,6 +983,7 @@ app.layout = html.Div(
                         html.H4(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
+                        dcc.Markdown(text_statisch["eingabeparameter"]),
                         dcc.Graph(id="eingabe_verkaufsfaktor", style={'height': '35vh'}),
                         dcc.Markdown(id='verkaufsfaktor_text'),
                         dcc.Graph(id="eingabe_anschlusszinssatz", style={'height': '35vh'}),
@@ -960,7 +995,7 @@ app.layout = html.Div(
                         dcc.Graph(id="eingabe_mietausfall", style={'height': '35vh'}),
                         dcc.Markdown(id='mietausfall_text'),
                         html.H4("Ergebnisse der Simulation"),
-                        dcc.Markdown(id='ergebnisse_text'),
+                        dcc.Markdown(text_statisch["ergebnisse"]),
                         dcc.Graph(id="verkaufspreis", style={'height': '35vh'}),
                         dcc.Markdown(id='verkaufspreis_text'),
                         dcc.Graph(id="objektrendite", style={'height': '35vh'}),
@@ -988,6 +1023,10 @@ app.layout = html.Div(
 )
 
 
+
+#
+# Callbacks
+#
 
 @app.callback(
     Output("table", "columns"),
@@ -1103,12 +1142,13 @@ def updateTable(
 @app.callback(
     #   Output("kennzahlen1", "figure"),
 #    Output('kaufpreis', 'value'),
+#    Output('einleitung_text', 'children'),
     Output('anschlusszinssatz_text', 'children'),
     Output('verkaufsfaktor_text', 'children'),
     Output('mietsteigerung_text', 'children'),
     Output('kostensteigerung_text', 'children'),
     Output('mietausfall_text', 'children'),
-    Output('ergebnisse_text', 'children'),
+    #Output('ergebnisse_text', 'children'),
     Output('verkaufspreis_text', 'children'),
     Output('objektrendite_text', 'children'),
     Output('eigenkapitalrendite_text', 'children'),
@@ -1449,7 +1489,7 @@ def custom_figure(
     loading_antwort = ""
     
     # Generate text output
-    text = text_generator(
+    text_dynamisch = text_generator(
         ergebnis,
         zinsbindung,
         anlagehorizont,
@@ -1458,17 +1498,18 @@ def custom_figure(
         )
 
     return (
-        text["anschlusszinssatz"],
-        text["verkaufsfaktor"],
-        text["mietsteigerung"],
-        text["kostensteigerung"],
-        text["mietausfall"],
-        text["ergebnisse"],
-        text["verkaufspreis"],
-        text["objektrendite"],
-        text["eigenkapitalrendite"],
-        text["gewinn"],
-        text["minimaler_cashflow"],
+#        text["einleitung"],
+        text_dynamisch["anschlusszinssatz"],
+        text_dynamisch["verkaufsfaktor"],
+        text_dynamisch["mietsteigerung"],
+        text_dynamisch["kostensteigerung"],
+        text_dynamisch["mietausfall"],
+        #text_dynamisch["ergebnisse"],
+        text_dynamisch["verkaufspreis"],
+        text_dynamisch["objektrendite"],
+        text_dynamisch["eigenkapitalrendite"],
+        text_dynamisch["gewinn"],
+        text_dynamisch["minimaler_cashflow"],
         loading_antwort,
         fig_verkaufsfaktor,
         fig_anschlusszinssatz,
