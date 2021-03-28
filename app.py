@@ -1387,27 +1387,31 @@ def custom_figure(
                 y3 = fig.data[0].y[len(x1):-len(x2)]
 
                 fig.add_scatter(x=x3, y=y3,fill='tozeroy', 
-                                mode='none' , fillcolor='lightblue')
+                                mode='none' , fillcolor='lightblue',
+                                name=name)
             
                 #fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
                 #fig.add_scatter(x=x2, y=y2,fill='tozeroy', mode='none' , fillcolor='green')
             if name=="Verkaufspreis":
                 x1   = [xc   for xc in fig.data[0].x if xc <kaufpreis]
                 y1   = fig.data[0].y[:len(x1)]            
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
+                                fillcolor="red", name=name)
 
             if ((name=="Objektrendite") or 
                 (name=="Eigenkapitalrendite") or
                 (name=="Gewinn")):
                 x1   = [xc   for xc in fig.data[0].x if xc <0]
                 y1   = fig.data[0].y[:len(x1)]            
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
+                                fillcolor="red", name=name)
                 
             if name=="Minimaler Cashflow":
                 xl = np.quantile(eingabeparameter, q=0.05)
                 x1   = [xc   for xc in fig.data[0].x if xc <xl]
                 y1   = fig.data[0].y[:len(x1)]
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor='red')
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
+                                fillcolor='red', name=name)
                 
         return fig
 
