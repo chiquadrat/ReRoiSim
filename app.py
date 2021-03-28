@@ -1123,7 +1123,7 @@ def updateTable(
     anfangs_netto_mietrendite = round((jahresreinertrag / gesamtkosten) * 100, 2)
 
     # Finanzierung
-    darlehen = (gesamtkosten - eigenkapital) / (1 - disagio)
+    darlehen = (gesamtkosten - eigenkapital) / (1 - (disagio/100))
     kreditrate_jahr = darlehen * ((zinsatz / 100) + (tilgungssatz / 100))
 
     df = pd.DataFrame(
