@@ -23,7 +23,7 @@ from dash_extensions.snippets import send_data_frame
 import openpyxl
 
 from formeln import renditerechner
-from text import text_generator
+from text import text_generator, text_static
 
 VALID_USERNAME_PASSWORD_PAIRS = {"Christoph": "Groener"}
 
@@ -33,8 +33,31 @@ server = app.server
 auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
 # app.config.suppress_callback_exceptions = True
 
+#
+# Statische Texte
+#
+
+text_statisch = text_static()
+
 app.layout = html.Div(
     [
+                # row zero
+        html.Div(
+            children=[
+                # first column of row zero
+                html.Div(
+                    children=[html.H3("Immobilienrendite-Simulator"),
+                              dcc.Markdown(text_statisch["einleitung"]),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
         # row zero
         html.Div(
             children=[
@@ -57,7 +80,7 @@ app.layout = html.Div(
                 # first column of first row
                 html.Div(
                     children=[
-                        html.Label("Kaufpreis"),
+                        html.Label("Kaufpreis (Euro)"),
                         dcc.Input(
                             id="kaufpreis",
                             placeholder="Eingabe...",
@@ -65,6 +88,7 @@ app.layout = html.Div(
                             min=1,
                             type="number",
                             required=True,
+                            
                         ),
                     ],
                     style={
@@ -77,7 +101,7 @@ app.layout = html.Div(
                 # second column of first row
                 html.Div(
                     children=[
-                        html.Label("-> davon Grundstücksanteil"),
+                        html.Label("davon Grundstücksanteil (Euro)"),
                         dcc.Input(
                             id="kaufpreis_grundstueck",
                             placeholder="Eingabe...",
@@ -97,7 +121,8 @@ app.layout = html.Div(
                 # third column of first row
                 html.Div(
                     children=[
-                        html.Label("-> davon Sanierungskosten"),
+                        html.Label("davon Sanierungskosten (Euro)*",
+                                   title="nach § 7h oder § 7i EStG: Nur für die Sanierung von Baudenkmälern und Gebäuden in Sanierungsgebieten"),
                         dcc.Input(
                             id="kaufpreis_sanierung",
                             placeholder="Eingabe...",
@@ -122,7 +147,8 @@ app.layout = html.Div(
                 # first column of second row
                 html.Div(
                     children=[
-                        html.Label("Kaufnebenkosten"),
+                        html.Label("Kaufnebenkosten (Euro)*",
+                                   title="Umfassen Makler und Notarkosten sowie die Grunderwerbssteuer."),
                         dcc.Input(
                             id="kaufnebenkosten",
                             placeholder="Eingabe...",
@@ -142,7 +168,8 @@ app.layout = html.Div(
                 # second column of second row
                 html.Div(
                     children=[
-                        html.Label("Renovierungskosten"),
+                        html.Label("Renovierungskosten (Euro)*",
+                                   title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."),
                         dcc.Input(
                             id="renovierungskosten",
                             placeholder="Eingabe...",
@@ -184,7 +211,8 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Mieteinahmen"),
+                        html.Label("Mieteinahmen (Euro)*",
+                                   title="Nettokaltmiete"),
                         dcc.Input(
                             id="mieteinnahmen",
                             placeholder="Eingabe...",
@@ -204,7 +232,8 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Mietsteigerung"),
+                        html.Label("Mietsteigerung (%)*",
+                                   title="Erwartungswert"),
                         dcc.Input(
                             id="mietsteigerung",
                             placeholder="Eingabe...",
@@ -223,7 +252,8 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Mietsteigerung"),
+                        html.Label("Unsicherheit Mietsteigerung*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_mietsteigerung",
                             placeholder="Eingabe...",
@@ -269,7 +299,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Instandhaltungskosten Jahr "),
+                        html.Label("Instandhaltungskosten (Euro)"),
                         dcc.Input(
                             id="instandhaltungskosten",
                             placeholder="Eingabe...",
@@ -289,7 +319,7 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Verwaltungskosten Jahr"),
+                        html.Label("Verwaltungskosten (Euro)"),
                         dcc.Input(
                             id="verwaltungskosten",
                             placeholder="Eingabe...",
@@ -315,7 +345,8 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Pauschale für Mietausfall"),
+                        html.Label("Pauschale für Mietausfall (%)*",
+                                   title="Erwartungswert"),
                         dcc.Input(
                             id="mietausfall",
                             placeholder="Eingabe...",
@@ -335,7 +366,8 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Mietausfall"),
+                        html.Label("Unsicherheit Mietausfall*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_mietausfall",
                             placeholder="Eingabe...",
@@ -355,7 +387,8 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Geschätzte Kostensteigerung"),
+                        html.Label("Geschätzte Kostensteigerung (%)*",
+                                   title="Erwartungswert"),
                         dcc.Input(
                             id="kostensteigerung",
                             placeholder="Eingabe...",
@@ -380,7 +413,8 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Kostensteigerung"),
+                        html.Label("Unsicherheit Kostensteigerung*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_kostensteigerung",
                             placeholder="Eingabe...",
@@ -422,7 +456,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Eigenkapital"),
+                        html.Label("Eigenkapital (Euro)"),
                         dcc.Input(
                             id="eigenkapital",
                             placeholder="Eingabe...",
@@ -442,7 +476,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Zinsbindung"),
+                        html.Label("Zinsbindung (Jahre)"),
                         dcc.Input(
                             id="zinsbindung",
                             placeholder="Eingabe...",
@@ -462,7 +496,7 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Disagio"),
+                        html.Label("Disagio (%)"),
                         dcc.Input(
                             id="disagio",
                             placeholder="Eingabe...",
@@ -488,7 +522,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Zinssatz"),
+                        html.Label("Zinssatz (%)"),
                         dcc.Input(
                             id="zinsatz",
                             placeholder="Eingabe...",
@@ -507,7 +541,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Tilgungssatz"),
+                        html.Label("Tilgungssatz (%)"),
                         dcc.Input(
                             id="tilgungssatz",
                             placeholder="Eingabe...",
@@ -527,7 +561,8 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Anschlusszinssatz"),
+                        html.Label("Anschlusszinssatz (%)*",
+                                   title="Erwartungswert"),
                         dcc.Input(
                             id="anschlusszinssatz",
                             placeholder="Eingabe...",
@@ -553,7 +588,8 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Anschlusszinssatz"),
+                        html.Label("Unsicherheit Anschlusszinssatz*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_anschlusszinssatz",
                             placeholder="Eingabe...",
@@ -618,7 +654,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Zu versteuerndes Einkommen"),
+                        html.Label("Zu versteuerndes Einkommen (Euro)"),
                         dcc.Input(
                             id="einkommen",
                             placeholder="Eingabe...",
@@ -680,7 +716,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Anlagehorizont"),
+                        html.Label("Anlagehorizont (Jahre)"),
                         dcc.Input(
                             id="anlagehorizont",
                             placeholder="Eingabe...",
@@ -700,7 +736,8 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Geschätzter Verkaufsfaktor"),
+                        html.Label("Geschätzter Verkaufsfaktor*",
+                                   title="Kaufpreis-Miet-Verhältnis (Erwartungswert)"),
                         dcc.Input(
                             id="verkaufsfaktor",
                             placeholder="Eingabe...",
@@ -720,7 +757,8 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Verkaufsfaktor"),
+                        html.Label("Unsicherheit Verkaufsfaktor*",
+                                   title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_verkaufsfaktor",
                             placeholder="Eingabe...",
@@ -740,93 +778,53 @@ app.layout = html.Div(
             ],
             className="row",
         ),
-        # row sixteen
+        # Berechnete Kennzahlen
+        # row 20
         html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("6. Simulation"),],
-                    style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
-                    },
-                ),
-            ],
-            className="row",
-        ),
-        # row seventeen
-        html.Div(
-            children=[
-                # first column
-                html.Div(
                     children=[
-                        html.Label("Anzahl der Simulationsläufe"),
-                        dcc.Input(
-                            id="sim_runs",
-                            placeholder="Eingabe...",
-                            type="number",
-                            value=250,
-                            min=2,
-                            max=10_000,
-                            required=True,
+                        html.H4("Berechnete Kennzahlen"),
+                        dcc.Markdown(text_statisch["berechnete_kennzahlen"]),
+                        dash_table.DataTable(
+                            id="table",
+                            style_cell={
+                                "textAlign": "left",
+                                "fontSize": 14,
+                                "font-family": "sans-serif",
+                            },
+                            style_as_list_view=True,
+                            style_header={
+                                "backgroundColor": "white",
+                                "fontWeight": "bold",
+                            },
                         ),
                     ],
                     style={
-                        "display": "inline-block",
+                        #  "display": "inline-block",
                         "vertical-align": "top",
                         "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "margin-top": "3vw",
+                        "margin-right": "15vw",
                     },
                 ),
             ],
             className="row",
-        ),
-        # row eighteen
-        html.Div(
-            children=[
-                # first column of third row
-                html.Div(
-                    children=[html.Button("Start der Simulation", id="button"),
-],
-                    style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
-                    },
-                ),
-            html.Div(
-                children=[
-                                                          dcc.Loading(
-            id="loading-1",
-            type="default",
-            children=html.Div(id="loading-output-1")
-        ),
-                    
-                ],
-                                    style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
-                    },
-            )
-            ],
-            className="row",
-        ),
+        ),        
         # row sixteen
         html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("7. Import/Export der Eingabeparameter"),],
+                    children=[html.H4("6. Import/Export der Eingabeparameter"),
+                              dcc.Markdown(text_statisch["export_import"]),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
                         "margin-left": "3vw",
                         "margin-top": "3vw",
+                        "margin-right": "10vw",
                     },
                 ),
             ],
@@ -893,6 +891,86 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+        
+        # row sixteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[html.H4("7. Simulation"),
+                              dcc.Markdown(text_statisch["simulation"]),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                        "margin-right": "10vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
+        # row seventeen
+        html.Div(
+            children=[
+                # first column
+                html.Div(
+                    children=[
+                        html.Label("Anzahl der Simulationsläufe"),
+                        dcc.Input(
+                            id="sim_runs",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=250,
+                            min=2,
+                            max=10_000,
+                            required=True,
+                        ),
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
+        # row eighteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[html.Button("Start der Simulation", id="button"),
+],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                ),
+            html.Div(
+                children=[
+                                                          dcc.Loading(
+            id="loading-1",
+            type="default",
+            children=html.Div(id="loading-output-1")
+        ),
+                    
+                ],
+                                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+            )
+            ],
+            className="row",
+        ),
+        
         # Next row
         # html.Div(
         #     children=[
@@ -908,38 +986,7 @@ app.layout = html.Div(
         #             },
         #     className="row",
         # ),
-        # row 20
-        html.Div(
-            children=[
-                # first column of third row
-                html.Div(
-                    children=[
-                        html.H4("Berechnete Kennzahlen"),
-                        dash_table.DataTable(
-                            id="table",
-                            style_cell={
-                                "textAlign": "left",
-                                "fontSize": 14,
-                                "font-family": "sans-serif",
-                            },
-                            style_as_list_view=True,
-                            style_header={
-                                "backgroundColor": "white",
-                                "fontWeight": "bold",
-                            },
-                        ),
-                    ],
-                    style={
-                        #  "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
-                        "margin-right": "15vw",
-                    },
-                ),
-            ],
-            className="row",
-        ),
+
         # 21
         html.Div(
             children=[
@@ -949,6 +996,7 @@ app.layout = html.Div(
                         html.H4(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
+                        dcc.Markdown(text_statisch["eingabeparameter"]),
                         dcc.Graph(id="eingabe_verkaufsfaktor", style={'height': '35vh'}),
                         dcc.Markdown(id='verkaufsfaktor_text'),
                         dcc.Graph(id="eingabe_anschlusszinssatz", style={'height': '35vh'}),
@@ -960,7 +1008,7 @@ app.layout = html.Div(
                         dcc.Graph(id="eingabe_mietausfall", style={'height': '35vh'}),
                         dcc.Markdown(id='mietausfall_text'),
                         html.H4("Ergebnisse der Simulation"),
-                        dcc.Markdown(id='ergebnisse_text'),
+                        dcc.Markdown(text_statisch["ergebnisse"]),
                         dcc.Graph(id="verkaufspreis", style={'height': '35vh'}),
                         dcc.Markdown(id='verkaufspreis_text'),
                         dcc.Graph(id="objektrendite", style={'height': '35vh'}),
@@ -988,6 +1036,10 @@ app.layout = html.Div(
 )
 
 
+
+#
+# Callbacks
+#
 
 @app.callback(
     Output("table", "columns"),
@@ -1071,7 +1123,7 @@ def updateTable(
     anfangs_netto_mietrendite = round((jahresreinertrag / gesamtkosten) * 100, 2)
 
     # Finanzierung
-    darlehen = (gesamtkosten - eigenkapital) / (1 - disagio)
+    darlehen = (gesamtkosten - eigenkapital) / (1 - (disagio/100))
     kreditrate_jahr = darlehen * ((zinsatz / 100) + (tilgungssatz / 100))
 
     df = pd.DataFrame(
@@ -1103,12 +1155,13 @@ def updateTable(
 @app.callback(
     #   Output("kennzahlen1", "figure"),
 #    Output('kaufpreis', 'value'),
+#    Output('einleitung_text', 'children'),
     Output('anschlusszinssatz_text', 'children'),
     Output('verkaufsfaktor_text', 'children'),
     Output('mietsteigerung_text', 'children'),
     Output('kostensteigerung_text', 'children'),
     Output('mietausfall_text', 'children'),
-    Output('ergebnisse_text', 'children'),
+    #Output('ergebnisse_text', 'children'),
     Output('verkaufspreis_text', 'children'),
     Output('objektrendite_text', 'children'),
     Output('eigenkapitalrendite_text', 'children'),
@@ -1333,27 +1386,32 @@ def custom_figure(
                 x3 = [xc   for xc in fig.data[0].x if (xc > xl) and (xc < xr)]
                 y3 = fig.data[0].y[len(x1):-len(x2)]
 
-                fig.add_scatter(x=x3, y=y3,fill='tozeroy', mode='none' , fillcolor='lightblue')
+                fig.add_scatter(x=x3, y=y3,fill='tozeroy', 
+                                mode='none' , fillcolor='lightblue',
+                                name=name)
             
                 #fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
                 #fig.add_scatter(x=x2, y=y2,fill='tozeroy', mode='none' , fillcolor='green')
             if name=="Verkaufspreis":
                 x1   = [xc   for xc in fig.data[0].x if xc <kaufpreis]
                 y1   = fig.data[0].y[:len(x1)]            
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
+                                fillcolor="red", name=name)
 
             if ((name=="Objektrendite") or 
                 (name=="Eigenkapitalrendite") or
                 (name=="Gewinn")):
                 x1   = [xc   for xc in fig.data[0].x if xc <0]
                 y1   = fig.data[0].y[:len(x1)]            
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
+                                fillcolor="red", name=name)
                 
             if name=="Minimaler Cashflow":
                 xl = np.quantile(eingabeparameter, q=0.05)
                 x1   = [xc   for xc in fig.data[0].x if xc <xl]
                 y1   = fig.data[0].y[:len(x1)]
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor='red')
+                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
+                                fillcolor='red', name=name)
                 
         return fig
 
@@ -1449,7 +1507,7 @@ def custom_figure(
     loading_antwort = ""
     
     # Generate text output
-    text = text_generator(
+    text_dynamisch = text_generator(
         ergebnis,
         zinsbindung,
         anlagehorizont,
@@ -1458,17 +1516,18 @@ def custom_figure(
         )
 
     return (
-        text["anschlusszinssatz"],
-        text["verkaufsfaktor"],
-        text["mietsteigerung"],
-        text["kostensteigerung"],
-        text["mietausfall"],
-        text["ergebnisse"],
-        text["verkaufspreis"],
-        text["objektrendite"],
-        text["eigenkapitalrendite"],
-        text["gewinn"],
-        text["minimaler_cashflow"],
+#        text["einleitung"],
+        text_dynamisch["anschlusszinssatz"],
+        text_dynamisch["verkaufsfaktor"],
+        text_dynamisch["mietsteigerung"],
+        text_dynamisch["kostensteigerung"],
+        text_dynamisch["mietausfall"],
+        #text_dynamisch["ergebnisse"],
+        text_dynamisch["verkaufspreis"],
+        text_dynamisch["objektrendite"],
+        text_dynamisch["eigenkapitalrendite"],
+        text_dynamisch["gewinn"],
+        text_dynamisch["minimaler_cashflow"],
         loading_antwort,
         fig_verkaufsfaktor,
         fig_anschlusszinssatz,
