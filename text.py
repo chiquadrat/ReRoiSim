@@ -3,14 +3,7 @@ import numpy as np
 def text_static():
     # Einleitung
     einleitung = f"""
-    Hier folgt die sicke Einleitung. Das ist eine Überschrift:
-    ##### Überschrift
-    
-    Das ist eine Liste:
-    * ITem1
-    * Item2
-    
-    
+    Hier folgt die sicke Einleitung. 
     """
     
     # Ergebnisse
