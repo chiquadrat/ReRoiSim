@@ -124,8 +124,8 @@ def renditerechner(
     # Etf Startbetrag
     etf_startgeld = eigenkapital
 
-    etf_rendite_run = []
-    etf_gewinn_run = []
+    etf_rendite_runs = []
+    etf_gewinn_runs = []
     verkaufspreis_runs = []
     eigenkapitalrendite_runs = []
     objektrendite_runs = []
@@ -199,6 +199,7 @@ def renditerechner(
         steuerwirkung_objekt_pj = [0]
         liquiditaet_pj = [-gesamtkosten]
         etf_investition_pj = [-eigenkapital]
+        etf_investition_verzinst_pj = [eigenkapital]
 
         anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz[run])
 
@@ -388,10 +389,30 @@ def renditerechner(
                 - restschuld_faellig_pj[index_nr]
             )
             
-            # ETF Investition
-            etf_investition_pj.append(
-                ueberschuss_pj[index_nr]
-            )
+            # ETF investition
+            if ueberschuss_gesamt_pj[index_nr] < 0:
+                etf_investition_pj.append(
+                    ueberschuss_gesamt_pj[index_nr]
+                )
+            else:
+                etf_investition_pj.append(0)
+            
+            # ETF verzinst
+            if ueberschuss_gesamt_pj[index_nr] < 0:
+                etf_investition_verzinst_pj.append(
+                    (etf_investition_verzinst_pj[index_nr-1] * 
+                        (1 + etf_rendite[index_nr - 1, run]) +
+                        ueberschuss_gesamt_pj[index_nr] * -1
+                    )
+                )
+            else:
+                etf_investition_verzinst_pj.append(
+                    (etf_investition_verzinst_pj[index_nr-1] * 
+                        (1 + etf_rendite[index_nr - 1, run]) 
+                    )
+                )
+            #print(etf_investition_pj)
+            #print(etf_investition_verzinst_pj)
 
             # Steuerliches Ergebnis für die Berechnung der Objektrendite
             if jahr_pj[index_nr] == 1:
@@ -435,8 +456,12 @@ def renditerechner(
                 + verkaufspreis_pj[index_nr]
             )
 
-        np.array(etf_investition_pj)
-        # npf.irr([-5000, 0, 0, 0, 6500])
+        # Eigenkapitalrendite ETF
+        etf_investition_pj[index_nr] = etf_investition_verzinst_pj[index_nr]
+        etf_rendite_runs.append(npf.irr(etf_investition_pj))
+        
+        # Gewinn ETF
+        etf_gewinn_runs.append(sum(etf_investition_pj))
 
         # Verkaufspreis
         # print(verkaufspreis_pj)
@@ -475,6 +500,9 @@ def renditerechner(
         "mietsteigerung":mietsteigerung.flatten(),
         "kostensteigerung":kostensteigerung.flatten(),
         "mietausfall":mietausfall.flatten(),
+        "etf_rendite":etf_rendite.flatten(),
+        "etf_ek_rendite":etf_rendite_runs,
+        "etf_gewinn":etf_gewinn_runs,
     }
 
 
