@@ -9,9 +9,10 @@ def text_static():
     # Ergebnisse
     ergebnisse = f"""Im folgenden werden die Simulationsergebnisse grafisch dargestellt und beschrieben."""
     
-    berechnete_kennzahlen = f"""
-    Auf Basis Ihrer Eingabe wurden die folgenden anfänglichen Kennzahlen für Ihre Immobilie berechnet.
-    """
+    # berechnete_kennzahlen = f"""
+    # Auf Basis Ihrer Eingabe wurden die folgenden anfänglichen Kennzahlen für Ihre Immobilie berechnet.
+    # """
+    berechnete_kennzahlen = ""
     
     export_import = f"""
     >Die Exportfunktion bietet Ihnen die Möglichkeit, Ihre Eingabewerte
@@ -22,7 +23,7 @@ def text_static():
     
     simulation = f"""
     >**Wichtig:** Die Simulation wird erst durch das Klicken des
-    >__*START DER SIMULATION*__ Button gestartet. Sollten Sie anschließend Eingabeparameter
+    >*Buttons*  gestartet. Sollten Sie anschließend Eingabeparameter
     >verändern, müssen Sie die Simulation erneut starten.
     """
     

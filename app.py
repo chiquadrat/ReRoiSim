@@ -778,6 +778,30 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+        # row fourteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[html.Label("ETF Vergleich"),
+                        dcc.RadioItems(
+                            id="etf_vergleich",
+                            options=[
+                                {"label": "MSCI World", "value": "0"},
+                                {"label": "Dax","value": "1",},
+                            ],
+                            value="0",
+                        ),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),        
         # Berechnete Kennzahlen
         # row 20
         html.Div(
@@ -997,28 +1021,29 @@ app.layout = html.Div(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
                         dcc.Markdown(text_statisch["eingabeparameter"]),
-                        dcc.Graph(id="eingabe_verkaufsfaktor", style={'height': '35vh'}),
+                        dcc.Graph(id="eingabe_verkaufsfaktor"),
                         dcc.Markdown(id='verkaufsfaktor_text'),
-                        dcc.Graph(id="eingabe_anschlusszinssatz", style={'height': '35vh'}),
+                        dcc.Graph(id="eingabe_anschlusszinssatz"),
                         dcc.Markdown(id='anschlusszinssatz_text'),                        
-                        dcc.Graph(id="eingabe_mietsteigerung", style={'height': '35vh'}),
+                        dcc.Graph(id="eingabe_mietsteigerung"),
                         dcc.Markdown(id='mietsteigerung_text'),
-                        dcc.Graph(id="eingabe_kostensteigerung", style={'height': '35vh'}),
+                        dcc.Graph(id="eingabe_kostensteigerung"),
                         dcc.Markdown(id='kostensteigerung_text'),
-                        dcc.Graph(id="eingabe_mietausfall", style={'height': '35vh'}),
+                        dcc.Graph(id="eingabe_mietausfall"),
                         dcc.Markdown(id='mietausfall_text'),
                         html.H4("Ergebnisse der Simulation"),
                         dcc.Markdown(text_statisch["ergebnisse"]),
-                        dcc.Graph(id="verkaufspreis", style={'height': '35vh'}),
+                        dcc.Graph(id="verkaufspreis"),
                         dcc.Markdown(id='verkaufspreis_text'),
-                        dcc.Graph(id="objektrendite", style={'height': '35vh'}),
+                        dcc.Graph(id="objektrendite"),
                         dcc.Markdown(id='objektrendite_text'),
-                        dcc.Graph(id="eigenkapitalrendite", style={'height': '35vh'}),
+                        dcc.Graph(id="eigenkapitalrendite"),
                         dcc.Markdown(id='eigenkapitalrendite_text'),
-                        dcc.Graph(id="gewinn", style={'height': '35vh'}),
+                        dcc.Graph(id="gewinn"),
                         dcc.Markdown(id='gewinn_text'),
-                        dcc.Graph(id="minimaler_cashflow", style={'height': '35vh'}),
+                        dcc.Graph(id="minimaler_cashflow"),
                         dcc.Markdown(id='minimaler_cashflow_text'),
+                        html.H6("ETF Vergleich"),
                     ],
                     style={
                         # "display": "inline-block",
