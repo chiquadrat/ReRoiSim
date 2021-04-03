@@ -48,6 +48,8 @@ def renditerechner(
     verkaufsfaktor=25,
     # Simulation
     sim_runs=1,
+    etf_rendite=0.06,
+    unsicherheit_etf_rendite=0,
     unsicherheit_mietsteigerung=0,
     unsicherheit_kostensteigerung=0,
     unsicherheit_mietausfall=0,
@@ -118,7 +120,12 @@ def renditerechner(
     )
     abschreibungsart = "Linear 2,0%" if baujahr > 1924 else "Linear 2,5%"
     bemessung_sonderabschreibung = kaufpreis_sanierung * gesamtkosten / kaufpreis
+    
+    # Etf Startbetrag
+    etf_startgeld = eigenkapital
 
+    etf_rendite_runs = []
+    etf_gewinn_runs = []
     verkaufspreis_runs = []
     eigenkapitalrendite_runs = []
     objektrendite_runs = []
@@ -126,6 +133,10 @@ def renditerechner(
     minimaler_cashflow_runs = []
 
     # Unabhängige Simulation
+    etf_rendite = np.random.normal(
+        etf_rendite, unsicherheit_etf_rendite, sim_runs * anlagehorizont
+    ).reshape(anlagehorizont, sim_runs)
+    
     verkaufsfaktor = np.random.normal(
         verkaufsfaktor, unsicherheit_verkaufsfaktor, sim_runs
     )
@@ -187,6 +198,8 @@ def renditerechner(
         steuern_nachher_objekt_pj = [0]
         steuerwirkung_objekt_pj = [0]
         liquiditaet_pj = [-gesamtkosten]
+        etf_investition_pj = [-eigenkapital]
+        etf_investition_verzinst_pj = [eigenkapital]
 
         anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz[run])
 
@@ -363,7 +376,7 @@ def renditerechner(
             else:
                 verkaufspreis_pj.append(0)
 
-                # fällige Restschuld zum Ende des Anlagehorizontes
+            # fällige Restschuld zum Ende des Anlagehorizontes
             if jahr_pj[index_nr] == anlagehorizont:
                 restschuld_faellig_pj.append(restschuld_pj[index_nr])
             else:
@@ -375,6 +388,31 @@ def renditerechner(
                 + verkaufspreis_pj[index_nr]
                 - restschuld_faellig_pj[index_nr]
             )
+            
+            # ETF investition
+            if ueberschuss_gesamt_pj[index_nr] < 0:
+                etf_investition_pj.append(
+                    ueberschuss_gesamt_pj[index_nr]
+                )
+            else:
+                etf_investition_pj.append(0)
+            
+            # ETF verzinst
+            if ueberschuss_gesamt_pj[index_nr] < 0:
+                etf_investition_verzinst_pj.append(
+                    (etf_investition_verzinst_pj[index_nr-1] * 
+                        (1 + etf_rendite[index_nr - 1, run]) +
+                        ueberschuss_gesamt_pj[index_nr] * -1
+                    )
+                )
+            else:
+                etf_investition_verzinst_pj.append(
+                    (etf_investition_verzinst_pj[index_nr-1] * 
+                        (1 + etf_rendite[index_nr - 1, run]) 
+                    )
+                )
+            #print(etf_investition_pj)
+            #print(etf_investition_verzinst_pj)
 
             # Steuerliches Ergebnis für die Berechnung der Objektrendite
             if jahr_pj[index_nr] == 1:
@@ -418,6 +456,13 @@ def renditerechner(
                 + verkaufspreis_pj[index_nr]
             )
 
+        # Eigenkapitalrendite ETF
+        etf_investition_pj[index_nr] = etf_investition_verzinst_pj[index_nr]
+        etf_rendite_runs.append(npf.irr(etf_investition_pj))
+        
+        # Gewinn ETF
+        etf_gewinn_runs.append(sum(etf_investition_pj))
+
         # Verkaufspreis
         # print(verkaufspreis_pj)
         verkaufspreis_runs.append(sum(verkaufspreis_pj))
@@ -455,6 +500,9 @@ def renditerechner(
         "mietsteigerung":mietsteigerung.flatten(),
         "kostensteigerung":kostensteigerung.flatten(),
         "mietausfall":mietausfall.flatten(),
+        "etf_rendite":etf_rendite.flatten(),
+        "etf_ek_rendite":etf_rendite_runs,
+        "etf_gewinn":etf_gewinn_runs,
     }
 
 
