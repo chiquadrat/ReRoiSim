@@ -1044,6 +1044,8 @@ app.layout = html.Div(
                         dcc.Graph(id="minimaler_cashflow"),
                         dcc.Markdown(id='minimaler_cashflow_text'),
                         html.H6("ETF Vergleich"),
+                        dcc.Graph(id="etf_rendite"),
+                        dcc.Graph(id="etf_gewinn"),
                     ],
                     style={
                         # "display": "inline-block",
@@ -1203,6 +1205,8 @@ def updateTable(
     Output("eigenkapitalrendite", "figure"),
     Output("gewinn", "figure"),
     Output("minimaler_cashflow", "figure"),
+    Output("etf_rendite", "figure"),
+    Output("etf_gewinn", "figure"),
     [Input("button", "n_clicks")],
     state=[
         State("kaufpreis", "value"),
@@ -1235,6 +1239,7 @@ def updateTable(
         State("verkaufsfaktor", "value"),
         State("unsicherheit_verkaufsfaktor", "value"),
         State("sim_runs", "value"),
+        State("etf_vergleich", "value"),
     ],
 )
 def custom_figure(
@@ -1269,19 +1274,27 @@ def custom_figure(
     verkaufsfaktor,
     unsicherheit_verkaufsfaktor,
     sim_runs,
+    etf_vergleich,
 ):
     # Call formeln.py here
 
     # Preprocessing arguments
-    if baujahr == 0:
+    if int(baujahr) == 0:
         baujahr = 1950
     else:
         baujahr = 1900
-
-    if familienstand == 0:
+    
+    if int(familienstand) == 0:
         alleinstehend = True
     else:
         alleinstehend = False
+        
+    if int(etf_vergleich)==0:    # MSCI World
+        etf_rendite = 0.08
+        unsicherheit_etf_rendite = 0.1
+    elif int(etf_vergleich)==1:  # Dax
+        etf_rendite = 0.06
+        unsicherheit_etf_rendite = 0.08
 
     ergebnis = renditerechner(
         kaufpreis=kaufpreis,
@@ -1314,6 +1327,8 @@ def custom_figure(
         unsicherheit_verkaufsfaktor=unsicherheit_verkaufsfaktor,
         sim_runs=sim_runs,
         steuerjahr=2021,
+        etf_rendite=etf_rendite,
+        unsicherheit_etf_rendite=unsicherheit_etf_rendite,
     )
 
     def figure_ein_aus_gabeparameter(eingabeparameter, name, zeichen, x, runden, area):
@@ -1527,7 +1542,73 @@ def custom_figure(
         runden=0,
         area="nothing"
     )
+
+    def figure_etf_vergleich(
+        eingabeparameter1, 
+        eingabeparameter2, 
+        name1,
+        name2,
+        zeichen, x, runden, ueberschrift):
         
+        eingabeparameter1 = np.array(ergebnis[eingabeparameter1])
+        eingabeparameter1 = eingabeparameter1[~np.isnan(eingabeparameter1)]
+        
+        eingabeparameter2 = np.array(ergebnis[eingabeparameter2])
+        eingabeparameter2 = eingabeparameter2[~np.isnan(eingabeparameter2)]
+        
+        fig = ff.create_distplot([eingabeparameter1, eingabeparameter2], [name1, name2], 
+                         show_hist=False, show_rug=False)
+
+        fig = fig.add_vline(
+                            x=np.quantile(eingabeparameter1, q=0.5),
+                            line_width=3,
+                            line_dash="dash",
+                            line_color="cornflowerblue",
+                            annotation_text=f"Median: {round(np.quantile(eingabeparameter1, q=0.5)*x,runden)} {zeichen}",
+                            annotation_position="top left",
+                            annotation_font_size=12,
+                            annotation_font_color="black",
+                        )
+
+        fig = fig.add_vline(
+                            x=np.quantile(eingabeparameter2, q=0.5),
+                            line_width=3,
+                            line_dash="dash",
+                            line_color="orange",
+                            annotation_text=f"Median: {round(np.quantile(eingabeparameter2, q=0.5)*x,runden)} {zeichen}",
+                            annotation_position="top right",
+                            annotation_font_size=12,
+                            annotation_font_color="black",
+                        )
+        fig.update_yaxes(rangemode="tozero")
+        fig.update_layout(plot_bgcolor="white")
+        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+        fig.update_layout(title=ueberschrift)
+        
+        return fig
+        
+    fig_etf_rendite = figure_etf_vergleich(
+        eingabeparameter1="eigenkapitalrendite",
+        eingabeparameter2="etf_ek_rendite",
+        name1="Immobilie",
+        name2="ETF",
+        zeichen="%",
+        x=100,
+        runden=2,
+        ueberschrift="Eigenkapitalrendite"
+    )
+    
+    fig_etf_gewinn = figure_etf_vergleich(
+        eingabeparameter1="gewinn",
+        eingabeparameter2="etf_gewinn",
+        name1="Immobilie",
+        name2="ETF",
+        zeichen="€",
+        x=1,
+        runden=0,
+        ueberschrift="Gewinn"
+    )
         
     loading_antwort = ""
     
@@ -1564,6 +1645,8 @@ def custom_figure(
         fig_eigenkapitalrendite,
         fig_gewinn,
         fig_minimaler_cashflow,
+        fig_etf_rendite,
+        fig_etf_gewinn,
     )
     
 #
