@@ -11,6 +11,7 @@ import plotly.express as px
 from dash.dependencies import Input, Output, State
 import plotly.figure_factory as ff
 from dash.exceptions import PreventUpdate
+from scipy.stats import iqr
 
 # Import
 import base64
@@ -1059,7 +1060,7 @@ app.layout = html.Div(
             className="row",
         ),
     ],
-   # className="container",
+    className="container",
 )
 
 
@@ -1332,9 +1333,16 @@ def custom_figure(
     )
 
     def figure_ein_aus_gabeparameter(eingabeparameter, name, zeichen, x, runden, area):
+        if name == "Minimaler Cashflow":
+            eingabeparameter = np.array(ergebnis[eingabeparameter])
+            eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
+            upper_bound = np.quantile(eingabeparameter, q=0.75) + 3.5 * iqr(eingabeparameter)
+            lower_bound = np.quantile(eingabeparameter, q=0.75) - 3.5 * iqr(eingabeparameter)
+            eingabeparameter = eingabeparameter[(eingabeparameter > lower_bound) & (eingabeparameter < upper_bound)]
+        else:        
+            eingabeparameter = np.array(ergebnis[eingabeparameter])
+            eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
         
-        eingabeparameter = np.array(ergebnis[eingabeparameter])
-        eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
         if np.all(eingabeparameter == eingabeparameter[0]) == True:
             fig = go.Figure(data=[go.Table()])
         else:
@@ -1373,34 +1381,45 @@ def custom_figure(
                 annotation_font_size=12,
                 annotation_font_color="black",)                
             else:
+                if runden==0:
+                    annotation_tmp = f"5% Quantil: {int(np.quantile(eingabeparameter, q=.05)*x)} {zeichen}" 
+                else:
+                    annotation_tmp = f"5% Quantil: {round(np.quantile(eingabeparameter, q=.05)*x,runden)} {zeichen}"
                 fig = fig.add_vline(
                     x=np.quantile(eingabeparameter, q=0.05),
                     line_width=3,
                     line_dash="dash",
                     line_color="black",
-                    annotation_text=f"5% Quantil: {round(np.quantile(eingabeparameter, q=.05)*x,runden)} {zeichen}",
+                    annotation_text=annotation_tmp,
                     annotation_position="bottom right",
                     annotation_font_size=12,
                     annotation_font_color="black",
                 )
-                
+            if runden==0:
+                annotation_tmp = f"95% Quantil: {int(np.quantile(eingabeparameter, q=.95)*x)} {zeichen}" 
+            else:
+                annotation_tmp = f"95% Quantil: {round(np.quantile(eingabeparameter, q=.95)*x,runden)} {zeichen}"            
             fig = fig.add_vline(
                     x=np.quantile(eingabeparameter, q=0.95),
                     line_width=3,
                     line_dash="dash",
                     line_color="black",
-                    annotation_text=f"95% Quantil: {round(np.quantile(eingabeparameter, q=.95)*x,runden)} {zeichen}",
+                    annotation_text=annotation_tmp,
                     annotation_position="bottom right",
                     annotation_font_size=12,
                     annotation_font_color="black",
                 )
-                #fig.update_layout(yaxis_range=[0,4])
+
+            if runden==0:
+                annotation_tmp = f"Median: {int(np.quantile(eingabeparameter, q=0.5)*x)} {zeichen}" 
+            else:
+                annotation_tmp = f"Median: {round(np.quantile(eingabeparameter, q=0.5)*x,runden)} {zeichen}"                            
             fig = fig.add_vline(
                     x=np.quantile(eingabeparameter, q=0.5),
                     line_width=3,
                     line_dash="dash",
                     line_color="black",
-                    annotation_text=f"Median: {round(np.quantile(eingabeparameter, q=0.5)*x,runden)} {zeichen}",
+                    annotation_text=annotation_tmp,
                     annotation_position="top right",
                     annotation_font_size=12,
                     annotation_font_color="black",
@@ -1460,7 +1479,7 @@ def custom_figure(
         name="Verkaufsfaktor",
         zeichen="",
         x=1,
-        runden=0,
+        runden=1,
         area="middle"
     )
 
@@ -1576,7 +1595,7 @@ def custom_figure(
                             line_dash="dash",
                             line_color="orange",
                             annotation_text=f"Median: {round(np.quantile(eingabeparameter2, q=0.5)*x,runden)} {zeichen}",
-                            annotation_position="top right",
+                            annotation_position="bottom right",
                             annotation_font_size=12,
                             annotation_font_color="black",
                         )
