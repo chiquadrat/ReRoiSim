@@ -1291,11 +1291,11 @@ def custom_figure(
         alleinstehend = False
         
     if int(etf_vergleich)==0:    # MSCI World
-        etf_rendite = 0.08
-        unsicherheit_etf_rendite = 0.1
+        etf_rendite = 0.0813
+        unsicherheit_etf_rendite = 0.1677
     elif int(etf_vergleich)==1:  # Dax
-        etf_rendite = 0.06
-        unsicherheit_etf_rendite = 0.08
+        etf_rendite = 0.1095
+        unsicherheit_etf_rendite = 0.2276
 
     ergebnis = renditerechner(
         kaufpreis=kaufpreis,
@@ -1578,27 +1578,36 @@ def custom_figure(
         fig = ff.create_distplot([eingabeparameter1, eingabeparameter2], [name1, name2], 
                          show_hist=False, show_rug=False)
 
+        if runden==0:
+            annotation_tmp = f"Median: {int(np.quantile(eingabeparameter1, q=0.5)*x)} {zeichen}"
+        else:
+            annotation_tmp = f"Median: {round(np.quantile(eingabeparameter1, q=0.5)*x,runden)} {zeichen}"            
         fig = fig.add_vline(
                             x=np.quantile(eingabeparameter1, q=0.5),
                             line_width=3,
                             line_dash="dash",
                             line_color="cornflowerblue",
-                            annotation_text=f"Median: {round(np.quantile(eingabeparameter1, q=0.5)*x,runden)} {zeichen}",
+                            annotation_text=annotation_tmp,
                             annotation_position="top left",
                             annotation_font_size=12,
                             annotation_font_color="black",
                         )
 
+        if runden==0:
+            annotation_tmp = f"Median: {int(np.quantile(eingabeparameter2, q=0.5)*x)} {zeichen}"
+        else:
+            annotation_tmp = f"Median: {round(np.quantile(eingabeparameter2, q=0.5)*x,runden)} {zeichen}"
         fig = fig.add_vline(
                             x=np.quantile(eingabeparameter2, q=0.5),
                             line_width=3,
                             line_dash="dash",
                             line_color="orange",
-                            annotation_text=f"Median: {round(np.quantile(eingabeparameter2, q=0.5)*x,runden)} {zeichen}",
+                            annotation_text=annotation_tmp,
                             annotation_position="bottom right",
                             annotation_font_size=12,
                             annotation_font_color="black",
                         )
+        
         fig.update_yaxes(rangemode="tozero")
         fig.update_layout(plot_bgcolor="white")
         fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
