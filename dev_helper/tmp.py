@@ -29,7 +29,7 @@ steuerjahr=2021,  # nur 2015 und 2021 implementiert
 anlagehorizont=20,
 verkaufsfaktor=25,
 # Simulation
-sim_runs=250,
+sim_runs=1,
 unsicherheit_etf_rendite=0.05,
 unsicherheit_mietsteigerung=0.05,
 unsicherheit_kostensteigerung=0.05,

@@ -5,7 +5,7 @@
 import numpy as np
 import numpy_financial as npf
 import truncated_normal
-import steuerberechnung
+from steuerberechnung import steuerberechnung_immo, steuerberechnung_etf
 
 # Todo: Verkaufsfaktor durch Immobilienpreissteierung ersetzen
 
@@ -457,7 +457,16 @@ def renditerechner(
             )
 
         # Eigenkapitalrendite ETF
-        etf_investition_pj[index_nr] = etf_investition_verzinst_pj[index_nr]
+        # etf_investition_endwert = etf_investition_verzinst_pj[index_nr]
+        # etf_investition = sum(etf_investition_pj[:-1]) 
+        etf_endwert_versteuert = steuerberechnung.steuerberchnung_etf(
+            investition=sum(etf_investition_pj[:-1]),
+            endwert=etf_investition_verzinst_pj[index_nr]
+        )
+        
+        print(etf_investition_verzinst_pj[index_nr])
+        print(etf_endwert_versteuert)
+        etf_investition_pj[index_nr] = etf_endwert_versteuert
         etf_rendite_runs.append(npf.irr(etf_investition_pj))
         
         # Gewinn ETF

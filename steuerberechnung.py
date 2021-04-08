@@ -76,3 +76,8 @@ def steuerberechnung(jahreseinkommen, splittingtarif, steuerjahr):
         einkommenssteuer = einkommenssteuer * 2
 
     return einkommenssteuer
+
+def steuerberechnung_etf(investition, endwert):
+    endwert_versteuert = endwert - (endwert - investition) * 0.26375
+    return endwert_versteuert
+    
