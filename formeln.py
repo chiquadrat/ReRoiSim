@@ -338,7 +338,7 @@ def renditerechner(
 
             # Steuern vorher
             steuern_vorher_pj.append(
-                steuerberechnung.steuerberechnung(
+                steuerberechnung_immo(
                     einkommen_vorher_pj[index_nr], not (alleinstehend), steuerjahr
                 )
             )
@@ -350,7 +350,7 @@ def renditerechner(
 
             # Steuern nachher für die Berechnung der Eigenkapitalrendite
             steuern_nachher_ekr_pj.append(
-                steuerberechnung.steuerberechnung(
+                steuerberechnung_immo(
                     einkommen_nachher_ekr_pj[index_nr], not (alleinstehend), steuerjahr
                 )
             )
@@ -437,7 +437,7 @@ def renditerechner(
 
             # Steuern nachher für die Berechnung der Objektrendite
             steuern_nachher_objekt_pj.append(
-                steuerberechnung.steuerberechnung(
+                steuerberechnung_immo(
                     einkommen_nachher_objekt_pj[index_nr],
                     not (alleinstehend),
                     steuerjahr,
@@ -459,13 +459,14 @@ def renditerechner(
         # Eigenkapitalrendite ETF
         # etf_investition_endwert = etf_investition_verzinst_pj[index_nr]
         # etf_investition = sum(etf_investition_pj[:-1]) 
-        etf_endwert_versteuert = steuerberechnung.steuerberchnung_etf(
-            investition=sum(etf_investition_pj[:-1]),
+        etf_endwert_versteuert = steuerberechnung_etf(
+            investition=(sum(etf_investition_pj[:-1]) * -1),
             endwert=etf_investition_verzinst_pj[index_nr]
         )
         
-        print(etf_investition_verzinst_pj[index_nr])
-        print(etf_endwert_versteuert)
+        print(f"Run: {run} Investitionen: {(sum(etf_investition_pj[:-1]) * -1)}")
+        print(f"Run: {run} Endwert: {etf_investition_verzinst_pj[index_nr]}")
+        print(f"Rund: {run} Endwert versteuert: {etf_endwert_versteuert}")
         etf_investition_pj[index_nr] = etf_endwert_versteuert
         etf_rendite_runs.append(npf.irr(etf_investition_pj))
         

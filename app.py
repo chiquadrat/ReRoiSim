@@ -1336,8 +1336,8 @@ def custom_figure(
         if name == "Minimaler Cashflow":
             eingabeparameter = np.array(ergebnis[eingabeparameter])
             eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
-            upper_bound = np.quantile(eingabeparameter, q=0.75) + 3.5 * iqr(eingabeparameter)
-            lower_bound = np.quantile(eingabeparameter, q=0.75) - 3.5 * iqr(eingabeparameter)
+            upper_bound = np.quantile(eingabeparameter, q=0.75) + 4.5 * iqr(eingabeparameter)
+            lower_bound = np.quantile(eingabeparameter, q=0.75) - 4.5 * iqr(eingabeparameter)
             eingabeparameter = eingabeparameter[(eingabeparameter > lower_bound) & (eingabeparameter < upper_bound)]
         else:        
             eingabeparameter = np.array(ergebnis[eingabeparameter])

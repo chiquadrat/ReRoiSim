@@ -16,7 +16,7 @@ import numpy as np
 # https://www.gesetze-im-internet.de/estg/__32a.html
 
 
-def steuerberechnung(jahreseinkommen, splittingtarif, steuerjahr):
+def steuerberechnung_immo(jahreseinkommen, splittingtarif, steuerjahr):
     """Funktion berechnet die Einkommenssteuer
 
     Args:
