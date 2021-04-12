@@ -26,7 +26,8 @@ import openpyxl
 from formeln import renditerechner
 from text import text_generator, text_static
 
-VALID_USERNAME_PASSWORD_PAIRS = {"Christoph": "Groener"}
+VALID_USERNAME_PASSWORD_PAIRS = {"Christoph": "Groener",
+                                 "Jack":"Singer"}
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -122,8 +123,9 @@ app.layout = html.Div(
                 # third column of first row
                 html.Div(
                     children=[
-                        html.Label("davon Sanierungskosten (Euro)*",
-                                   title="nach § 7h oder § 7i EStG: Nur für die Sanierung von Baudenkmälern und Gebäuden in Sanierungsgebieten"),
+                        html.Label("davon Sanierungskosten (Euro)",
+                                  # title="nach § 7h oder § 7i EStG: Nur für die Sanierung von Baudenkmälern und Gebäuden in Sanierungsgebieten"
+                                  ),
                         dcc.Input(
                             id="kaufpreis_sanierung",
                             placeholder="Eingabe...",
@@ -148,8 +150,9 @@ app.layout = html.Div(
                 # first column of second row
                 html.Div(
                     children=[
-                        html.Label("Kaufnebenkosten (Euro)*",
-                                   title="Umfassen Makler und Notarkosten sowie die Grunderwerbssteuer."),
+                        html.Label("Kaufnebenkosten (Euro)",
+                                   #title="Umfassen Makler und Notarkosten sowie die Grunderwerbssteuer."
+                                   ),
                         dcc.Input(
                             id="kaufnebenkosten",
                             placeholder="Eingabe...",
@@ -170,7 +173,8 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Renovierungskosten (Euro)*",
-                                   title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."),
+                                   #title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."
+                                   ),
                         dcc.Input(
                             id="renovierungskosten",
                             placeholder="Eingabe...",
@@ -212,8 +216,9 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Mieteinahmen (Euro)*",
-                                   title="Nettokaltmiete"),
+                        html.Label("Mieteinahmen (Euro)",
+                                   #title="Nettokaltmiete"
+                                   ),
                         dcc.Input(
                             id="mieteinnahmen",
                             placeholder="Eingabe...",
@@ -234,7 +239,8 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Mietsteigerung (%)*",
-                                   title="Erwartungswert"),
+                                  title="Erwartungswert"
+                                   ),
                         dcc.Input(
                             id="mietsteigerung",
                             placeholder="Eingabe...",
@@ -254,7 +260,8 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                         html.Label("Unsicherheit Mietsteigerung*",
-                                   title="Standardabweichung"),
+                                   title="Standardabweichung"
+                                  ),
                         dcc.Input(
                             id="unsicherheit_mietsteigerung",
                             placeholder="Eingabe...",
@@ -346,7 +353,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Pauschale für Mietausfall (%)*",
+                        html.Label("Pauschale für Mietausfall (%)",
                                    title="Erwartungswert"),
                         dcc.Input(
                             id="mietausfall",
@@ -788,8 +795,8 @@ app.layout = html.Div(
                         dcc.RadioItems(
                             id="etf_vergleich",
                             options=[
-                                {"label": "MSCI World", "value": "0"},
-                                {"label": "Dax","value": "1",},
+                                {"label": "MSCI World (einschließlich Dividenden)", "value": "0"},
+                                {"label": "Dax (einschließlich Dividenden)","value": "1",},
                             ],
                             value="0",
                         ),],
@@ -1044,9 +1051,12 @@ app.layout = html.Div(
                         dcc.Markdown(id='gewinn_text'),
                         dcc.Graph(id="minimaler_cashflow"),
                         dcc.Markdown(id='minimaler_cashflow_text'),
-                        html.H6("ETF Vergleich"),
+                        html.H5("ETF Vergleich"),
                         dcc.Graph(id="etf_rendite"),
+                        dcc.Markdown(id='etf_rendite_text'),
                         dcc.Graph(id="etf_gewinn"),
+                        dcc.Markdown(id='etf_gewinn_text'),
+                        dcc.Markdown(text_statisch["haftungsausschluss"]),
                     ],
                     style={
                         # "display": "inline-block",
@@ -1184,6 +1194,8 @@ def updateTable(
     #   Output("kennzahlen1", "figure"),
 #    Output('kaufpreis', 'value'),
 #    Output('einleitung_text', 'children'),
+    Output('etf_rendite_text', 'children'),
+    Output('etf_gewinn_text', 'children'),
     Output('anschlusszinssatz_text', 'children'),
     Output('verkaufsfaktor_text', 'children'),
     Output('mietsteigerung_text', 'children'),
@@ -1291,11 +1303,13 @@ def custom_figure(
         alleinstehend = False
         
     if int(etf_vergleich)==0:    # MSCI World
-        etf_rendite = 0.08
-        unsicherheit_etf_rendite = 0.1
+        etf_rendite = 0.1046
+        unsicherheit_etf_rendite = 0.1711
+        name2 = "MSCI World"
     elif int(etf_vergleich)==1:  # Dax
-        etf_rendite = 0.06
-        unsicherheit_etf_rendite = 0.08
+        etf_rendite = 0.1095
+        unsicherheit_etf_rendite = 0.2276
+        name2 = "Dax"
 
     ergebnis = renditerechner(
         kaufpreis=kaufpreis,
@@ -1336,8 +1350,8 @@ def custom_figure(
         if name == "Minimaler Cashflow":
             eingabeparameter = np.array(ergebnis[eingabeparameter])
             eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
-            upper_bound = np.quantile(eingabeparameter, q=0.75) + 3.5 * iqr(eingabeparameter)
-            lower_bound = np.quantile(eingabeparameter, q=0.75) - 3.5 * iqr(eingabeparameter)
+            upper_bound = np.quantile(eingabeparameter, q=0.75) + 4.5 * iqr(eingabeparameter)
+            lower_bound = np.quantile(eingabeparameter, q=0.75) - 4.5 * iqr(eingabeparameter)
             eingabeparameter = eingabeparameter[(eingabeparameter > lower_bound) & (eingabeparameter < upper_bound)]
         else:        
             eingabeparameter = np.array(ergebnis[eingabeparameter])
@@ -1578,27 +1592,36 @@ def custom_figure(
         fig = ff.create_distplot([eingabeparameter1, eingabeparameter2], [name1, name2], 
                          show_hist=False, show_rug=False)
 
+        if runden==0:
+            annotation_tmp = f"Median: {int(np.quantile(eingabeparameter1, q=0.5)*x)} {zeichen}"
+        else:
+            annotation_tmp = f"Median: {round(np.quantile(eingabeparameter1, q=0.5)*x,runden)} {zeichen}"            
         fig = fig.add_vline(
                             x=np.quantile(eingabeparameter1, q=0.5),
                             line_width=3,
                             line_dash="dash",
                             line_color="cornflowerblue",
-                            annotation_text=f"Median: {round(np.quantile(eingabeparameter1, q=0.5)*x,runden)} {zeichen}",
+                            annotation_text=annotation_tmp,
                             annotation_position="top left",
                             annotation_font_size=12,
                             annotation_font_color="black",
                         )
 
+        if runden==0:
+            annotation_tmp = f"Median: {int(np.quantile(eingabeparameter2, q=0.5)*x)} {zeichen}"
+        else:
+            annotation_tmp = f"Median: {round(np.quantile(eingabeparameter2, q=0.5)*x,runden)} {zeichen}"
         fig = fig.add_vline(
                             x=np.quantile(eingabeparameter2, q=0.5),
                             line_width=3,
                             line_dash="dash",
                             line_color="orange",
-                            annotation_text=f"Median: {round(np.quantile(eingabeparameter2, q=0.5)*x,runden)} {zeichen}",
+                            annotation_text=annotation_tmp,
                             annotation_position="bottom right",
                             annotation_font_size=12,
                             annotation_font_color="black",
                         )
+        
         fig.update_yaxes(rangemode="tozero")
         fig.update_layout(plot_bgcolor="white")
         fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
@@ -1611,7 +1634,7 @@ def custom_figure(
         eingabeparameter1="eigenkapitalrendite",
         eingabeparameter2="etf_ek_rendite",
         name1="Immobilie",
-        name2="ETF",
+        name2=name2,
         zeichen="%",
         x=100,
         runden=2,
@@ -1622,7 +1645,7 @@ def custom_figure(
         eingabeparameter1="gewinn",
         eingabeparameter2="etf_gewinn",
         name1="Immobilie",
-        name2="ETF",
+        name2=name2,
         zeichen="€",
         x=1,
         runden=0,
@@ -1642,6 +1665,8 @@ def custom_figure(
 
     return (
 #        text["einleitung"],
+        text_dynamisch["etf_rendite"],
+        text_dynamisch["etf_gewinn"],
         text_dynamisch["anschlusszinssatz"],
         text_dynamisch["verkaufsfaktor"],
         text_dynamisch["mietsteigerung"],
