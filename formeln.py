@@ -464,9 +464,6 @@ def renditerechner(
             endwert=etf_investition_verzinst_pj[index_nr]
         )
         
-        print(f"Run: {run} Investitionen: {(sum(etf_investition_pj[:-1]) * -1)}")
-        print(f"Run: {run} Endwert: {etf_investition_verzinst_pj[index_nr]}")
-        print(f"Rund: {run} Endwert versteuert: {etf_endwert_versteuert}")
         etf_investition_pj[index_nr] = etf_endwert_versteuert
         etf_rendite_runs.append(npf.irr(etf_investition_pj))
         
