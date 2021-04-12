@@ -36,6 +36,12 @@ def text_static():
     über die Eingabemaske reduzieren, bzw. vergößern.
     """
     
+    haftungsausschluss = f"""
+    >Wir möchten ausdrücklich darauf hinweisen, dass wir keine Gewähr für die 
+    >Richtigkeit der Berechnungen, Darstellungen und Angaben übernehmen. 
+    >Das Simulations-Tool ersetzt keine Rechts-, Steuer oder Finanzberatung.
+    """
+    
     text_statisch = {
         "simulation":simulation,
         "export_import":export_import,
@@ -43,6 +49,7 @@ def text_static():
         "einleitung": einleitung,
         "ergebnisse": ergebnisse,
         "eingabeparameter":eingabeparameter,
+        "haftungsausschluss":haftungsausschluss,
     }
 
     return text_statisch
@@ -180,6 +187,21 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
     Ihr durchschnittlicher minimaler jährlicher Cashflow liegt bei **{int(minimaler_cashflow.mean())} Euro**. In
     5% der Fällen wird Ihr minimaler Cashflow bei unter **{int(np.quantile(minimaler_cashflow, q=0.05))} Euro ** liegen.
     """
+    etf_rendite_text = f"""
+    Ihre durchschnittliche EK Rendite (nach Steuern) bei Anlage Ihres initialen Eigenkapitals
+    und der jährlichen negativen Cashflows (falls vorhanden) in einen ETF
+    beträgt **{round(np.array(ergebnis['etf_ek_rendite']).mean() * 100, 2)} %**. Mit einer Wahrscheinlichkeit von 
+    **{round((sum(np.array(ergebnis['etf_ek_rendite']) > np.array(ergebnis['eigenkapitalrendite']))/len(ergebnis['eigenkapitalrendite']))*100, 2)}  %** hätten Sie mit einer ETF Investition eine höhere Rendite erziehlt.
+    """
+ 
+ 
+    etf_gewinn_text = f"""
+    Ihr durchschnittlicher Gewinn bei Anlage Ihres initialen Eigenkapitals
+    und der jährlichen negativen Cashflows (falls vorhanden) in einen ETF
+    beträgt **{int(np.array(ergebnis['etf_gewinn']).mean())} Euro**. Mit einer Wahrscheinlichkeit von 
+    **{round((sum(np.array(ergebnis['etf_gewinn']) > np.array(ergebnis['gewinn']))/len(ergebnis['etf_gewinn']))*100, 2)}  %** 
+    hätten Sie mit einer ETF Investition einen höheren Gewinn erziehlt.
+    """
     
     text_dynamisch = {
         "verkaufsfaktor": verkaufsfaktor_text,
@@ -192,6 +214,8 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
         "gewinn":gewinn_text,
         "minimaler_cashflow":minimaler_cashflow_text,
         "mietausfall":mietausfall_text,
+        "etf_rendite":etf_rendite_text,
+        "etf_gewinn":etf_gewinn_text,
     }
 
     return text_dynamisch
