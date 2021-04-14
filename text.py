@@ -7,7 +7,8 @@ def text_static():
     """
     
     # Ergebnisse
-    ergebnisse = f"""Im folgenden werden die Simulationsergebnisse grafisch dargestellt und beschrieben."""
+    ergebnisse = f"""Im Folgenden werden die Simulationsergebnisse grafisch dargestellt und beschrieben.
+    """
     
     # berechnete_kennzahlen = f"""
     # Auf Basis Ihrer Eingabe wurden die folgenden anfänglichen Kennzahlen für Ihre Immobilie berechnet.
@@ -16,24 +17,26 @@ def text_static():
     
     export_import = f"""
     >Die Exportfunktion bietet Ihnen die Möglichkeit, Ihre Eingabewerte
-    >in Form einer .csv-Datei herunterzuladen. Sollten Sie die Simulation erneut durchführen
-    >wollen, mit gegebenfalls leicht veränderte Eingabewerten, können Sie mit Hilfe der Importfunktion
-    >die zuvor exportierte .csv-Datei wieder importieren und Eingabeparameter verändern. Somit ersparen Sie sich die erneute Eingabe.
+    >in Form einer CSV-Datei herunterzuladen. Sollten Sie die Simulation erneut durchführen
+    >wollen, mit gegebenenfalls  leicht veränderte Eingabewerten, können Sie mithilfe der Importfunktion
+    >die zuvor exportierte CSV-Datei wieder importieren und Ihre Eingabeparameter verändern. Somit ersparen Sie sich die erneute Eingabe.
     """
     
     simulation = f"""
     >**Wichtig:** Die Simulation wird erst durch das Klicken des
-    >*Buttons*  gestartet. Sollten Sie anschließend Eingabeparameter
+    >*Buttons*  gestartet. Wenn Sie anschließend Eingabeparameter
     >verändern, müssen Sie die Simulation erneut starten.
     """
     
     eingabeparameter = f"""
-    Im folgenden können Sie sich einen Überblick darüber verschaffen, wie die 
-    von Ihnen gewählte Unsicherheit Ihre Eingabeparameter beeinflusst, also wie stark
-    diese zwischen einzelnen Simulationsläufen schwanken. Sollte Ihnen die Schwankung
-    zu groß (unplausible) erscheinen, können Sie diese veringern oder vergößern indem Sie die Unsicherheit
-    der Eingabeparameter
-    über die Eingabemaske reduzieren, bzw. vergößern.
+    Im Folgenden können Sie sich einen Überblick darüber verschaffen, wie die 
+    von Ihnen gewählte Unsicherheit (die Standardabweichung) Ihre Eingabeparameter beeinflusst; also wie stark
+    die mit Unsicherheit behaftet Eingabeparameter zwischen den einzelnen Simulationsläufen schwanken. 
+    Sollte Ihnen die Schwankungen zu groß oder klein erscheinen, 
+    können Sie diese verringern  oder vergrößern  indem Sie die Unsicherheit
+    der Eingabeparameter über die Eingabemaske reduzieren, bzw. vergrößern. Dies ermöglicht Ihnen
+    das Risiko Ihrer Investition deutlich besser einzuschätzen als bei einer rein
+    deterministischen Betrachtung.
     """
     
     haftungsausschluss = f"""
@@ -74,69 +77,71 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
      erzielen werden. Bei der von Ihnen gewählten Unsicherheit wird in 90 % der Simulationsläufe ein 
      Verkaufsfaktor zwischen **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.05), 1)}** und
      **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.95), 1)}** (blau schraffierter Bereich) für die Berechnung der 
-     Renditeergebnisse  angenommen. 
-     Historische Werte finde sie unter: LINK"""
+     Rendite Ergebnisse  angenommen.
+     """
 
     # Zinsbindung
     if zinsbindung >= anlagehorizont:
-        anschlusszinssatz_text = f"""Der Anschlusszinsatz ist für das von Ihnen
+        anschlusszinssatz_text = f"""Der Anschlusszinssatz ist für das von Ihnen
         gewählte Simulationsszenario nicht relevant, da Ihr gewählter Anlagehorizont
-        von **{anlagehorizont} Jahren** nicht länger ist als die von Ihnen angegebene
+        von **{anlagehorizont} Jahren** nicht länger ist, als die von Ihnen angegebene
         Zinsbindung von **{zinsbindung} Jahren**.
         """
     else:
         anschlusszinssatz_text = f"""In der Simulation wird davon ausgegangen, dass sie nach
-        **{anlagehorizont} Jahren**  einen 
+        **{zinsbindung} Jahren**  einen 
         durchschnittlichen Anschlusszinsatz von ** {round(np.array(ergebnis["anschlusszinssatz"]*100).mean(),2)} %**
         zahlen müssen. Bei der von Ihnen gewählten Unsicherheit wird in 90 % der Simulationsläufe ein 
         Anschlusszinsatz zwischen **{round(np.quantile(np.array(ergebnis["anschlusszinssatz"])*100, q=0.05), 2)} %** und
         **{round(np.quantile(np.array(ergebnis["anschlusszinssatz"])*100, q=0.95), 2)} %** (blau schraffierter Bereich) für 
-        die Berechnung der Renditeergebnisse angenommen. Historische Werte 
-        finde sie unter: LINK"""
+        die Berechnung der Rendite Ergebnisse angenommen."""
 
     # Erste Mieterhöhung    
     if erste_mieterhoehung > anlagehorizont:
-        mietsteigerung_text = f"""Die potentielle Mietsteigerung ist für Ihr Simulationsergebnis nicht
+        mietsteigerung_text = f"""Die potenziellen Mietsteigerungen sind für Ihr Simulationsergebnis nicht
         relevant, da Ihr gewählter Anlagehorizont von **{anlagehorizont} Jahren** vor der ersten Mieterhöhung, nach
         **{erste_mieterhoehung} Jahren** endet"""
     else:
         mietsteigerung_text = f"""In der Simulation wird ab **Jahr {erste_mieterhoehung}**,
-        dem Jahr der ersten Mieterhöhung von einer jährlichen durchschnittlichen
+        dem Jahr der ersten Mieterhöhung, von einer jährlichen durchschnittlichen
         Mietsteigerung von ** {round(np.array(ergebnis["mietsteigerung"]*100).mean(),2)} %** ausgegangen. 
         Bei der von Ihnen gewählten Unsicherheit liegt die jährliche Mietsteigerung in der Simulation
         in 90% der Fälle zwischen **{round(np.quantile(np.array(ergebnis["mietsteigerung"])*100, q=0.05), 2)} %** und
         **{round(np.quantile(np.array(ergebnis["mietsteigerung"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
-        Historische Werte finde sie unter: LINK"""
+        """
 
     # Kostensteigerung
     kostensteigerung_text = f"""In der Simulation wird von einer jährlichen durchschnittlichen
         Kostensteigerung von ** {round(np.array(ergebnis["kostensteigerung"]*100).mean(),2)} %** ausgegangen. 
-        Bei der von Ihnen gewählten Unsicherheit liegt die jährliche Kostensteogerung in der Simulation
+        Bei der von Ihnen gewählten Unsicherheit liegt die jährliche Kostensteigerung  in der Simulation
         in 90% der Fälle zwischen **{round(np.quantile(np.array(ergebnis["kostensteigerung"])*100, q=0.05), 2)} %** und
         **{round(np.quantile(np.array(ergebnis["kostensteigerung"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
-        Historische Werte finde sie unter: LINK"""
+        """
 
     # Mietausfall
     mietausfall_text = f"""In der Simulation wird von einem jährlichen durchschnittlichen
         Mietausfall von ** {round(np.array(ergebnis["mietausfall"]*100).mean(),2)} %** ausgegangen. 
-        Bei der von Ihnen gewählten Unsicherheit liegt der jährliche Mietausfalls in der Simulation
+        Bei der von Ihnen gewählten Unsicherheit liegt der jährliche Mietausfall in der Simulation
         in 90% der Fälle zwischen **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.05), 2)} %** und
         **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
-        Historische Werte finde sie unter: LINK"""
+        """
    
    # Verkaufspreis
     verkaufspreis = np.array(ergebnis["verkaufspreis"])
     verkaufspreis = verkaufspreis[~np.isnan(verkaufspreis)]
     if verkaufspreis.min() < kaufpreis:
-        verkaufspreis_text = f"""Im durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont} Jahren** für 
+        verkaufspreis_text = f"""Im Durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont} Jahren** für 
         **{int(np.array(ergebnis["verkaufspreis"]).mean())} Euro** verkaufen können. Ihr durchschnittlicher Verkaufsgewinn/verlust
-        beträgt somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)} Euro**. In 
-        **{round(len(verkaufspreis[verkaufspreis<kaufpreis])/len(verkaufspreis)*100,2)} %** der Fälle werden Sie 
-        das Objekt für einen Preis verkaufen der unter dem Einkaufspreis liegt
+        beträgt somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)} Euro**. Mit einer
+        Wahrscheinlichkeit von  
+        **{round(len(verkaufspreis[verkaufspreis<kaufpreis])/len(verkaufspreis)*100,2)} %** wird der 
+        zu erzielende
+        Verkaufspreis
+        unter dem Kaufpreis liegen.
         """
     else:
-        verkaufspreis_text = f"""Im durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont} Jahren** für 
-        **{int(np.array(ergebnis["verkaufspreis"]).mean())} Euro** verkaufen können. Ihr durchschnittlicher Verkaufsgewinn/verlust
+        verkaufspreis_text = f"""Im Durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont} Jahren** für 
+        **{int(np.array(ergebnis["verkaufspreis"]).mean())} Euro** verkaufen können. Ihr durchschnittlicher Verkaufsgewinn
         beträgt somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)} Euro**. 
         """
 
@@ -144,13 +149,13 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
     objektrendite = np.array(ergebnis["objektrendite"])
     objektrendite = objektrendite[~np.isnan(objektrendite)]
     if objektrendite.min() < 0:
-        objektrendite_text = f"""Ihre durchschnittliche Objektrendite nach **{anlagehorizont} Jahren**
-        beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. In 
-        **{round(len(objektrendite[objektrendite<0])/len(objektrendite)*100,2)} %** der Fälle
-        wird Ihre Objektrendite negativ sein.
+        objektrendite_text = f"""Die durchschnittliche Objektrendite nach **{anlagehorizont} Jahren**
+        beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. Mit einer Wahrscheinlichkeit von 
+        **{round(len(objektrendite[objektrendite<0])/len(objektrendite)*100,2)} %** 
+        wird die Objektrendite negativ sein.
         """
     else:
-        objektrendite_text = f"""Ihre durchschnittliche Objektrendite nach **{anlagehorizont} Jahren**
+        objektrendite_text = f"""Die durchschnittliche Objektrendite nach **{anlagehorizont} Jahren**
         beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. 
         """
     
@@ -158,49 +163,51 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
     eigenkapitalrendite = np.array(ergebnis["eigenkapitalrendite"])
     eigenkapitalrendite = eigenkapitalrendite[~np.isnan(eigenkapitalrendite)]
     if eigenkapitalrendite.min() < 0:
-        eigenkapitalrendite_text = f"""Ihre durchschnittliche Eigenkapitalrendite nach **{anlagehorizont} Jahren**
-        beträgt **{round(eigenkapitalrendite.mean()*100, 2)} %**. In 
-        **{round(len(eigenkapitalrendite[eigenkapitalrendite<0])/len(eigenkapitalrendite)*100,2)} %** der Fälle
-        wird Ihre Eigenkapitalrendite negativ sein.
+        eigenkapitalrendite_text = f"""Die durchschnittliche Eigenkapitalrendite nach **{anlagehorizont} Jahren**
+        beträgt **{round(eigenkapitalrendite.mean()*100, 2)} %**. Mit einer Wahrscheinlichkeit von
+        **{round(len(eigenkapitalrendite[eigenkapitalrendite<0])/len(eigenkapitalrendite)*100,2)} %** 
+        wird die Eigenkapitalrendite negativ sein.
         """
     else:
-        eigenkapitalrendite_text = f"""Ihre durchschnittliche Eigenkapitalrendite nach **{anlagehorizont} Jahren**
+        eigenkapitalrendite_text = f"""Die durchschnittliche Eigenkapitalrendite nach **{anlagehorizont} Jahren**
         beträgt **{round(np.array(ergebnis["eigenkapitalrendite"]).mean()*100, 2)} %**. 
         """
         
     gewinn = np.array(ergebnis["gewinn"])
     gewinn = gewinn[~np.isnan(gewinn)]
     if gewinn.min() < 0:
-        gewinn_text = f"""Ihr durchschnittlicher Gewinn nach **{anlagehorizont} Jahren**
-        beträgt **{int(gewinn.mean())} Euro**. In 
-        **{round(len(gewinn[gewinn<0])/len(gewinn)*100,2)} %** der Fälle werden Sie mit Ihrem
-        Objekt Verlust machen. Im Verlustfall beträgt die durschnittliche Höhe Ihres Verlusts
+        gewinn_text = f"""Der durchschnittliche Gewinn nach **{anlagehorizont} Jahren**
+        beträgt **{int(gewinn.mean())} Euro**. Mit einer Wahrscheinlichkeit von 
+        **{round(len(gewinn[gewinn<0])/len(gewinn)*100,2)} %** werden Sie mit Ihrem
+        Objekt Verlust machen. Im Verlustfall beträgt die durchschnittliche Höhe Ihres Verlusts
         **{int(gewinn[gewinn<0].mean())} Euro**.
         """
     else:
-        gewinn_text = f"""Ihr durchschnittlicher Gewinn nach **{anlagehorizont} Jahren**
+        gewinn_text = f"""Der durchschnittliche Gewinn nach **{anlagehorizont} Jahren**
         beträgt **{int(gewinn.mean())} Euro**."""
     
     minimaler_cashflow = np.array(ergebnis["minimaler_cashflow"])
     minimaler_cashflow = minimaler_cashflow[~np.isnan(minimaler_cashflow)]
     minimaler_cashflow_text = f"""
-    Ihr durchschnittlicher minimaler jährlicher Cashflow liegt bei **{int(minimaler_cashflow.mean())} Euro**. In
-    5% der Fällen wird Ihr minimaler Cashflow bei unter **{int(np.quantile(minimaler_cashflow, q=0.05))} Euro ** liegen.
+    Der durchschnittliche minimale jährliche Cashflow liegt bei **{int(minimaler_cashflow.mean())} Euro**. Mit einer
+    Wahrscheinlichkeit von
+    5% wird der minimale jährliche Cashflow bei unter **{int(np.quantile(minimaler_cashflow, q=0.05))} Euro ** liegen.
     """
     etf_rendite_text = f"""
-    Ihre durchschnittliche EK Rendite (nach Steuern) bei Anlage Ihres initialen Eigenkapitals
+    Die durchschnittliche EK Rendite (nach Steuern) bei Anlage Ihres initialen Eigenkapitals
     und der jährlichen negativen Cashflows (falls vorhanden) in einen ETF
     beträgt **{round(np.array(ergebnis['etf_ek_rendite']).mean() * 100, 2)} %**. Mit einer Wahrscheinlichkeit von 
-    **{round((sum(np.array(ergebnis['etf_ek_rendite']) > np.array(ergebnis['eigenkapitalrendite']))/len(ergebnis['eigenkapitalrendite']))*100, 2)}  %** hätten Sie mit einer ETF Investition eine höhere Rendite erziehlt.
+    **{round((sum(np.array(ergebnis['etf_ek_rendite']) > np.array(ergebnis['eigenkapitalrendite']))/len(ergebnis['eigenkapitalrendite']))*100, 2)}  %** hätten Sie mit einer ETF Investition eine höhere Rendite erzielt 
+    als mit dem Kauf der Immobilie.
     """
  
  
     etf_gewinn_text = f"""
-    Ihr durchschnittlicher Gewinn bei Anlage Ihres initialen Eigenkapitals
+    Der durchschnittliche Gewinn bei Anlage Ihres initialen Eigenkapitals
     und der jährlichen negativen Cashflows (falls vorhanden) in einen ETF
     beträgt **{int(np.array(ergebnis['etf_gewinn']).mean())} Euro**. Mit einer Wahrscheinlichkeit von 
     **{round((sum(np.array(ergebnis['etf_gewinn']) > np.array(ergebnis['gewinn']))/len(ergebnis['etf_gewinn']))*100, 2)}  %** 
-    hätten Sie mit einer ETF Investition einen höheren Gewinn erziehlt.
+    hätten Sie mit einer ETF Investition einen höheren Gewinn erzielt  als mit dem Kauf der Immobilie.
     """
     
     text_dynamisch = {
