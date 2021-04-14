@@ -26,7 +26,9 @@ import openpyxl
 from formeln import renditerechner
 from text import text_generator, text_static
 
-VALID_USERNAME_PASSWORD_PAIRS = {"Christoph": "Groener",
+VALID_USERNAME_PASSWORD_PAIRS = {
+                                "Immobilien":"Simulator",
+                                "Christoph": "Groener",
                                  "Jack":"Singer"}
 
 # Initialize the app
@@ -817,7 +819,7 @@ app.layout = html.Div(
                 # first column of third row
                 html.Div(
                     children=[
-                        html.H4("Berechnete Kennzahlen"),
+                        html.H4("Statistische Anfangsberechnung"),
                         dcc.Markdown(text_statisch["berechnete_kennzahlen"]),
                         dash_table.DataTable(
                             id="table",
@@ -1174,7 +1176,7 @@ def updateTable(
                 "Darlehenshöhe",
                 "Kreditrate (Jahr)",
             ],
-            "Berechnungen": [
+            "Ergebnis": [
                 f"{gesamtkosten}€",
                 kaufpreis_miet_verhaeltnis,
                 f"{anfangs_brutto_mietrendite}%",
