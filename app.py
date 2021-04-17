@@ -174,7 +174,7 @@ app.layout = html.Div(
                 # second column of second row
                 html.Div(
                     children=[
-                        html.Label("Renovierungskosten (Euro)*",
+                        html.Label("Renovierungskosten (Euro)",
                                    #title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."
                                    ),
                         dcc.Input(
@@ -240,7 +240,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Mietsteigerung (%)*",
+                        html.Label("Mietsteigerung (%)",
                                   title="Erwartungswert"
                                    ),
                         dcc.Input(
@@ -261,7 +261,7 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Mietsteigerung*",
+                        html.Label("Unsicherheit Mietsteigerung (%)",
                                    title="Standardabweichung"
                                   ),
                         dcc.Input(
@@ -289,7 +289,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Erste Mieterhöhung ab Jahr"),
+                        html.Label("erste Mieterhöhung ab Jahr"),
                         dcc.Input(
                             id="erste_mieterhoehung",
                             placeholder="Eingabe...",
@@ -376,7 +376,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Mietausfall*",
+                        html.Label("Unsicherheit Mietausfall (%)",
                                    title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_mietausfall",
@@ -394,10 +394,16 @@ app.layout = html.Div(
                         "margin-top": "1vw",
                     },
                 ),
+            ],
+            className="row",
+        ),
+        # row seven
+        html.Div(
+            children=[
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Geschätzte Kostensteigerung (%)*",
+                        html.Label("Kostensteigerung (%)",
                                    title="Erwartungswert"),
                         dcc.Input(
                             id="kostensteigerung",
@@ -414,16 +420,10 @@ app.layout = html.Div(
                         "margin-top": "1vw",
                     },
                 ),
-            ],
-            className="row",
-        ),
-        # row seven
-        html.Div(
-            children=[
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Kostensteigerung*",
+                        html.Label("Unsicherheit Kostensteigerung (%)",
                                    title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_kostensteigerung",
@@ -571,7 +571,7 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Anschlusszinssatz (%)*",
+                        html.Label("Anschlusszinssatz (%)",
                                    title="Erwartungswert"),
                         dcc.Input(
                             id="anschlusszinssatz",
@@ -598,7 +598,7 @@ app.layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Anschlusszinssatz*",
+                        html.Label("Unsicherheit Anschlusszinssatz (%)",
                                    title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_anschlusszinssatz",
@@ -645,7 +645,7 @@ app.layout = html.Div(
                         dcc.RadioItems(
                             id="familienstand",
                             options=[
-                                {"label": "Alleinstehend", "value": "0"},
+                                {"label": "alleinstehend", "value": "0"},
                                 {
                                     "label": "Ehepaar (zusammen veranlagt)",
                                     "value": "1",
@@ -664,7 +664,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Zu versteuerndes Einkommen (Euro)"),
+                        html.Label("zu versteuerndes Einkommen (Euro)"),
                         dcc.Input(
                             id="einkommen",
                             placeholder="Eingabe...",
@@ -746,7 +746,7 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Geschätzter Verkaufsfaktor*",
+                        html.Label("geschätzter Verkaufsfaktor",
                                    title="Kaufpreis-Miet-Verhältnis (Erwartungswert)"),
                         dcc.Input(
                             id="verkaufsfaktor",
@@ -767,7 +767,7 @@ app.layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Unsicherheit Verkaufsfaktor*",
+                        html.Label("Unsicherheit Verkaufsfaktor (%)",
                                    title="Standardabweichung"),
                         dcc.Input(
                             id="unsicherheit_verkaufsfaktor",
@@ -812,40 +812,6 @@ app.layout = html.Div(
             ],
             className="row",
         ),        
-        # Berechnete Kennzahlen
-        # row 20
-        html.Div(
-            children=[
-                # first column of third row
-                html.Div(
-                    children=[
-                        html.H4("Statistische Anfangsberechnung"),
-                        dcc.Markdown(text_statisch["berechnete_kennzahlen"]),
-                        dash_table.DataTable(
-                            id="table",
-                            style_cell={
-                                "textAlign": "left",
-                                "fontSize": 14,
-                                "font-family": "sans-serif",
-                            },
-                            style_as_list_view=True,
-                            style_header={
-                                "backgroundColor": "white",
-                                "fontWeight": "bold",
-                            },
-                        ),
-                    ],
-                    style={
-                        #  "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
-                        "margin-right": "15vw",
-                    },
-                ),
-            ],
-            className="row",
-        ),        
         # row sixteen
         html.Div(
             children=[
@@ -864,6 +830,7 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+
         # row sixteen
         html.Div(
             children=[
@@ -887,7 +854,7 @@ app.layout = html.Div(
                             dcc.Upload(
         id='upload-data',
         children=html.Div([
-            'Daten importieren',
+            'DATEN IMPORTIEREN',
             #html.A('Select Files')
         ]),
         style={
@@ -926,12 +893,47 @@ app.layout = html.Div(
             className="row",
         ),
         
+        # Berechnete Kennzahlen
+        # row 20
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[
+                        html.H4("7. Statische Anfangsberechnung"),
+                        dcc.Markdown(text_statisch["berechnete_kennzahlen"]),
+                        dash_table.DataTable(
+                            id="table",
+                            style_cell={
+                                "textAlign": "left",
+                                "fontSize": 14,
+                                "font-family": "sans-serif",
+                            },
+                            style_as_list_view=True,
+                            style_header={
+                                "backgroundColor": "white",
+                                "fontWeight": "bold",
+                            },
+                        ),
+                    ],
+                    style={
+                        #  "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                        "margin-right": "15vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),        
+        
         # row sixteen
         html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("7. Simulation"),
+                    children=[html.H4("8. Simulation"),
                               dcc.Markdown(text_statisch["simulation"]),],
                     style={
                         "display": "inline-block",
@@ -1058,6 +1060,7 @@ app.layout = html.Div(
                         dcc.Markdown(id='etf_rendite_text'),
                         dcc.Graph(id="etf_gewinn"),
                         dcc.Markdown(id='etf_gewinn_text'),
+                        html.H4("9. Disclaimer"),
                         dcc.Markdown(text_statisch["haftungsausschluss"]),
                     ],
                     style={
@@ -1177,12 +1180,12 @@ def updateTable(
                 "Kreditrate (Jahr)",
             ],
             "Ergebnis": [
-                f"{gesamtkosten}€",
+                f"{gesamtkosten} €",
                 kaufpreis_miet_verhaeltnis,
-                f"{anfangs_brutto_mietrendite}%",
-                f"{anfangs_netto_mietrendite}%",
-                f"{int(darlehen)}€",
-                f"{int(kreditrate_jahr)}€",
+                f"{anfangs_brutto_mietrendite} %",
+                f"{anfangs_netto_mietrendite} %",
+                f"{int(darlehen)} €",
+                f"{int(kreditrate_jahr)} €",
             ],
         }
     )
@@ -1374,7 +1377,8 @@ def custom_figure(
                 annotation_text=f"{round(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter)*100,2)} % Quantil",
                 annotation_position="bottom right",
                 annotation_font_size=12,
-                annotation_font_color="black",)
+                annotation_font_color="black",
+                annotation_bgcolor="white",)
             elif (name=="Gewinn") and (eingabeparameter.min() < 0):
                 #print(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter))
                 fig = fig.add_vline(
@@ -1385,7 +1389,8 @@ def custom_figure(
                 annotation_text=f"{round(len(eingabeparameter[eingabeparameter<0])/len(eingabeparameter)*100,2)} % Quantil",
                 annotation_position="bottom right",
                 annotation_font_size=12,
-                annotation_font_color="black",)
+                annotation_font_color="black",
+                annotation_bgcolor="white",)
             elif (name=="Objektrendite" or name=="Eigenkapitalrendite") and (eingabeparameter.min()<0):
                 fig = fig.add_vline(
                 x=0,
@@ -1395,7 +1400,8 @@ def custom_figure(
                 annotation_text=f"{round(len(eingabeparameter[eingabeparameter<0])/len(eingabeparameter)*100,2)} % Quantil",
                 annotation_position="bottom right",
                 annotation_font_size=12,
-                annotation_font_color="black",)                
+                annotation_font_color="black",
+                annotation_bgcolor="white",)                
             else:
                 if runden==0:
                     annotation_tmp = f"5% Quantil: {int(np.quantile(eingabeparameter, q=.05)*x)} {zeichen}" 
@@ -1410,6 +1416,7 @@ def custom_figure(
                     annotation_position="bottom right",
                     annotation_font_size=12,
                     annotation_font_color="black",
+                    annotation_bgcolor="white",
                 )
             if runden==0:
                 annotation_tmp = f"95% Quantil: {int(np.quantile(eingabeparameter, q=.95)*x)} {zeichen}" 
@@ -1424,6 +1431,7 @@ def custom_figure(
                     annotation_position="bottom right",
                     annotation_font_size=12,
                     annotation_font_color="black",
+                    annotation_bgcolor="white",
                 )
 
             if runden==0:
@@ -1439,7 +1447,19 @@ def custom_figure(
                     annotation_position="top right",
                     annotation_font_size=12,
                     annotation_font_color="black",
+                    annotation_bgcolor="white",
                 )
+            
+            # fig = fig.add_vline(
+            #         x=eingabeparameter.mean(),
+            #         line_width=3,
+            #         line_dash="dash",
+            #         line_color="red",
+            #         annotation_text="",
+            #         annotation_position="top right",
+            #         annotation_font_size=12,
+            #         annotation_font_color="black",
+            #     )
 
             fig.update_yaxes(rangemode="tozero")
             fig.update_layout(plot_bgcolor="white")
@@ -1607,6 +1627,7 @@ def custom_figure(
                             annotation_position="top left",
                             annotation_font_size=12,
                             annotation_font_color="black",
+                            annotation_bgcolor="white",
                         )
 
         if runden==0:
@@ -1622,6 +1643,7 @@ def custom_figure(
                             annotation_position="bottom right",
                             annotation_font_size=12,
                             annotation_font_color="black",
+                            annotation_bgcolor="white",
                         )
         
         fig.update_yaxes(rangemode="tozero")
