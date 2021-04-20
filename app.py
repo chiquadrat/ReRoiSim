@@ -46,22 +46,22 @@ text_statisch = text_static()
 app.layout = html.Div(
     [
                 # row zero
-        # html.Div(
-        #     children=[
-        #         # first column of row zero
-        #         html.Div(
-        #             children=[html.H3("Immobilienrendite-Simulator"),
-        #                       dcc.Markdown(text_statisch["einleitung"]),],
-        #             style={
-        #                 "display": "inline-block",
-        #                 "vertical-align": "top",
-        #                 "margin-left": "3vw",
-        #                 "margin-top": "3vw",
-        #             },
-        #         ),
-        #     ],
-        #     className="row",
-        # ),
+        html.Div(
+            children=[
+                # first column of row zero
+                html.Div(
+                    children=[html.H3("Immobilienrendite-Simulator"),
+                              dcc.Markdown(text_statisch["einleitung"]),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
         # row zero
         html.Div(
             children=[
