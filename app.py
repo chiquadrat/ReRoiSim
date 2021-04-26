@@ -50,7 +50,7 @@ app.layout = html.Div(
             children=[
                 # first column of row zero
                 html.Div(
-                    children=[html.H3("Immobilienrendite-Simulator"),
+                    children=[html.H3("Immobilienrendite - Simulator"),
                               dcc.Markdown(text_statisch["einleitung"]),],
                     style={
                         "display": "inline-block",
@@ -1555,8 +1555,6 @@ def custom_figure(
         area="middle"
     )
 
-
-
     fig_verkaufspreis = figure_ein_aus_gabeparameter(
         eingabeparameter="verkaufspreis",
         name="Verkaufspreis",
@@ -1574,7 +1572,7 @@ def custom_figure(
         runden=2,
         area="nothing"
     )
-
+    
     fig_eigenkapitalrendite = figure_ein_aus_gabeparameter(
         eingabeparameter="eigenkapitalrendite",
         name="Eigenkapitalrendite",
@@ -1677,6 +1675,8 @@ def custom_figure(
     )
         
     loading_antwort = ""
+    
+   
     
     # Generate text output
     text_dynamisch = text_generator(

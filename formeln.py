@@ -208,14 +208,16 @@ def renditerechner(
 
             # Jahr
             jahr_pj.append(index_nr)
-
             # Mieteinahmen
             if jahr_pj[index_nr] < erste_mieterhoehung:
                 mieteinnahmen_pj.append(mieteinnahmen)
-            elif jahr_pj[index_nr] >= erste_mieterhoehung:
-                mieteinnahmen_pj.append(
-                    mieteinnahmen_pj[-1] * (1 + mietsteigerung[index_nr - 1, run])
-                )
+            elif (jahr_pj[index_nr] >= erste_mieterhoehung):
+                if index_nr==1:
+                    mieteinnahmen_pj.append(mieteinnahmen)
+                else:
+                    mieteinnahmen_pj.append(
+                        mieteinnahmen_pj[-1] * (1 + mietsteigerung[index_nr - 1, run])
+                    )
 
             # nicht umlegbare Kosten
             if jahr_pj[index_nr] == 1:
@@ -232,8 +234,8 @@ def renditerechner(
             mietausfall_pj.append(
                 mieteinnahmen_pj[index_nr] * mietausfall[index_nr - 1, run]
             )
-
-            # Jahresreinertrag
+            
+            # Jahresreinertrag            
             jahresreinertrag_pj.append(
                 mieteinnahmen_pj[index_nr]
                 - nicht_umlegbare_kosten_pj[index_nr]
@@ -411,8 +413,6 @@ def renditerechner(
                         (1 + etf_rendite[index_nr - 1, run]) 
                     )
                 )
-            #print(etf_investition_pj)
-            #print(etf_investition_verzinst_pj)
 
             # Steuerliches Ergebnis für die Berechnung der Objektrendite
             if jahr_pj[index_nr] == 1:
@@ -476,7 +476,6 @@ def renditerechner(
 
         # Berechnung der Eigenkapitalrendite : interner Zinsfuß der Zahlungsreihe ueberschuss_gesamt_pj
         eigenkapitalrendite_runs.append(npf.irr(ueberschuss_gesamt_pj))
-        # print(ueberschuss_gesamt_pj)
 
         # Berechnung der Objektrendite : interner Zinsfuß der Zahlungsreihe liquiditaet_pj
         objektrendite_runs.append(npf.irr(liquiditaet_pj))
@@ -513,5 +512,6 @@ def renditerechner(
     }
 
 
-# ergebnis = renditerechner()
-# print(ergebnis)
+# ergebnis = renditerechner(erste_mieterhoehung = 10)
+# print(ergebnis["objektrendite"])
+# print(ergebnis["eigenkapitalrendite"])
