@@ -26,15 +26,15 @@ import openpyxl
 from formeln import renditerechner
 from text import text_generator, text_static
 
-VALID_USERNAME_PASSWORD_PAIRS = {
-                                "Immobilien":"Simulator",
-                                "Christoph": "Groener",
-                                 "Jack":"Singer"}
+#VALID_USERNAME_PASSWORD_PAIRS = {
+#                                "Immobilien":"Simulator",
+#                                "Christoph": "Groener",
+#                                 "Jack":"Singer"}
 
 # Initialize the app
 app = dash.Dash(__name__)
 server = app.server
-auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
+#auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
 # app.config.suppress_callback_exceptions = True
 
 #
