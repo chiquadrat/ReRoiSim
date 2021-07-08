@@ -1396,7 +1396,9 @@ def custom_figure(
         if np.all(eingabeparameter == eingabeparameter[0]) == True:
             fig = go.Figure(data=[go.Table()])
         else:
-            fig = ff.create_distplot([eingabeparameter], [name], show_hist=False, show_rug=False)
+            fig = ff.create_distplot([eingabeparameter], 
+                                     [name], 
+                                     show_hist=False, show_rug=False)
             
             if (name=="Verkaufspreis") and (eingabeparameter.min() < kaufpreis):
                 #print(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter))
