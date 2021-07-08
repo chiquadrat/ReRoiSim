@@ -208,6 +208,9 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
     Wahrscheinlichkeit von
     5% wird der minimale jährliche Cashflow bei unter **{int(np.quantile(minimaler_cashflow, q=0.05))} Euro ** liegen.
     """
+    
+    eigenkapitalrendite_etf = np.array(ergebnis["etf_ek_rendite"])
+    eigenkapitalrendite_etf = eigenkapitalrendite_etf[~np.isnan(eigenkapitalrendite_etf)]
     etf_rendite_text = f"""
     Beim Kauf der Immobilie können Sie eine durchschnittliche Eigenkapitalrendite von **{round(eigenkapitalrendite.mean()*100, 2)} %** 
     erwarten. Wenn Sie stattdessen das initial eingesetzte Eigenkapital und die jährlichen negativen Cashflows (falls vorhanden) 
@@ -216,6 +219,13 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
     Mit einer Wahrscheinlichkeit von 
     **{round((sum(np.array(ergebnis['etf_ek_rendite']) > np.array(ergebnis['eigenkapitalrendite']))/len(ergebnis['eigenkapitalrendite']))*100, 2)}  %** würden Sie mit einer ETF-Investition eine höhere Rendite erzielen 
     als mit dem Kauf der Immobilie.
+    
+    
+    Am Ende Ihres Anlagehorizonts werden Sie bei einer ETF Investition mit einer Wahrscheinlichkeit von
+    **{round(len(eigenkapitalrendite_etf[eigenkapitalrendite_etf<0])/len(eigenkapitalrendite_etf)*100,2)} %**
+    eine negative Rendite erzielt haben. Bei einer Immobilieninvestition beträgt die Wahrscheinlichkeit
+    für eine negative Rendite am Ende Ihres Anlagehorizonts **{round(len(eigenkapitalrendite[eigenkapitalrendite<0])/len(eigenkapitalrendite)*100,2)} %**.
+    
     """
  
  

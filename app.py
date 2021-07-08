@@ -788,6 +788,24 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+        # row sixteen
+        html.Div(
+            children=[
+                # first column of third row
+                html.Div(
+                    children=[
+        dcc.Markdown(id='wertsteigerung_pa_text'),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                        "margin-right": "10vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
         # row fourteen
         html.Div(
             children=[
@@ -1087,6 +1105,7 @@ app.layout = html.Div(
 @app.callback(
     Output("table", "columns"),
     Output("table", "data"),
+    Output("wertsteigerung_pa_text", "children"),
     Input("kaufpreis", "value"),
     Input("kaufpreis_grundstueck", "value"),
     Input("kaufpreis_sanierung", "value"),
@@ -1191,8 +1210,20 @@ def updateTable(
     )
     data = df.to_dict("records")
     columns = [{"name": i, "id": i} for i in df.columns]
+        
+    f = verkaufsfaktor * (mieteinnahmen * (1+(mietsteigerung/100))**(anlagehorizont - erste_mieterhoehung + 1))
+    s = kaufpreis
+    y = anlagehorizont
+    wertsteigerung_pa = round((((f/s)**(1/y)-1)*100),2)
+    
+    wertsteigerung_pa_text = f"""
+    >Bei einem Verkaufsfaktor von **{verkaufsfaktor}** und einer
+    >jährlichen Mietsteigerung von **{mietsteigerung} %** ab dem **{erste_mieterhoehung}. Jahr **
+    >beträgt die jährliche Wertsteigerung
+    >der Immobilie **{wertsteigerung_pa} %**.
+    """
 
-    return columns, data
+    return columns, data, wertsteigerung_pa_text
 
 
 @app.callback(
@@ -1365,7 +1396,9 @@ def custom_figure(
         if np.all(eingabeparameter == eingabeparameter[0]) == True:
             fig = go.Figure(data=[go.Table()])
         else:
-            fig = ff.create_distplot([eingabeparameter], [name], show_hist=False, show_rug=False)
+            fig = ff.create_distplot([eingabeparameter], 
+                                     [name], 
+                                     show_hist=False, show_rug=False)
             
             if (name=="Verkaufspreis") and (eingabeparameter.min() < kaufpreis):
                 #print(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter))
@@ -1643,6 +1676,7 @@ def custom_figure(
                             annotation_font_color="black",
                             annotation_bgcolor="white",
                         )
+                
         
         fig.update_yaxes(rangemode="tozero")
         fig.update_layout(plot_bgcolor="white")
