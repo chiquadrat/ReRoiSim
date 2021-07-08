@@ -1219,8 +1219,8 @@ def updateTable(
     wertsteigerung_pa_text = f"""
     >Bei einem Verkaufsfaktor von **{verkaufsfaktor}** und einer
     >jährlichen Mietsteigerung von **{mietsteigerung} %** ab dem **{erste_mieterhoehung}. Jahr **
-    >beträgt die angenommene jährliche Wertsteigerung
-    >der Immobilie  f={f}, s={s}, wert={wertsteigerung_pa} %
+    >beträgt die jährliche Wertsteigerung
+    >der Immobilie **{wertsteigerung_pa} %**.
     """
 
     return columns, data, wertsteigerung_pa_text
@@ -1674,6 +1674,7 @@ def custom_figure(
                             annotation_font_color="black",
                             annotation_bgcolor="white",
                         )
+                
         
         fig.update_yaxes(rangemode="tozero")
         fig.update_layout(plot_bgcolor="white")
