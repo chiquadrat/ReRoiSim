@@ -4,6 +4,7 @@
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 ################################################################################
 #
@@ -14,7 +15,7 @@ import numpy as np
 #
 # Allgemein
 #
-anlagehorizont = 15
+anlagehorizont = 30
 alleinstehend = False
 
 #
@@ -33,7 +34,7 @@ eigenkapital = 6_500
 zinsbindung = 15
 zinsatz = 0.0200
 tilgungssatz = 0.03
-anschlusszinssatz = 0.05
+anschlusszinssatz = 0.04
 unsicherheit_anschlusszinssatz = 1
 
 #
@@ -79,7 +80,8 @@ kreditrate_pj = [0]
 tilgung_pj = [0]
 vermoegen_immo = [wert_immo_pj[0] - darlehen]
 etf_vermoegen = [eigenkapital]
-etf_cash_inflow = [0]
+verzinstes_ek_vermoegen = [eigenkapital]
+
 nettokaltmiete_pa = [nettokaltmiete*12]
 instandhaltungskosten_pa = [instandhaltungskosten]
 
@@ -137,6 +139,18 @@ for index_nr in range(1, anlagehorizont + 1):
             nettokaltmiete_pa[index_nr-1] - kreditrate_pj[index_nr] 
         ) + instandhaltungskosten_pa[index_nr-1])
         
+    # Verzinstes EK Vermoegen (p.a.)
+    if kreditrate_pj[index_nr] > nettokaltmiete_pa[index_nr-1]:
+        verzinstes_ek_vermoegen.append(verzinstes_ek_vermoegen[index_nr-1] * (verzinsung_ek + 1) 
+                             + (
+            kreditrate_pj[index_nr] - nettokaltmiete_pa[index_nr-1]
+        ) + instandhaltungskosten_pa[index_nr-1])
+    else:
+        verzinstes_ek_vermoegen.append(verzinstes_ek_vermoegen[index_nr-1] * (verzinsung_ek + 1) 
+                             + (
+            nettokaltmiete_pa[index_nr-1] - kreditrate_pj[index_nr] 
+        ) + instandhaltungskosten_pa[index_nr-1])
+            
     # Steigerung Instandhaltungskosten    
     instandhaltungskosten_pa.append(
         instandhaltungskosten_pa[index_nr-1] * (1+kostensteigerung)
@@ -145,6 +159,11 @@ for index_nr in range(1, anlagehorizont + 1):
         nettokaltmiete_pa[index_nr-1] * (1+steigerung_nettokaltmiete)
     )
     
+plt.plot(jahr_pj, etf_vermoegen, label="ETF Vermoegen")    
+plt.plot(jahr_pj, vermoegen_immo, label="Immo Vermoegen")    
+plt.plot(jahr_pj, verzinstes_ek_vermoegen, label="Verzinstes EK Vermoegen")    
+plt.legend()
+plt.show()
     
 
     
