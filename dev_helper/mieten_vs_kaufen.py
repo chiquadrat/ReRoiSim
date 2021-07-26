@@ -128,26 +128,26 @@ for index_nr in range(1, anlagehorizont + 1):
     vermoegen_immo.append(wert_immo_pj[index_nr] - restschuld_pj[index_nr])
     
     # ETF Vermögen (p.a.)
-    if kreditrate_pj[index_nr] > nettokaltmiete_pa[index_nr-1]:
+    if kreditrate_pj[index_nr] >= nettokaltmiete_pa[index_nr-1]:
         etf_vermoegen.append(etf_vermoegen[index_nr-1] * (etf_rendite + 1) 
                              + (
             kreditrate_pj[index_nr] - nettokaltmiete_pa[index_nr-1]
         ) + instandhaltungskosten_pa[index_nr-1])
     else:
         etf_vermoegen.append(etf_vermoegen[index_nr-1] * (etf_rendite + 1) 
-                             + (
+                             - (
             nettokaltmiete_pa[index_nr-1] - kreditrate_pj[index_nr] 
         ) + instandhaltungskosten_pa[index_nr-1])
         
     # Verzinstes EK Vermoegen (p.a.)
-    if kreditrate_pj[index_nr] > nettokaltmiete_pa[index_nr-1]:
+    if kreditrate_pj[index_nr] >= nettokaltmiete_pa[index_nr-1]:
         verzinstes_ek_vermoegen.append(verzinstes_ek_vermoegen[index_nr-1] * (verzinsung_ek + 1) 
                              + (
             kreditrate_pj[index_nr] - nettokaltmiete_pa[index_nr-1]
         ) + instandhaltungskosten_pa[index_nr-1])
     else:
         verzinstes_ek_vermoegen.append(verzinstes_ek_vermoegen[index_nr-1] * (verzinsung_ek + 1) 
-                             + (
+                             - (
             nettokaltmiete_pa[index_nr-1] - kreditrate_pj[index_nr] 
         ) + instandhaltungskosten_pa[index_nr-1])
             
@@ -162,6 +162,7 @@ for index_nr in range(1, anlagehorizont + 1):
 plt.plot(jahr_pj, etf_vermoegen, label="ETF Vermoegen")    
 plt.plot(jahr_pj, vermoegen_immo, label="Immo Vermoegen")    
 plt.plot(jahr_pj, verzinstes_ek_vermoegen, label="Verzinstes EK Vermoegen")    
+plt.title("Mieten vs. Kaufen (ohne Steuern)")
 plt.legend()
 plt.show()
     
