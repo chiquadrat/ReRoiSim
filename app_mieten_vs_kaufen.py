@@ -110,7 +110,7 @@ app.layout = html.Div(
                         dcc.Input(
                             id="renovierungskosten",
                             placeholder="Eingabe...",
-                            value=1_000,
+                            value=10_000,
                             type="number",
                             min=0,
                             required=True,
@@ -132,7 +132,7 @@ app.layout = html.Div(
                         dcc.Input(
                             id="kaufnebenkosten",
                             placeholder="Eingabe...",
-                            value=10000,
+                            value=30000,
                             type="number",
                             required=True,
                         ),
@@ -159,7 +159,7 @@ app.layout = html.Div(
                         dcc.Input(
                             id="instandhaltungskosten",
                             placeholder="Eingabe...",
-                            value=40_000,
+                            value=2_000,
                             type="number",
                             min=0,
                             required=True,
@@ -317,7 +317,7 @@ app.layout = html.Div(
                             id="zinsbindung",
                             placeholder="Eingabe...",
                             type="number",
-                            value=20,
+                            value=15,
                             min=1,
                             required=True,
                         ),
@@ -458,7 +458,7 @@ app.layout = html.Div(
                         dcc.Input(
                             id="nettokaltmiete",
                             placeholder="Eingabe...",
-                            value=12_000,
+                            value=6_500,
                             type="number",
                             min=0,
                             required=True,
@@ -499,7 +499,7 @@ app.layout = html.Div(
                                    title="Standardabweichung"
                                   ),
                         dcc.Input(
-                            id="unsicherheit_mietsteigerung",
+                            id="unsicherheit_steigerung_nettokaltmiete",
                             placeholder="Eingabe...",
                             type="number",
                             value=1,
@@ -631,7 +631,7 @@ app.layout = html.Div(
                             id="verzinsung_ek",
                             placeholder="Eingabe...",
                             type="number",
-                            value=22,
+                            value=2.2,
                             min=1,
                             required=True,
                         ),
@@ -652,7 +652,7 @@ app.layout = html.Div(
                             id="unsicherheit_verzinsung_ek",
                             placeholder="Eingabe...",
                             type="number",
-                            value=4,
+                            value=1,
                             min=0.1,
                             required=True,
                         ),
@@ -889,7 +889,7 @@ app.layout = html.Div(
 #
 
 @app.callback(
-    Output('mieten_vs_kaufen', 'children'),
+    Output('mieten_vs_kaufen', 'figure'),
     [Input("button", "n_clicks")],
     state=[
         State("kaufpreis", "value"),
@@ -908,7 +908,7 @@ app.layout = html.Div(
         State("unsicherheit_anschlusszinssatz", "value"),
         State("nettokaltmiete", "value"),
         State("steigerung_nettokaltmiete", "value"),
-        State("unsicherheit_mietsteigerung", "value"),
+        State("unsicherheit_steigerung_nettokaltmiete", "value"),
         State("familienstand", "value"),
         State("einkommen", "value"),
         State("anlagehorizont", "value"),
@@ -936,7 +936,7 @@ def custom_figure(
    unsicherheit_anschlusszinssatz,
    nettokaltmiete,
    steigerung_nettokaltmiete,
-   unsicherheit_mietsteigerung,
+   unsicherheit_steigerung_nettokaltmiete,
    familienstand,
    einkommen,
    anlagehorizont,
@@ -958,6 +958,7 @@ def custom_figure(
         etf_rendite = 0.1095
         unsicherheit_etf_rendite = 0.2276
         name2 = "Dax"
+        
 
     ergebnis = mieten_kaufen(
         anlagehorizont=anlagehorizont,
@@ -968,594 +969,246 @@ def custom_figure(
         renovierungskosten=renovierungskosten,
         kaufnebenkosten=kaufnebenkosten,
         instandhaltungskosten=instandhaltungskosten,
-        kostensteigerung=kostensteigerung,
+        kostensteigerung=kostensteigerung/100,
         unsicherheit_kostensteigerung=unsicherheit_kostensteigerung,
-        wertsteigerung=wertsteigerung,
+        wertsteigerung=wertsteigerung/100,
         unsicherheit_wertsteigerung=unsicherheit_wertsteigerung,
         eigenkapital=eigenkapital,
         zinsbindung=zinsbindung,
-        zinssatz=zinssatz,
-        tilgungssatz=tilgungssatz,
-        anschlusszinssatz=anschlusszinssatz,
+        zinssatz=zinssatz/100,
+        tilgungssatz=tilgungssatz/100,
+        anschlusszinssatz=anschlusszinssatz/100,
         unsicherheit_anschlusszinssatz=unsicherheit_anschlusszinssatz,
-        nettokaltmiete=nettokaltmiete,
-        steigerung_nettokaltmiete=steigerung_nettokaltmiete,
-        unsicherheit_mietsteigerung=unsicherheit_mietsteigerung,
+        nettokaltmiete=nettokaltmiete/12,
+        steigerung_nettokaltmiete=steigerung_nettokaltmiete/100,
+        unsicherheit_steigerung_nettokaltmiete=unsicherheit_steigerung_nettokaltmiete,
         etf_rendite = etf_rendite,
         unsicherheit_etf_rendite=unsicherheit_etf_rendite,
-        verzinsung_ek=verzinsung_ek,
+        verzinsung_ek=verzinsung_ek/100,
         unsicherheit_verzinsung_ek=unsicherheit_verzinsung_ek,
         
     )
 
-    def figure_ein_aus_gabeparameter(eingabeparameter, name, zeichen, x, runden, area):
-        if name == "Minimaler Cashflow":
-            eingabeparameter = np.array(ergebnis[eingabeparameter])
-            eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
-            upper_bound = np.quantile(eingabeparameter, q=0.75) + 4.5 * iqr(eingabeparameter)
-            lower_bound = np.quantile(eingabeparameter, q=0.75) - 4.5 * iqr(eingabeparameter)
-            eingabeparameter = eingabeparameter[(eingabeparameter > lower_bound) & (eingabeparameter < upper_bound)]
-        else:        
-            eingabeparameter = np.array(ergebnis[eingabeparameter])
-            eingabeparameter = eingabeparameter[~np.isnan(eingabeparameter)]
-        
-        if np.all(eingabeparameter == eingabeparameter[0]) == True:
-            fig = go.Figure(data=[go.Table()])
-        else:
-            fig = ff.create_distplot([eingabeparameter], 
-                                     [name], 
-                                     show_hist=False, show_rug=False)
-            
-            if (name=="Verkaufspreis") and (eingabeparameter.min() < kaufpreis):
-                #print(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter))
-                fig = fig.add_vline(
-                x=kaufpreis,
-                line_width=3,
-                line_dash="dash",
-                line_color="black",
-                annotation_text=f"{round(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter)*100,2)} % Quantil",
-                annotation_position="bottom right",
-                annotation_font_size=12,
-                annotation_font_color="black",
-                annotation_bgcolor="white",)
-            elif (name=="Gewinn") and (eingabeparameter.min() < 0):
-                #print(len(eingabeparameter[eingabeparameter<kaufpreis])/len(eingabeparameter))
-                fig = fig.add_vline(
-                x=0,
-                line_width=3,
-                line_dash="dash",
-                line_color="black",
-                annotation_text=f"{round(len(eingabeparameter[eingabeparameter<0])/len(eingabeparameter)*100,2)} % Quantil",
-                annotation_position="bottom right",
-                annotation_font_size=12,
-                annotation_font_color="black",
-                annotation_bgcolor="white",)
-            elif (name=="Objektrendite" or name=="Eigenkapitalrendite") and (eingabeparameter.min()<0):
-                fig = fig.add_vline(
-                x=0,
-                line_width=3,
-                line_dash="dash",
-                line_color="black",
-                annotation_text=f"{round(len(eingabeparameter[eingabeparameter<0])/len(eingabeparameter)*100,2)} % Quantil",
-                annotation_position="bottom right",
-                annotation_font_size=12,
-                annotation_font_color="black",
-                annotation_bgcolor="white",)                
-            else:
-                if runden==0:
-                    annotation_tmp = f"5% Quantil: {int(np.quantile(eingabeparameter, q=.05)*x)} {zeichen}" 
-                else:
-                    annotation_tmp = f"5% Quantil: {round(np.quantile(eingabeparameter, q=.05)*x,runden)} {zeichen}"
-                fig = fig.add_vline(
-                    x=np.quantile(eingabeparameter, q=0.05),
-                    line_width=3,
-                    line_dash="dash",
-                    line_color="black",
-                    annotation_text=annotation_tmp,
-                    annotation_position="bottom right",
-                    annotation_font_size=12,
-                    annotation_font_color="black",
-                    annotation_bgcolor="white",
-                )
-            if runden==0:
-                annotation_tmp = f"95% Quantil: {int(np.quantile(eingabeparameter, q=.95)*x)} {zeichen}" 
-            else:
-                annotation_tmp = f"95% Quantil: {round(np.quantile(eingabeparameter, q=.95)*x,runden)} {zeichen}"            
-            fig = fig.add_vline(
-                    x=np.quantile(eingabeparameter, q=0.95),
-                    line_width=3,
-                    line_dash="dash",
-                    line_color="black",
-                    annotation_text=annotation_tmp,
-                    annotation_position="bottom right",
-                    annotation_font_size=12,
-                    annotation_font_color="black",
-                    annotation_bgcolor="white",
-                )
-
-            if runden==0:
-                annotation_tmp = f"Median: {int(np.quantile(eingabeparameter, q=0.5)*x)} {zeichen}" 
-            else:
-                annotation_tmp = f"Median: {round(np.quantile(eingabeparameter, q=0.5)*x,runden)} {zeichen}"                            
-            fig = fig.add_vline(
-                    x=np.quantile(eingabeparameter, q=0.5),
-                    line_width=3,
-                    line_dash="dash",
-                    line_color="black",
-                    annotation_text=annotation_tmp,
-                    annotation_position="top right",
-                    annotation_font_size=12,
-                    annotation_font_color="black",
-                    annotation_bgcolor="white",
-                )
-            
-            # fig = fig.add_vline(
-            #         x=eingabeparameter.mean(),
-            #         line_width=3,
-            #         line_dash="dash",
-            #         line_color="red",
-            #         annotation_text="",
-            #         annotation_position="top right",
-            #         annotation_font_size=12,
-            #         annotation_font_color="black",
-            #     )
-
-            fig.update_yaxes(rangemode="tozero")
-            fig.update_layout(plot_bgcolor="white")
-            fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-            fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-            fig.update_layout(showlegend=False)
-            fig.update_layout(title=name)
-            
-            
-            if area == "middle":
-                xl = np.quantile(eingabeparameter, q=0.05)
-                xr = np.quantile(eingabeparameter, q=0.95)
-                x1   = [xc   for xc in fig.data[0].x if xc <xl]
-                y1   = fig.data[0].y[:len(x1)]
-
-                x2   = [xc   for xc in fig.data[0].x if xc > xr]
-                y2   = fig.data[0].y[-len(x2):]
-
-                x3 = [xc   for xc in fig.data[0].x if (xc > xl) and (xc < xr)]
-                y3 = fig.data[0].y[len(x1):-len(x2)]
-
-                fig.add_scatter(x=x3, y=y3,fill='tozeroy', 
-                                mode='none' , fillcolor='lightblue',
-                                name=name)
-            
-                #fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , fillcolor="red")
-                #fig.add_scatter(x=x2, y=y2,fill='tozeroy', mode='none' , fillcolor='green')
-            if name=="Verkaufspreis":
-                x1   = [xc   for xc in fig.data[0].x if xc <kaufpreis]
-                y1   = fig.data[0].y[:len(x1)]            
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
-                                fillcolor="red", name=name)
-
-            if ((name=="Objektrendite") or 
-                (name=="Eigenkapitalrendite") or
-                (name=="Gewinn")):
-                x1   = [xc   for xc in fig.data[0].x if xc <0]
-                y1   = fig.data[0].y[:len(x1)]            
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
-                                fillcolor="red", name=name)
-                
-            if name=="Minimaler Cashflow":
-                xl = np.quantile(eingabeparameter, q=0.05)
-                x1   = [xc   for xc in fig.data[0].x if xc <xl]
-                y1   = fig.data[0].y[:len(x1)]
-                fig.add_scatter(x=x1, y=y1,fill='tozeroy', mode='none' , 
-                                fillcolor='red', name=name)
-                
-        return fig
-
-    fig_verkaufsfaktor = figure_ein_aus_gabeparameter(
-        eingabeparameter="verkaufsfaktor",
-        name="Verkaufsfaktor",
-        zeichen="",
-        x=1,
-        runden=1,
-        area="middle"
-    )
-
-    fig_anschlusszinssatz = figure_ein_aus_gabeparameter(
-        eingabeparameter="anschlusszinssatz",
-        name="Anschlusszinssatz",
-        zeichen="%",
-        x=100,
-        runden=2,
-        area="middle"
-    )
-
-    fig_mietsteigerung = figure_ein_aus_gabeparameter(
-        eingabeparameter="mietsteigerung",
-        name="Mietsteigerung pro Jahr",
-        zeichen="%",
-        x=100,
-        runden=2,
-        area="middle"
-    )
-
-    fig_kostensteigerung = figure_ein_aus_gabeparameter(
-        eingabeparameter="kostensteigerung",
-        name="Kostensteigerung pro Jahr",
-        zeichen="%",
-        x=100,
-        runden=2,
-        area="middle"
-    )
-
-    fig_mietausfall = figure_ein_aus_gabeparameter(
-        eingabeparameter="mietausfall",
-        name="Mietausfall pro Jahr",
-        zeichen="%",
-        x=100,
-        runden=2,
-        area="middle"
-    )
-
-    fig_verkaufspreis = figure_ein_aus_gabeparameter(
-        eingabeparameter="verkaufspreis",
-        name="Verkaufspreis",
-        zeichen="€",
-        x=1,
-        runden=0,
-        area="nothing"
-    )
-
-    fig_objektrendite = figure_ein_aus_gabeparameter(
-        eingabeparameter="objektrendite",
-        name="Objektrendite",
-        zeichen="%",
-        x=100,
-        runden=2,
-        area="nothing"
-    )
+    print(ergebnis)
     
-    fig_eigenkapitalrendite = figure_ein_aus_gabeparameter(
-        eingabeparameter="eigenkapitalrendite",
-        name="Eigenkapitalrendite",
-        zeichen="%",
-        x=100,
-        runden=2,
-        area="nothing"
-    )
-
-    fig_gewinn = figure_ein_aus_gabeparameter(
-        eingabeparameter="gewinn", name="Gewinn", zeichen="€", x=1, runden=0,
-        area="nothing"
-    )
-
-    fig_minimaler_cashflow = figure_ein_aus_gabeparameter(
-        eingabeparameter="minimaler_cashflow",
-        name="Minimaler Cashflow",
-        zeichen="€",
-        x=1,
-        runden=0,
-        area="nothing"
-    )
-
-    def figure_etf_vergleich(
-        eingabeparameter1, 
-        eingabeparameter2, 
-        name1,
-        name2,
-        zeichen, x, runden, ueberschrift):
-        
-        eingabeparameter1 = np.array(ergebnis[eingabeparameter1])
-        eingabeparameter1 = eingabeparameter1[~np.isnan(eingabeparameter1)]
-        
-        eingabeparameter2 = np.array(ergebnis[eingabeparameter2])
-        eingabeparameter2 = eingabeparameter2[~np.isnan(eingabeparameter2)]
-        
-        fig = ff.create_distplot([eingabeparameter1, eingabeparameter2], [name1, name2], 
-                         show_hist=False, show_rug=False)
-
-        if runden==0:
-            annotation_tmp = f"Median: {int(np.quantile(eingabeparameter1, q=0.5)*x)} {zeichen}"
-        else:
-            annotation_tmp = f"Median: {round(np.quantile(eingabeparameter1, q=0.5)*x,runden)} {zeichen}"            
-        fig = fig.add_vline(
-                            x=np.quantile(eingabeparameter1, q=0.5),
-                            line_width=3,
-                            line_dash="dash",
-                            line_color="cornflowerblue",
-                            annotation_text=annotation_tmp,
-                            annotation_position="top left",
-                            annotation_font_size=12,
-                            annotation_font_color="black",
-                            annotation_bgcolor="white",
-                        )
-
-        if runden==0:
-            annotation_tmp = f"Median: {int(np.quantile(eingabeparameter2, q=0.5)*x)} {zeichen}"
-        else:
-            annotation_tmp = f"Median: {round(np.quantile(eingabeparameter2, q=0.5)*x,runden)} {zeichen}"
-        fig = fig.add_vline(
-                            x=np.quantile(eingabeparameter2, q=0.5),
-                            line_width=3,
-                            line_dash="dash",
-                            line_color="orange",
-                            annotation_text=annotation_tmp,
-                            annotation_position="bottom right",
-                            annotation_font_size=12,
-                            annotation_font_color="black",
-                            annotation_bgcolor="white",
-                        )
-                
-        
-        fig.update_yaxes(rangemode="tozero")
-        fig.update_layout(plot_bgcolor="white")
-        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-        fig.update_layout(title=ueberschrift)
-        
-        return fig
-        
-    fig_etf_rendite = figure_etf_vergleich(
-        eingabeparameter1="eigenkapitalrendite",
-        eingabeparameter2="etf_ek_rendite",
-        name1="Immobilie",
-        name2=name2,
-        zeichen="%",
-        x=100,
-        runden=2,
-        ueberschrift="Eigenkapitalrendite"
-    )
-    
-    fig_etf_gewinn = figure_etf_vergleich(
-        eingabeparameter1="gewinn",
-        eingabeparameter2="etf_gewinn",
-        name1="Immobilie",
-        name2=name2,
-        zeichen="€",
-        x=1,
-        runden=0,
-        ueberschrift="Gewinn"
-    )
-        
-    loading_antwort = ""
-    
-   
-    
-    # Generate text output
-    text_dynamisch = text_generator(
-        ergebnis,
-        zinsbindung,
-        anlagehorizont,
-        erste_mieterhoehung,
-        kaufpreis,
-        )
+    fig_vermoegen = go.Figure()
+    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_pj"],
+                    mode='lines+markers',
+                    name='ETF'))
+    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_minus_neg_cashflows_versteuert_pj"],
+                    mode='lines+markers',
+                    name='ETF versteuert'))
+    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["vermoegen_immo_pj"],
+                    mode='lines+markers',
+                    name='Immobilie'))    
+    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["vermoegen_immo_versteuert_pj"],
+                    mode='lines+markers',
+                    name='Immobilie versteuert'))    
+    fig_vermoegen.update_layout(title="Vermögensentwicklung")
 
     return (
-#        text["einleitung"],
-        text_dynamisch["etf_rendite"],
-        text_dynamisch["etf_gewinn"],
-        text_dynamisch["anschlusszinssatz"],
-        text_dynamisch["verkaufsfaktor"],
-        text_dynamisch["mietsteigerung"],
-        text_dynamisch["kostensteigerung"],
-        text_dynamisch["mietausfall"],
-        #text_dynamisch["ergebnisse"],
-        text_dynamisch["verkaufspreis"],
-        text_dynamisch["objektrendite"],
-        text_dynamisch["eigenkapitalrendite"],
-        text_dynamisch["gewinn"],
-        text_dynamisch["minimaler_cashflow"],
-        loading_antwort,
-        fig_verkaufsfaktor,
-        fig_anschlusszinssatz,
-        fig_mietsteigerung,
-        fig_kostensteigerung,
-        fig_mietausfall,
-        fig_verkaufspreis,
-        fig_objektrendite,
-        fig_eigenkapitalrendite,
-        fig_gewinn,
-        fig_minimaler_cashflow,
-        fig_etf_rendite,
-        fig_etf_gewinn,
+        fig_vermoegen
     )
     
-#
-# CSV/Excel Import
-#
+# #
+# # CSV/Excel Import
+# #
 
-def parse_contents(contents, filename, date):
-    content_type, content_string = contents.split(',')
-    decoded = base64.b64decode(content_string)
-    if 'csv' in filename:
-# Assume that the user uploaded a CSV file
-        df = pd.read_csv(
-        io.StringIO(decoded.decode('utf-8')))
-    elif 'xls' in filename:
-# Assume that the user uploaded an excel file
-        df = pd.read_excel(io.BytesIO(decoded)) 
-    else:
-        df = "**Keine csv oder xlsx Datei**"
-    return df
+# def parse_contents(contents, filename, date):
+#     content_type, content_string = contents.split(',')
+#     decoded = base64.b64decode(content_string)
+#     if 'csv' in filename:
+# # Assume that the user uploaded a CSV file
+#         df = pd.read_csv(
+#         io.StringIO(decoded.decode('utf-8')))
+#     elif 'xls' in filename:
+# # Assume that the user uploaded an excel file
+#         df = pd.read_excel(io.BytesIO(decoded)) 
+#     else:
+#         df = "**Keine csv oder xlsx Datei**"
+#     return df
 
-# Upload component: The same file can NOT be uploaded twice in a row. It will not
-# get recognized. This is something we need to live with right now. In the future we 
-# could checkout:
-# https://community.plotly.com/t/reuploading-same-file/42178
-# https://community.plotly.com/t/can-i-upload-the-same-file-twice-in-a-row/40526/3
-@app.callback(Output('upload-status', 'children'),
-                Output("kaufpreis", "value"),
-                Output("kaufpreis_grundstueck", "value"),
-                Output("kaufpreis_sanierung", "value"),
-                Output("kaufnebenkosten", "value"),
-                Output("renovierungskosten", "value"),
-                Output("mieteinnahmen", "value"),
-                Output("mietsteigerung", "value"),
-                Output("unsicherheit_mietsteigerung", "value"),
-                Output("erste_mieterhoehung", "value"),
-                Output("instandhaltungskosten", "value"),
-                Output("verwaltungskosten", "value"),
-                Output("mietausfall", "value"),
-                Output("unsicherheit_mietausfall", "value"),
-                Output("kostensteigerung", "value"),
-                Output("unsicherheit_kostensteigerung", "value"),
-                Output("eigenkapital", "value"),
-                Output("zinsbindung", "value"),
-                Output("disagio", "value"),
-                Output("zinsatz", "value"),
-                Output("tilgungssatz", "value"),
-                Output("anschlusszinssatz", "value"),
-                Output("unsicherheit_anschlusszinssatz", "value"),
-                Output("familienstand", "value"),
-                Output("einkommen", "value"),
-                Output("baujahr", "value"),
-                #    Input("sonderabschreibung", "value"),
-                Output("anlagehorizont", "value"),
-                Output("verkaufsfaktor", "value"),
-                Output("unsicherheit_verkaufsfaktor", "value"),
-              [Input('upload-data', 'contents')],
-              [State('upload-data', 'filename'),
-               State('upload-data', 'last_modified')])
-def update_output(list_of_contents, list_of_names, list_of_dates):
-    default_input = [
-        300_000, 100_000, 0, 40_000, 1_000, 12_000, 2, 1, 5, 1_200, 600, 2, 2, 1.5,
-        2, 100_000, 20, 0, 1.5, 2.5, 4, 1.5, "0", 100_000, "0", 15, 22, 4
-    ]   
-    default_column = [
-        'Kaufpreis', 'davon Grundstücksanteil', 'davon Sanierungskosten', 
-        'Kaufnebenkosten', 'Renovierungskosten', 'Mieteinahmen', 'Mietsteigerung', 
-        'Unsicherheit Mietsteigerung', 'Erste Mieterhöhung ab Jahr', 'Instandhaltungskosten Jahr', 
-        'Verwaltungskosten Jahr', 'Pauschale für Mietausfall', 'Unsicherheit Mietausfall', 
-        'Geschätzte Kostensteigerung', 'Unsicherheit Kostensteigerung', 'Eigenkapital', 
-        'Zinsbindung', 'Disagio', 'Zinssatz', 'Tilgungssatz', 'Anschlusszinssatz', 
-        'Unsicherheit Anschlusszinssatz', 'Familienstand', 'Zu versteuerndes Einkommen', 
-        'Baujahr', 'Anlagehorizont', 'Geschätzter Verkaufsfaktor', 'Unsicherheit Verkaufsfaktor'
-    ] 
-    text_message = ""
-    if list_of_contents is not None:
-        df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
-        if isinstance(df, pd.DataFrame): 
-            if "Unnamed: 0" in list(df.columns):                
-                df.drop(["Unnamed: 0"], axis=1, inplace=True)
-            imported_input = (
-                str(df[i][0]) 
-                if i in ["Familienstand", "Baujahr"] 
-                else df[i][0] 
-                for i in list(df.columns)
-            )
-            #print(list(df.columns))
-            if list(df.columns)==default_column:
-                return "**Upload erfolgreich**", *imported_input 
-            if list(df.columns)!=default_column:
-                return "**Falsches Format**", *default_input
-        else:
-            text_message = df
-            return text_message, *default_input
-    else:
-        return text_message, *default_input
+# # Upload component: The same file can NOT be uploaded twice in a row. It will not
+# # get recognized. This is something we need to live with right now. In the future we 
+# # could checkout:
+# # https://community.plotly.com/t/reuploading-same-file/42178
+# # https://community.plotly.com/t/can-i-upload-the-same-file-twice-in-a-row/40526/3
+# @app.callback(Output('upload-status', 'children'),
+#                 Output("kaufpreis", "value"),
+#                 Output("kaufpreis_grundstueck", "value"),
+#                 Output("kaufpreis_sanierung", "value"),
+#                 Output("kaufnebenkosten", "value"),
+#                 Output("renovierungskosten", "value"),
+#                 Output("mieteinnahmen", "value"),
+#                 Output("mietsteigerung", "value"),
+#                 Output("unsicherheit_mietsteigerung", "value"),
+#                 Output("erste_mieterhoehung", "value"),
+#                 Output("instandhaltungskosten", "value"),
+#                 Output("verwaltungskosten", "value"),
+#                 Output("mietausfall", "value"),
+#                 Output("unsicherheit_mietausfall", "value"),
+#                 Output("kostensteigerung", "value"),
+#                 Output("unsicherheit_kostensteigerung", "value"),
+#                 Output("eigenkapital", "value"),
+#                 Output("zinsbindung", "value"),
+#                 Output("disagio", "value"),
+#                 Output("zinsatz", "value"),
+#                 Output("tilgungssatz", "value"),
+#                 Output("anschlusszinssatz", "value"),
+#                 Output("unsicherheit_anschlusszinssatz", "value"),
+#                 Output("familienstand", "value"),
+#                 Output("einkommen", "value"),
+#                 Output("baujahr", "value"),
+#                 #    Input("sonderabschreibung", "value"),
+#                 Output("anlagehorizont", "value"),
+#                 Output("verkaufsfaktor", "value"),
+#                 Output("unsicherheit_verkaufsfaktor", "value"),
+#               [Input('upload-data', 'contents')],
+#               [State('upload-data', 'filename'),
+#                State('upload-data', 'last_modified')])
+# def update_output(list_of_contents, list_of_names, list_of_dates):
+#     default_input = [
+#         300_000, 100_000, 0, 40_000, 1_000, 12_000, 2, 1, 5, 1_200, 600, 2, 2, 1.5,
+#         2, 100_000, 20, 0, 1.5, 2.5, 4, 1.5, "0", 100_000, "0", 15, 22, 4
+#     ]   
+#     default_column = [
+#         'Kaufpreis', 'davon Grundstücksanteil', 'davon Sanierungskosten', 
+#         'Kaufnebenkosten', 'Renovierungskosten', 'Mieteinahmen', 'Mietsteigerung', 
+#         'Unsicherheit Mietsteigerung', 'Erste Mieterhöhung ab Jahr', 'Instandhaltungskosten Jahr', 
+#         'Verwaltungskosten Jahr', 'Pauschale für Mietausfall', 'Unsicherheit Mietausfall', 
+#         'Geschätzte Kostensteigerung', 'Unsicherheit Kostensteigerung', 'Eigenkapital', 
+#         'Zinsbindung', 'Disagio', 'Zinssatz', 'Tilgungssatz', 'Anschlusszinssatz', 
+#         'Unsicherheit Anschlusszinssatz', 'Familienstand', 'Zu versteuerndes Einkommen', 
+#         'Baujahr', 'Anlagehorizont', 'Geschätzter Verkaufsfaktor', 'Unsicherheit Verkaufsfaktor'
+#     ] 
+#     text_message = ""
+#     if list_of_contents is not None:
+#         df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
+#         if isinstance(df, pd.DataFrame): 
+#             if "Unnamed: 0" in list(df.columns):                
+#                 df.drop(["Unnamed: 0"], axis=1, inplace=True)
+#             imported_input = (
+#                 str(df[i][0]) 
+#                 if i in ["Familienstand", "Baujahr"] 
+#                 else df[i][0] 
+#                 for i in list(df.columns)
+#             )
+#             #print(list(df.columns))
+#             if list(df.columns)==default_column:
+#                 return "**Upload erfolgreich**", *imported_input 
+#             if list(df.columns)!=default_column:
+#                 return "**Falsches Format**", *default_input
+#         else:
+#             text_message = df
+#             return text_message, *default_input
+#     else:
+#         return text_message, *default_input
 
-#
-# CSV Export
-#
+# #
+# # CSV Export
+# #
 
-@app.callback(Output('download', 'data'),
-             [Input('download-results-button', 'n_clicks')],
-             state=[
-            State("kaufpreis", "value"),
-            State("kaufpreis_grundstueck", "value"),
-            State("kaufpreis_sanierung", "value"),
-            State("kaufnebenkosten", "value"),
-            State("renovierungskosten", "value"),
-            State("mieteinnahmen", "value"),
-            State("mietsteigerung", "value"),
-            State("unsicherheit_mietsteigerung", "value"),
-            State("erste_mieterhoehung", "value"),
-            State("instandhaltungskosten", "value"),
-            State("verwaltungskosten", "value"),
-            State("mietausfall", "value"),
-            State("unsicherheit_mietausfall", "value"),
-            State("kostensteigerung", "value"),
-            State("unsicherheit_kostensteigerung", "value"),
-            State("eigenkapital", "value"),
-            State("zinsbindung", "value"),
-            State("disagio", "value"),
-            State("zinsatz", "value"),
-            State("tilgungssatz", "value"),
-            State("anschlusszinssatz", "value"),
-            State("unsicherheit_anschlusszinssatz", "value"),
-            State("familienstand", "value"),
-            State("einkommen", "value"),
-            State("baujahr", "value"),
-            #    Input("sonderabschreibung", "value"),
-            State("anlagehorizont", "value"),
-            State("verkaufsfaktor", "value"),
-            State("unsicherheit_verkaufsfaktor", "value"),
-            ],
-            )
-def download_data(n_clicks, 
-                kaufpreis,
-                kaufpreis_grundstueck,
-                kaufpreis_sanierung,
-                kaufnebenkosten,
-                renovierungskosten,
-                mieteinnahmen,
-                mietsteigerung,
-                unsicherheit_mietsteigerung,
-                erste_mieterhoehung,
-                instandhaltungskosten,
-                verwaltungskosten,
-                mietausfall,
-                unsicherheit_mietausfall,
-                kostensteigerung,
-                unsicherheit_kostensteigerung,
-                eigenkapital,
-                zinsbindung,
-                disagio,
-                zinsatz,
-                tilgungssatz,
-                anschlusszinssatz,
-                unsicherheit_anschlusszinssatz,
-                familienstand,
-                einkommen,
-                baujahr,
-                #    sonderabschreibung,
-                anlagehorizont,
-                verkaufsfaktor,
-                unsicherheit_verkaufsfaktor,
-):
-    #print(n_clicks)
-    if n_clicks != None:
-        df = pd.DataFrame({"Kaufpreis": [kaufpreis], 
-                           "davon Grundstücksanteil": [kaufpreis_grundstueck],
-                            "davon Sanierungskosten":[kaufpreis_sanierung],
-                "Kaufnebenkosten":[kaufnebenkosten],
-                "Renovierungskosten":[renovierungskosten],
-                "Mieteinahmen":[mieteinnahmen],
-                "Mietsteigerung":[mietsteigerung],
-                'Unsicherheit Mietsteigerung':[unsicherheit_mietsteigerung],
-                'Erste Mieterhöhung ab Jahr':[erste_mieterhoehung],
-                'Instandhaltungskosten Jahr':[instandhaltungskosten],
-                'Verwaltungskosten Jahr':[verwaltungskosten],
-                'Pauschale für Mietausfall':[mietausfall],
-                'Unsicherheit Mietausfall':[unsicherheit_mietausfall],
-                'Geschätzte Kostensteigerung':[kostensteigerung],
-                'Unsicherheit Kostensteigerung':[unsicherheit_kostensteigerung],
-                'Eigenkapital':[eigenkapital],
-                'Zinsbindung':[zinsbindung],
-                'Disagio':[disagio],
-                'Zinssatz':[zinsatz],
-                'Tilgungssatz':[tilgungssatz],
-                'Anschlusszinssatz':[anschlusszinssatz],
-                'Unsicherheit Anschlusszinssatz':[unsicherheit_anschlusszinssatz],
-                'Familienstand':[familienstand],
-                'Zu versteuerndes Einkommen':[einkommen],
-                'Baujahr':[baujahr],
-                #    sonderabschreibung,
-                'Anlagehorizont':[anlagehorizont],
-                'Geschätzter Verkaufsfaktor':[verkaufsfaktor],
-                'Unsicherheit Verkaufsfaktor':[unsicherheit_verkaufsfaktor],
-                           },
-                          index=["Daten"]
-        )
-        #print(df)
-        return send_data_frame(df.to_csv, filename='data.csv')
+# @app.callback(Output('download', 'data'),
+#              [Input('download-results-button', 'n_clicks')],
+#              state=[
+#             State("kaufpreis", "value"),
+#             State("kaufpreis_grundstueck", "value"),
+#             State("kaufpreis_sanierung", "value"),
+#             State("kaufnebenkosten", "value"),
+#             State("renovierungskosten", "value"),
+#             State("mieteinnahmen", "value"),
+#             State("mietsteigerung", "value"),
+#             State("unsicherheit_mietsteigerung", "value"),
+#             State("erste_mieterhoehung", "value"),
+#             State("instandhaltungskosten", "value"),
+#             State("verwaltungskosten", "value"),
+#             State("mietausfall", "value"),
+#             State("unsicherheit_mietausfall", "value"),
+#             State("kostensteigerung", "value"),
+#             State("unsicherheit_kostensteigerung", "value"),
+#             State("eigenkapital", "value"),
+#             State("zinsbindung", "value"),
+#             State("disagio", "value"),
+#             State("zinsatz", "value"),
+#             State("tilgungssatz", "value"),
+#             State("anschlusszinssatz", "value"),
+#             State("unsicherheit_anschlusszinssatz", "value"),
+#             State("familienstand", "value"),
+#             State("einkommen", "value"),
+#             State("baujahr", "value"),
+#             #    Input("sonderabschreibung", "value"),
+#             State("anlagehorizont", "value"),
+#             State("verkaufsfaktor", "value"),
+#             State("unsicherheit_verkaufsfaktor", "value"),
+#             ],
+#             )
+# def download_data(n_clicks, 
+#                 kaufpreis,
+#                 kaufpreis_grundstueck,
+#                 kaufpreis_sanierung,
+#                 kaufnebenkosten,
+#                 renovierungskosten,
+#                 mieteinnahmen,
+#                 mietsteigerung,
+#                 unsicherheit_mietsteigerung,
+#                 erste_mieterhoehung,
+#                 instandhaltungskosten,
+#                 verwaltungskosten,
+#                 mietausfall,
+#                 unsicherheit_mietausfall,
+#                 kostensteigerung,
+#                 unsicherheit_kostensteigerung,
+#                 eigenkapital,
+#                 zinsbindung,
+#                 disagio,
+#                 zinsatz,
+#                 tilgungssatz,
+#                 anschlusszinssatz,
+#                 unsicherheit_anschlusszinssatz,
+#                 familienstand,
+#                 einkommen,
+#                 baujahr,
+#                 #    sonderabschreibung,
+#                 anlagehorizont,
+#                 verkaufsfaktor,
+#                 unsicherheit_verkaufsfaktor,
+# ):
+#     #print(n_clicks)
+#     if n_clicks != None:
+#         df = pd.DataFrame({"Kaufpreis": [kaufpreis], 
+#                            "davon Grundstücksanteil": [kaufpreis_grundstueck],
+#                             "davon Sanierungskosten":[kaufpreis_sanierung],
+#                 "Kaufnebenkosten":[kaufnebenkosten],
+#                 "Renovierungskosten":[renovierungskosten],
+#                 "Mieteinahmen":[mieteinnahmen],
+#                 "Mietsteigerung":[mietsteigerung],
+#                 'Unsicherheit Mietsteigerung':[unsicherheit_mietsteigerung],
+#                 'Erste Mieterhöhung ab Jahr':[erste_mieterhoehung],
+#                 'Instandhaltungskosten Jahr':[instandhaltungskosten],
+#                 'Verwaltungskosten Jahr':[verwaltungskosten],
+#                 'Pauschale für Mietausfall':[mietausfall],
+#                 'Unsicherheit Mietausfall':[unsicherheit_mietausfall],
+#                 'Geschätzte Kostensteigerung':[kostensteigerung],
+#                 'Unsicherheit Kostensteigerung':[unsicherheit_kostensteigerung],
+#                 'Eigenkapital':[eigenkapital],
+#                 'Zinsbindung':[zinsbindung],
+#                 'Disagio':[disagio],
+#                 'Zinssatz':[zinsatz],
+#                 'Tilgungssatz':[tilgungssatz],
+#                 'Anschlusszinssatz':[anschlusszinssatz],
+#                 'Unsicherheit Anschlusszinssatz':[unsicherheit_anschlusszinssatz],
+#                 'Familienstand':[familienstand],
+#                 'Zu versteuerndes Einkommen':[einkommen],
+#                 'Baujahr':[baujahr],
+#                 #    sonderabschreibung,
+#                 'Anlagehorizont':[anlagehorizont],
+#                 'Geschätzter Verkaufsfaktor':[verkaufsfaktor],
+#                 'Unsicherheit Verkaufsfaktor':[unsicherheit_verkaufsfaktor],
+#                            },
+#                           index=["Daten"]
+#         )
+#         #print(df)
+#         return send_data_frame(df.to_csv, filename='data.csv')
 
 
 if __name__ == "__main__":

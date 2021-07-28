@@ -235,6 +235,7 @@ def mieten_kaufen(
         "vermoegen_immo_pj": vermoegen_immo,
         "vermoegen_immo_versteuert_pj": vermoegen_immo_versteuert_pj,
         "etf_vermoegen_minus_neg_cashflows_versteuert_pj": etf_vermoegen_minus_neg_cashflows_versteuert_pj,
+        "jahr_pj":jahr_pj,
     }
 
 
