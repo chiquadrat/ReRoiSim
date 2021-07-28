@@ -36,7 +36,7 @@ kostensteigerung = 0.02
 unsicherheit_kostensteigerung = 1
 wertsteigerung = 0.015
 unsicherheit_wertsteigerung = 0.02
-eigenkapital = 25_500
+eigenkapital = 25_500   # MJ: sollen wir das zu den allgemeinen Eingaben packen?
 
 zinsbindung = 15
 zinsatz = 0.0200
@@ -85,8 +85,8 @@ zins_pj = [0]
 restschuld_pj = [darlehen]
 kreditrate_pj = [0]
 tilgung_pj = [0]
-vermoegen_immo = [wert_immo_pj[0] - darlehen]
-etf_vermoegen = [eigenkapital]
+vermoegen_immo = [wert_immo_pj[0] - darlehen]   # MJ: vermoegen_immo --> vermoegen_immo_pj
+etf_vermoegen = [eigenkapital]  # MJ: etf_vermoegen --> etf_vermoegen_pj
 etf_vermoegen_versteuert = [eigenkapital]
 verzinstes_ek_vermoegen = [eigenkapital]
 cashflow = [kreditrate_jahr - nettokaltmiete - instandhaltungskosten]
@@ -94,7 +94,7 @@ etf_vermoegen_minus_neg_cashflows = [eigenkapital]
 etf_vermoegen_minus_neg_cashflows_versteuert_pj = [eigenkapital]
 vermoegen_immo_versteuert_pj = [wert_immo_pj[0] - darlehen]
 
-nettokaltmiete_pa = [nettokaltmiete * 12]
+nettokaltmiete_pa = [nettokaltmiete * 12]   # MJ: nettokaltmiete_pa --> nettokaltmiete_pa_pj, sollte der erste Eintrag nicht auch nettokaltmiete_pa_pj= [0] sein und dann nettokaltmiete_pa_pj.append(nettokaltmiete * 12), dann ist der Index konstistent
 instandhaltungskosten_pa = [instandhaltungskosten]
 
 # Jährliche Betrachtung
@@ -137,10 +137,13 @@ for index_nr in range(1, anlagehorizont + 1):
     # Immobilienvermögen (p.a.)
     vermoegen_immo.append(wert_immo_pj[index_nr] - restschuld_pj[index_nr])
 
-    if wert_immo_pj[index_nr] > wert_immo_pj[0] and index_nr < 10:
+# MJ: die 10 Jahren gelten doch nur für nicht selbst genutztes Wohneigentum, oder? Bei dem Rechner gehen wir ja davon aus, dass man es selber nutzt. Dann sollte es eigentlich immer steuerfrei sein.
+# https://www.gesetze-im-internet.de/estg/__23.html
+# "Ausgenommen sind Wirtschaftsgüter, die im Zeitraum zwischen Anschaffung oder Fertigstellung und Veräußerung ausschließlich zu eigenen Wohnzwecken oder im Jahr der Veräußerung und in den beiden vorangegangenen Jahren zu eigenen Wohnzwecken genutzt wurden"
+    if wert_immo_pj[index_nr] > wert_immo_pj[0] and index_nr < 10:  
         einkommenssteuer_einkommen = steuerberechnung_immo(
             jahreseinkommen=einkommen, splittingtarif=False, steuerjahr=steuerjahr,
-        )
+        )   # MJ: Ist der Funktionsaufruf hier richtig?
         einkommenssteuer_einkommen_immo = steuerberechnung_immo(
             jahreseinkommen=(wert_immo_pj[index_nr] - wert_immo_pj[0] + einkommen),
             splittingtarif=False,
@@ -162,7 +165,7 @@ for index_nr in range(1, anlagehorizont + 1):
         etf_vermoegen.append(
             etf_vermoegen[index_nr - 1] * (etf_rendite + 1)
             + (kreditrate_pj[index_nr] - nettokaltmiete_pa[index_nr - 1])
-            + instandhaltungskosten_pa[index_nr - 1]
+            + instandhaltungskosten_pa[index_nr - 1]    # MJ: ist der letzte Teil nicht cashflow[index_nr - 1]
         )
 
         cashflow.append(
