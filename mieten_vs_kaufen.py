@@ -17,7 +17,7 @@ from steuerberechnung import steuerberechnung_immo, steuerberechnung_etf
 # Allgemein
 #
 anlagehorizont = 30
-eigenkapital = 25_500
+eigenkapital = 20_000
 
 #
 # Kennzahlen Immobilie
@@ -91,8 +91,8 @@ etf_vermoegen_minus_neg_cashflows_versteuert_pj = [eigenkapital]
 nettokaltmiete_pj = [0, nettokaltmiete]   # MJ: nettokaltmiete_pa --> nettokaltmiete_pa_pj, sollte der erste Eintrag nicht auch nettokaltmiete_pa_pj= [0] sein und dann nettokaltmiete_pa_pj.append(nettokaltmiete * 12), dann ist der Index konstistent
 instandhaltungskosten_pj = [0, instandhaltungskosten]
 
-etf_vermoegen_immo_pj = [max(0, eigenkapital - gesamtkosten)]
-etf_vermoegen_immo_versteuert_pj = [max(0, eigenkapital - gesamtkosten)]
+etf_vermoegen_immo_pj = [0]
+etf_vermoegen_immo_versteuert_pj = [0]
 
 # Jährliche Betrachtung
 for index_nr in range(1, anlagehorizont + 1):
@@ -167,7 +167,7 @@ for index_nr in range(1, anlagehorizont + 1):
     
     etf_vermoegen_immo_versteuert_pj.append(
             steuerberechnung_etf(
-                investition=(sum(np.array(cashflow_pj)[np.array(cashflow_pj) < 0]) * -1) + etf_vermoegen_versteuert_pj[0],
+                investition=(sum(np.array(cashflow_pj)[np.array(cashflow_pj) < 0]) * -1) + etf_vermoegen_immo_versteuert_pj[0],
                 endwert=etf_vermoegen_immo_pj[index_nr],
             )
             
