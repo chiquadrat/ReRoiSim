@@ -85,8 +85,8 @@ etf_vermoegen_pj = [eigenkapital]  # MJ: etf_vermoegen --> etf_vermoegen_pj
 etf_vermoegen_versteuert_pj = [eigenkapital]
 verzinstes_ek_vermoegen_pj = [eigenkapital]
 cashflow_pj = [kreditrate_jahr + instandhaltungskosten - nettokaltmiete]
-etf_vermoegen_minus_neg_cashflows_pj = [eigenkapital]
-etf_vermoegen_minus_neg_cashflows_versteuert_pj = [eigenkapital]
+#etf_vermoegen_minus_neg_cashflows_pj = [eigenkapital]
+#etf_vermoegen_minus_neg_cashflows_versteuert_pj = [eigenkapital]
 
 nettokaltmiete_pj = [0, nettokaltmiete]   # MJ: nettokaltmiete_pa --> nettokaltmiete_pa_pj, sollte der erste Eintrag nicht auch nettokaltmiete_pa_pj= [0] sein und dann nettokaltmiete_pa_pj.append(nettokaltmiete * 12), dann ist der Index konstistent
 instandhaltungskosten_pj = [0, instandhaltungskosten]
@@ -99,6 +99,11 @@ festgeld_vermoegen_versteuert_pj = [eigenkapital]
 
 festgeld_vermoegen_immo_pj = [0]
 festgeld_vermoegen_immo_versteuert_pj = [0]
+
+festgeld_vermoegen_initial_pj = [eigenkapital]
+festgeld_vermoegen_initial_versteuert_pj = [eigenkapital]
+etf_vermoegen_initial_pj = [eigenkapital]
+etf_vermoegen_initial_versteuert_pj = [eigenkapital]
 
 # Jährliche Betrachtung
 for index_nr in range(1, anlagehorizont + 1):
@@ -140,6 +145,25 @@ for index_nr in range(1, anlagehorizont + 1):
     # Immobilienvermögen (p.a.)
     vermoegen_immo_pj.append(wert_immo_pj[index_nr] - restschuld_pj[index_nr])
 
+    festgeld_vermoegen_initial_pj.append(
+        festgeld_vermoegen_initial_pj[index_nr - 1] * (fest_verzinst + 1)
+    )
+    
+    festgeld_vermoegen_initial_versteuert_pj.append(
+        festgeld_vermoegen_initial_versteuert_pj[index_nr - 1] * (fest_verzinst + 1) -
+        (festgeld_vermoegen_initial_versteuert_pj[index_nr - 1] * (fest_verzinst)) * kapitalertragssteuer
+    )
+    
+    etf_vermoegen_initial_pj.append(
+            etf_vermoegen_initial_pj[index_nr - 1] * (etf_rendite + 1)
+    )
+    
+    etf_vermoegen_initial_versteuert_pj.append(
+            steuerberechnung_etf(
+                investition=eigenkapital,
+                endwert=etf_vermoegen_initial_pj[index_nr],
+            )            
+        )
 
     # ETF Vermögen (p.a.)
     if cashflow_pj[index_nr - 1] > 0:
@@ -238,8 +262,10 @@ plt.plot(jahr_pj, etf_vermoegen_pj, label="ETF Vermoegen")
 plt.plot(jahr_pj, np.array(vermoegen_immo_pj) + np.array(etf_vermoegen_immo_pj), label="Immo + ETF Vermoegen")
 plt.plot(jahr_pj, etf_vermoegen_versteuert_pj, label="ETF Vermoegen versteuert")
 plt.plot(jahr_pj, np.array(vermoegen_immo_pj) + np.array(etf_vermoegen_immo_versteuert_pj), label="Immo + ETF Vermoegen versteuert")
-plt.title("Mieten vs. Kaufen (ETF Anlage)")
+plt.title("Mieten vs. Kaufen - Cashflows werden investiert")
 plt.legend()
+plt.ylabel('Kohlen')
+plt.xlabel('Jahre')
 plt.show()
 
 
@@ -247,6 +273,30 @@ plt.plot(jahr_pj, festgeld_vermoegen_pj, label="Festgeld Vermoegen")
 plt.plot(jahr_pj, np.array(vermoegen_immo_pj) + np.array(festgeld_vermoegen_immo_pj), label="Immo + Festgeld Vermoegen")
 plt.plot(jahr_pj, festgeld_vermoegen_versteuert_pj, label="Festgeld Vermoegen versteuert")
 plt.plot(jahr_pj, np.array(vermoegen_immo_pj) + np.array(festgeld_vermoegen_immo_versteuert_pj), label="Immo + Festgeld Vermoegen versteuert")
-plt.title("Mieten vs. Kaufen (Festgeld Anlage)")
+plt.title("Mieten vs. Kaufen - Cashflows werden investiert")
 plt.legend()
+plt.ylabel('Kohlen')
+plt.xlabel('Jahre')
 plt.show()
+
+
+plt.plot(jahr_pj, festgeld_vermoegen_initial_pj, label="Festgeld Vermoegen")
+plt.plot(jahr_pj, festgeld_vermoegen_initial_versteuert_pj, label="Festgeld Vermoegen versteuert")
+plt.plot(jahr_pj, np.array(vermoegen_immo_pj), label="Immo Vermoegen")
+plt.title("Mieten vs. Kaufen - Cashflows werden nicht investiert")
+plt.legend()
+plt.ylabel('Kohlen')
+plt.xlabel('Jahre')
+plt.show()
+
+plt.plot(jahr_pj, etf_vermoegen_initial_pj, label="ETF Vermoegen")
+plt.plot(jahr_pj, etf_vermoegen_initial_versteuert_pj, label="ETF Vermoegen versteuert")
+plt.plot(jahr_pj, np.array(vermoegen_immo_pj), label="Immo Vermoegen")
+plt.title("Mieten vs. Kaufen - Cashflows werden nicht investiert")
+plt.legend()
+plt.ylabel('Kohlen')
+plt.xlabel('Jahre')
+plt.show()
+
+
+
