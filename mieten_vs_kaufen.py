@@ -17,16 +17,10 @@ from steuerberechnung import steuerberechnung_immo, steuerberechnung_etf
 # Allgemein
 #
 anlagehorizont = 30
+eigenkapital = 25_500
 
 #
-# Steuern
-#
-alleinstehend = False
-einkommen = 150_000
-steuerjahr = 2021
-
-#
-# Immobilie
+# Kennzahlen Immobilie
 #
 kaufpreis = 150_000
 renovierungskosten = 1_000
@@ -36,8 +30,10 @@ kostensteigerung = 0.02
 unsicherheit_kostensteigerung = 1
 wertsteigerung = 0.015
 unsicherheit_wertsteigerung = 0.02
-eigenkapital = 25_500   # MJ: sollen wir das zu den allgemeinen Eingaben packen?
 
+#
+# Finanzierung Immobilie
+#
 zinsbindung = 15
 zinsatz = 0.0200
 tilgungssatz = 0.03
@@ -47,26 +43,25 @@ unsicherheit_anschlusszinssatz = 1
 #
 # Mieten
 #
-nettokaltmiete = 300
+nettokaltmiete = 3600
 steigerung_nettokaltmiete = 0.02
 unsicherheit_steigerung_nettokaltmiete = 0.02
 
 #
+# Steuern
+#
+alleinstehend = False
+kapitalertragssteuer = 0.25
+
+
+#
 # Alternative Anlagen
 #
-kapitalertragssteuer = 0.25
+
 etf_rendite = 0.06
 unsicherheit_etf_rendite = 1
-verzinsung_ek = 0.02
-unsicherheit_verzinsung_ek = 1
-
-# 1. Berechnung: Immobilienvermögen p.a. + am Ende des Anlagehorizonts
-
-# 2. Berechnung: ETF Vermögen (initiales EK + Kapital wenn
-# Kosten der Immo > Kosten Miete) p.a. + am Ende des Anlagehorizonts
-
-# 3. Berechnung: EK Vermögen p.a. (initiales EK + Kapital wenn
-# Kosten der Immo > Kosten Miete) + am Ende des Anlagehorizonts
+fest_verzinst = 0.02
+unsicherheit_fest_verzinst = 1
 
 
 # Objekt
@@ -85,17 +80,19 @@ zins_pj = [0]
 restschuld_pj = [darlehen]
 kreditrate_pj = [0]
 tilgung_pj = [0]
-vermoegen_immo = [wert_immo_pj[0] - darlehen]   # MJ: vermoegen_immo --> vermoegen_immo_pj
-etf_vermoegen = [eigenkapital]  # MJ: etf_vermoegen --> etf_vermoegen_pj
-etf_vermoegen_versteuert = [eigenkapital]
-verzinstes_ek_vermoegen = [eigenkapital]
-cashflow = [kreditrate_jahr - nettokaltmiete - instandhaltungskosten]
-etf_vermoegen_minus_neg_cashflows = [eigenkapital]
+vermoegen_immo_pj = [wert_immo_pj[0] - darlehen]   # MJ: vermoegen_immo --> vermoegen_immo_pj
+etf_vermoegen_pj = [eigenkapital]  # MJ: etf_vermoegen --> etf_vermoegen_pj
+etf_vermoegen_versteuert_pj = [eigenkapital]
+verzinstes_ek_vermoegen_pj = [eigenkapital]
+cashflow_pj = [kreditrate_jahr + instandhaltungskosten - nettokaltmiete]
+etf_vermoegen_minus_neg_cashflows_pj = [eigenkapital]
 etf_vermoegen_minus_neg_cashflows_versteuert_pj = [eigenkapital]
-vermoegen_immo_versteuert_pj = [wert_immo_pj[0] - darlehen]
 
-nettokaltmiete_pa = [nettokaltmiete * 12]   # MJ: nettokaltmiete_pa --> nettokaltmiete_pa_pj, sollte der erste Eintrag nicht auch nettokaltmiete_pa_pj= [0] sein und dann nettokaltmiete_pa_pj.append(nettokaltmiete * 12), dann ist der Index konstistent
-instandhaltungskosten_pa = [instandhaltungskosten]
+nettokaltmiete_pj = [0, nettokaltmiete]   # MJ: nettokaltmiete_pa --> nettokaltmiete_pa_pj, sollte der erste Eintrag nicht auch nettokaltmiete_pa_pj= [0] sein und dann nettokaltmiete_pa_pj.append(nettokaltmiete * 12), dann ist der Index konstistent
+instandhaltungskosten_pj = [0, instandhaltungskosten]
+
+etf_vermoegen_immo_pj = [max(0, eigenkapital - gesamtkosten)]
+etf_vermoegen_immo_versteuert_pj = [max(0, eigenkapital - gesamtkosten)]
 
 # Jährliche Betrachtung
 for index_nr in range(1, anlagehorizont + 1):
@@ -135,99 +132,60 @@ for index_nr in range(1, anlagehorizont + 1):
     wert_immo_pj.append(wert_immo_pj[index_nr - 1] * (1 + wertsteigerung))
 
     # Immobilienvermögen (p.a.)
-    vermoegen_immo.append(wert_immo_pj[index_nr] - restschuld_pj[index_nr])
+    vermoegen_immo_pj.append(wert_immo_pj[index_nr] - restschuld_pj[index_nr])
 
-# MJ: die 10 Jahren gelten doch nur für nicht selbst genutztes Wohneigentum, oder? Bei dem Rechner gehen wir ja davon aus, dass man es selber nutzt. Dann sollte es eigentlich immer steuerfrei sein.
-# https://www.gesetze-im-internet.de/estg/__23.html
-# "Ausgenommen sind Wirtschaftsgüter, die im Zeitraum zwischen Anschaffung oder Fertigstellung und Veräußerung ausschließlich zu eigenen Wohnzwecken oder im Jahr der Veräußerung und in den beiden vorangegangenen Jahren zu eigenen Wohnzwecken genutzt wurden"
-    if wert_immo_pj[index_nr] > wert_immo_pj[0] and index_nr < 10:  
-        einkommenssteuer_einkommen = steuerberechnung_immo(
-            jahreseinkommen=einkommen, splittingtarif=False, steuerjahr=steuerjahr,
-        )   # MJ: Ist der Funktionsaufruf hier richtig?
-        einkommenssteuer_einkommen_immo = steuerberechnung_immo(
-            jahreseinkommen=(wert_immo_pj[index_nr] - wert_immo_pj[0] + einkommen),
-            splittingtarif=False,
-            steuerjahr=steuerjahr,
-        )
-
-        vermoegen_immo_versteuert_pj.append(
-            wert_immo_pj[index_nr]
-            - restschuld_pj[index_nr]
-            - (einkommenssteuer_einkommen_immo - einkommenssteuer_einkommen)
-        )
-    else:
-        vermoegen_immo_versteuert_pj.append(
-            wert_immo_pj[index_nr] - restschuld_pj[index_nr]
-        )
 
     # ETF Vermögen (p.a.)
-    if kreditrate_pj[index_nr] >= nettokaltmiete_pa[index_nr - 1]:
-        etf_vermoegen.append(
-            etf_vermoegen[index_nr - 1] * (etf_rendite + 1)
-            + (kreditrate_pj[index_nr] - nettokaltmiete_pa[index_nr - 1])
-            + instandhaltungskosten_pa[index_nr - 1]    # MJ: ist der letzte Teil nicht cashflow[index_nr - 1]
+    if cashflow_pj[index_nr - 1] > 0:
+        etf_vermoegen_pj.append(
+            etf_vermoegen_pj[index_nr - 1] * (etf_rendite + 1) + 
+            cashflow_pj[index_nr -1 ]
         )
 
-        cashflow.append(
-            instandhaltungskosten_pa[index_nr - 1]
-            + kreditrate_pj[index_nr]
-            - nettokaltmiete_pa[index_nr - 1]
+        etf_vermoegen_immo_pj.append(
+            etf_vermoegen_immo_pj[index_nr - 1] * (etf_rendite + 1) 
         )
-
-        etf_vermoegen_minus_neg_cashflows_versteuert_pj.append(
-            steuerberechnung_etf(
-                investition=sum(np.array(cashflow)[np.array(cashflow) > 0]),
-                endwert=etf_vermoegen[index_nr],
-            )
-            + sum(np.array(cashflow)[np.array(cashflow) < 0])
-        )
+                
     else:
-        # Wenn die Netto-Kaltmiete höher ist als die Kreditrate sammeln wir die
-        # höheren Kosten einfach als Ausgabe, die am Ende das Vermögen schmälert.
-        # Es wird also davon ausgegangen, dass die Miete aus dem Cashflow bezahlt wird.
-        # -> Dies Art der Berechnung bevorzugt aber die ETF Investition,
-        # besser wäre es, soviel ETF Anteile zu verkaufen (unter Beachtung der Steuern)
-        # das der negative Cashflow gedeckt ist.
-        etf_vermoegen.append(
-            etf_vermoegen[index_nr - 1] * (etf_rendite + 1)
-            + instandhaltungskosten_pa[index_nr - 1]
+        etf_vermoegen_pj.append(
+            etf_vermoegen_pj[index_nr - 1] * (etf_rendite + 1)
+        )
+        
+        
+        etf_vermoegen_immo_pj.append(
+            etf_vermoegen_immo_pj[index_nr - 1] * (etf_rendite + 1) + 
+            (cashflow_pj[index_nr -1 ] * -1)
         )
 
-        cashflow.append(
-            instandhaltungskosten_pa[index_nr - 1]
-            + kreditrate_pj[index_nr]
-            - nettokaltmiete_pa[index_nr - 1]
-        )
-
-        etf_vermoegen_minus_neg_cashflows_versteuert_pj.append(
+    etf_vermoegen_versteuert_pj.append(
             steuerberechnung_etf(
-                investition=sum(np.array(cashflow)[np.array(cashflow) > 0]),
-                endwert=etf_vermoegen[index_nr],
+                investition=sum(np.array(cashflow_pj)[np.array(cashflow_pj) > 0]) + eigenkapital,
+                endwert=etf_vermoegen_pj[index_nr],
             )
-            + sum(np.array(cashflow)[np.array(cashflow) < 0])
+            
         )
-
-    # Verzinstes EK Vermoegen (p.a.)
-    if kreditrate_pj[index_nr] >= nettokaltmiete_pa[index_nr - 1]:
-        verzinstes_ek_vermoegen.append(
-            verzinstes_ek_vermoegen[index_nr - 1] * (verzinsung_ek + 1)
-            + (kreditrate_pj[index_nr] - nettokaltmiete_pa[index_nr - 1])
-            + instandhaltungskosten_pa[index_nr - 1]
+    
+    etf_vermoegen_immo_versteuert_pj.append(
+            steuerberechnung_etf(
+                investition=(sum(np.array(cashflow_pj)[np.array(cashflow_pj) < 0]) * -1) + etf_vermoegen_versteuert_pj[0],
+                endwert=etf_vermoegen_immo_pj[index_nr],
+            )
+            
         )
-    else:
-        verzinstes_ek_vermoegen.append(
-            verzinstes_ek_vermoegen[index_nr - 1] * (verzinsung_ek + 1)
-            - (nettokaltmiete_pa[index_nr - 1] - kreditrate_pj[index_nr])
-            + instandhaltungskosten_pa[index_nr - 1]
-        )
+        
 
     # Steigerung Instandhaltungskosten
-    instandhaltungskosten_pa.append(
-        instandhaltungskosten_pa[index_nr - 1] * (1 + kostensteigerung)
+    instandhaltungskosten_pj.append(
+        instandhaltungskosten_pj[index_nr] * (1 + kostensteigerung)
     )
-    nettokaltmiete_pa.append(
-        nettokaltmiete_pa[index_nr - 1] * (1 + steigerung_nettokaltmiete)
+    nettokaltmiete_pj.append(
+        nettokaltmiete_pj[index_nr] * (1 + steigerung_nettokaltmiete)
     )
+    
+    cashflow_pj.append(
+            instandhaltungskosten_pj[index_nr+1] + kreditrate_pj[index_nr] - nettokaltmiete_pj[index_nr+1]
+        )
+
 
 plt.plot(jahr_pj, etf_vermoegen, label="ETF Vermoegen")
 plt.plot(jahr_pj, vermoegen_immo, label="Immo Vermoegen")
