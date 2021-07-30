@@ -886,16 +886,16 @@ app.layout = html.Div(
                         dcc.Dropdown(
                         options=[
                             #{'label': 'Immobilie', 'value': 'immo'},
-                            {'label': 'Immobilie + ETF', 'value': 'immo_etf'},
-                            {'label': 'Immobilie + ETF (versteuert)', 'value': 'immo_etf_versteuert'},
-                            {'label': 'Immobilie + Festgeld', 'value': 'immo_festgeld'},
-                            {'label': 'Immobilie + Festgeld (versteuert)', 'value': 'immo_festgeld_versteuert'},
-                            {'label': 'ETF', 'value': 'etf'},
-                            {'label': 'ETF (versteuert)', 'value': 'etf_versteuert'},
-                            {'label': 'Festgeld', 'value': 'festgeld'},
-                            {'label': 'Festgeld (versteuert)', 'value': 'festgeld_versteuert'},
+                            {'label': 'Immobilie + ETF', 'value': 'Immobilie + ETF'},
+                            {'label': 'Immobilie + ETF (versteuert)', 'value': 'Immobilie + ETF (versteuert)'},
+                            {'label': 'Immobilie + Festgeld', 'value': 'Immobilie + Festgeld'},
+                            {'label': 'Immobilie + Festgeld (versteuert)', 'value': 'Immobilie + Festgeld (versteuert)'},
+                            {'label': 'ETF', 'value': 'ETF'},
+                            {'label': 'ETF (versteuert)', 'value': 'ETF (versteuert)'},
+                            {'label': 'Festgeld', 'value': 'Festgeld'},
+                            {'label': 'Festgeld (versteuert)', 'value': 'Festgeld (versteuert)'},
                         ],
-                        value=['immo_etf_versteuert', 'etf_versteuert'],
+                        value=['Immobilie + ETF (versteuert)', 'ETF (versteuert)'],
                         multi=True,
                         id="grafik_selector_investiert"),  
                         dcc.Graph(id="mieten_vs_kaufen"),                        
@@ -1042,17 +1042,30 @@ def custom_figure(
 
     #print(ergebnis["etf_vermoegen_immo_versteuert_pj"])
     
+    # Aufbereitung der Ergebnisse
+    ergebnisse_aufbereitet = {
+        "jahr_pj":ergebnis["jahr_pj"],
+        "Immobilie + ETF":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_pj"]),
+        "Immobilie + ETF (versteuert)":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),
+        "Immobilie + Festgeld":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["festgeld_vermoegen_immo_pj"]),
+        "Immobilie + Festgeld (versteuert)":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]),
+        "ETF": ergebnis["etf_vermoegen_pj"],
+        "ETF (versteuert)": ergebnis["etf_vermoegen_versteuert_pj"],
+        "Festgeld": ergebnis["festgeld_vermoegen_pj"],
+        "Festgeld (versteuert)": ergebnis["festgeld_vermoegen_versteuert_pj"],
+    }
+    
 
 
     return (
-  
-        ergebnis
+        ergebnisse_aufbereitet
     )
     
 @app.callback(Output('gewinn_text', 'children'), 
               Output('mieten_vs_kaufen', 'figure'),
               Input('intermediate-value', 'data'),
-              Input('grafik_selector_investiert', "value"))
+              Input('grafik_selector_investiert', "value"),
+               )
 def update_graph(ergebnisse, auswahl):
 
     # more generally, this line would be
@@ -1060,23 +1073,24 @@ def update_graph(ergebnisse, auswahl):
     ergebnis = ergebnisse
     bla = auswahl
     #print(dff)
-    print(bla)
+  
     
     fig_vermoegen = go.Figure()
-    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_pj"],
-                   mode='lines+markers',
-                   name='ETF'))
-    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_versteuert_pj"],
-                   mode='lines+markers',
-                   name='ETF versteuert'))
-    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
-                    y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_pj"]),
+    for wahl in auswahl:
+        fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis[wahl],
                     mode='lines+markers',
-                    name='Immobilie + ETF'))    
-    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
-                    y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),
-                    mode='lines+markers',
-                    name='Immobilie + ETF versteuert'))        
+                    name=wahl))
+    # fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_versteuert_pj"],
+    #                mode='lines+markers',
+    #                name='ETF versteuert'))
+    # fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
+    #                 y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_pj"]),
+    #                 mode='lines+markers',
+    #                 name='Immobilie + ETF'))    
+    # fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
+    #                 y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),
+    #                 mode='lines+markers',
+    #                 name='Immobilie + ETF versteuert'))        
     #fig_vermoegen.update_layout(title="Vermögensentwicklung")
     fig_vermoegen.update_layout(legend=dict(
     yanchor="top",
@@ -1086,7 +1100,7 @@ def update_graph(ergebnisse, auswahl):
 ))
     
     
-    return (f"Hello world  und {bla}"  ,
+    return (f""  ,
                   fig_vermoegen)
     
 # #
