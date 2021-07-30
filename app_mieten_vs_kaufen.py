@@ -648,7 +648,7 @@ app.layout = html.Div(
                             placeholder="Eingabe...",
                             type="number",
                             value=2.2,
-                            min=1,
+                            min=0,
                             required=True,
                         ),
                     ],
@@ -1079,8 +1079,6 @@ def custom_figure(
         "Festgeld (versteuert)":ergebnis["festgeld_vermoegen_initial_versteuert_pj"],
     }
     
-    #print(ergebnisse_aufbereitet_investiert)
-    #print(ergebnisse_aufbereitet_nicht_investiert)
     return (
         ergebnisse_aufbereitet_investiert,
         ergebnisse_aufbereitet_nicht_investiert
@@ -1096,16 +1094,6 @@ def custom_figure(
                )
 def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_selector_investiert,
                  grafik_selector_nicht_investiert):
-
-    # more generally, this line would be
-    # json.loads(jsonified_cleaned_data)
-    # print(ergebnisse_investiert)
-    # print(grafik_selector_investiert)
-    # print(ergebnisse_nicht_investiert)
-    # print(grafik_selector_nicht_investiert)
-   # bla = auswahl
-    #print(dff)
-  
     
     fig_vermoegen_investiert = go.Figure()
     for wahl in grafik_selector_investiert:
@@ -1136,205 +1124,226 @@ def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_sele
     
     return (fig_vermoegen_investiert, fig_vermoegen_nicht_investiert)
     
-# #
-# # CSV/Excel Import
-# #
+#
+# CSV/Excel Import
+#
 
-# def parse_contents(contents, filename, date):
-#     content_type, content_string = contents.split(',')
-#     decoded = base64.b64decode(content_string)
-#     if 'csv' in filename:
-# # Assume that the user uploaded a CSV file
-#         df = pd.read_csv(
-#         io.StringIO(decoded.decode('utf-8')))
-#     elif 'xls' in filename:
-# # Assume that the user uploaded an excel file
-#         df = pd.read_excel(io.BytesIO(decoded)) 
-#     else:
-#         df = "**Keine csv oder xlsx Datei**"
-#     return df
+def parse_contents(contents, filename, date):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    if 'csv' in filename:
+# Assume that the user uploaded a CSV file
+        df = pd.read_csv(
+        io.StringIO(decoded.decode('utf-8')))
+    elif 'xls' in filename:
+# Assume that the user uploaded an excel file
+        df = pd.read_excel(io.BytesIO(decoded)) 
+    else:
+        df = "**Keine csv oder xlsx Datei**"
+    return df
 
-# # Upload component: The same file can NOT be uploaded twice in a row. It will not
-# # get recognized. This is something we need to live with right now. In the future we 
-# # could checkout:
-# # https://community.plotly.com/t/reuploading-same-file/42178
-# # https://community.plotly.com/t/can-i-upload-the-same-file-twice-in-a-row/40526/3
-# @app.callback(Output('upload-status', 'children'),
-#                 Output("kaufpreis", "value"),
-#                 Output("kaufpreis_grundstueck", "value"),
-#                 Output("kaufpreis_sanierung", "value"),
-#                 Output("kaufnebenkosten", "value"),
-#                 Output("renovierungskosten", "value"),
-#                 Output("mieteinnahmen", "value"),
-#                 Output("mietsteigerung", "value"),
-#                 Output("unsicherheit_mietsteigerung", "value"),
-#                 Output("erste_mieterhoehung", "value"),
-#                 Output("instandhaltungskosten", "value"),
-#                 Output("verwaltungskosten", "value"),
-#                 Output("mietausfall", "value"),
-#                 Output("unsicherheit_mietausfall", "value"),
-#                 Output("kostensteigerung", "value"),
-#                 Output("unsicherheit_kostensteigerung", "value"),
-#                 Output("eigenkapital", "value"),
-#                 Output("zinsbindung", "value"),
-#                 Output("disagio", "value"),
-#                 Output("zinsatz", "value"),
-#                 Output("tilgungssatz", "value"),
-#                 Output("anschlusszinssatz", "value"),
-#                 Output("unsicherheit_anschlusszinssatz", "value"),
-#                 Output("familienstand", "value"),
-#                 Output("einkommen", "value"),
-#                 Output("baujahr", "value"),
-#                 #    Input("sonderabschreibung", "value"),
-#                 Output("anlagehorizont", "value"),
-#                 Output("verkaufsfaktor", "value"),
-#                 Output("unsicherheit_verkaufsfaktor", "value"),
-#               [Input('upload-data', 'contents')],
-#               [State('upload-data', 'filename'),
-#                State('upload-data', 'last_modified')])
-# def update_output(list_of_contents, list_of_names, list_of_dates):
-#     default_input = [
-#         300_000, 100_000, 0, 40_000, 1_000, 12_000, 2, 1, 5, 1_200, 600, 2, 2, 1.5,
-#         2, 100_000, 20, 0, 1.5, 2.5, 4, 1.5, "0", 100_000, "0", 15, 22, 4
-#     ]   
-#     default_column = [
-#         'Kaufpreis', 'davon Grundstücksanteil', 'davon Sanierungskosten', 
-#         'Kaufnebenkosten', 'Renovierungskosten', 'Mieteinahmen', 'Mietsteigerung', 
-#         'Unsicherheit Mietsteigerung', 'Erste Mieterhöhung ab Jahr', 'Instandhaltungskosten Jahr', 
-#         'Verwaltungskosten Jahr', 'Pauschale für Mietausfall', 'Unsicherheit Mietausfall', 
-#         'Geschätzte Kostensteigerung', 'Unsicherheit Kostensteigerung', 'Eigenkapital', 
-#         'Zinsbindung', 'Disagio', 'Zinssatz', 'Tilgungssatz', 'Anschlusszinssatz', 
-#         'Unsicherheit Anschlusszinssatz', 'Familienstand', 'Zu versteuerndes Einkommen', 
-#         'Baujahr', 'Anlagehorizont', 'Geschätzter Verkaufsfaktor', 'Unsicherheit Verkaufsfaktor'
-#     ] 
-#     text_message = ""
-#     if list_of_contents is not None:
-#         df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
-#         if isinstance(df, pd.DataFrame): 
-#             if "Unnamed: 0" in list(df.columns):                
-#                 df.drop(["Unnamed: 0"], axis=1, inplace=True)
-#             imported_input = (
-#                 str(df[i][0]) 
-#                 if i in ["Familienstand", "Baujahr"] 
-#                 else df[i][0] 
-#                 for i in list(df.columns)
-#             )
-#             #print(list(df.columns))
-#             if list(df.columns)==default_column:
-#                 return "**Upload erfolgreich**", *imported_input 
-#             if list(df.columns)!=default_column:
-#                 return "**Falsches Format**", *default_input
-#         else:
-#             text_message = df
-#             return text_message, *default_input
-#     else:
-#         return text_message, *default_input
+# Upload component: The same file can NOT be uploaded twice in a row. It will not
+# get recognized. This is something we need to live with right now. In the future we 
+# could checkout:
+# https://community.plotly.com/t/reuploading-same-file/42178
+# https://community.plotly.com/t/can-i-upload-the-same-file-twice-in-a-row/40526/3
+@app.callback(Output('upload-status', 'children'),
+              
+              
+        Output("anlagehorizont", "value"),
+        Output("eigenkapital", "value"),
+        
+        Output("kaufpreis", "value"),
+        Output("renovierungskosten", "value"),
+        Output("kaufnebenkosten", "value"),
+        Output("instandhaltungskosten", "value"),
+        Output("kostensteigerung", "value"),
+        Output("unsicherheit_kostensteigerung", "value"),
+        Output("wertsteigerung", "value"),
+        Output("unsicherheit_wertsteigerung", "value"),
+        
+        Output("zinsbindung", "value"),
+        Output("zinssatz", "value"),
+        Output("tilgungssatz", "value"),
+        Output("anschlusszinssatz", "value"),
+        Output("unsicherheit_anschlusszinssatz", "value"),
+        
+        Output("nettokaltmiete", "value"),
+        Output("steigerung_nettokaltmiete", "value"),
+        Output("unsicherheit_steigerung_nettokaltmiete", "value"),
+        
+        Output("familienstand", "value"),
+        Output("kapitalertragssteuer", "value"),
+      
+        
+        Output("verzinsung_ek", "value"),
+        Output("unsicherheit_verzinsung_ek", "value"),
+        Output("etf_vergleich", "value"),
+              [Input('upload-data', 'contents')],
+              [State('upload-data', 'filename'),
+               State('upload-data', 'last_modified')])
+def update_output(list_of_contents, list_of_names, list_of_dates):
+    default_input = [
+        15, 100_00, 300_000, 1_000, 30_000, 2_000, 1.5, 1.5, 1.5, 1.5, 15, 1.5, 2.5, 4,
+        1.5, 6500, 2, 1, "0", 26.375, 2.2, 1, "0"
+    ]   
+    default_column = [
+   "anlagehorizont",
+   "eigenkapital",
+    
+   "kaufpreis",
+   "renovierungskosten",
+   "kaufnebenkosten",
+   "instandhaltungskosten",
+   "kostensteigerung",
+   "unsicherheit_kostensteigerung",
+   "wertsteigerung",
+   "unsicherheit_wertsteigerung",
+   
+   
+   "zinsbindung",
+   "zinssatz",
+   "tilgungssatz",
+   "anschlusszinssatz",
+   "unsicherheit_anschlusszinssatz",
+   
+   "nettokaltmiete",
+   "steigerung_nettokaltmiete",
+   "unsicherheit_steigerung_nettokaltmiete",
+   
+   "familienstand",
+   "kapitalertragssteuer",
+   
+   "verzinsung_ek",
+   "unsicherheit_verzinsung_ek",
+   "etf_vergleich",
+    ] 
+    text_message = ""
+    if list_of_contents is not None:
+        df = parse_contents(list_of_contents[-1], list_of_names[-1], list_of_dates[-1])        
+        if isinstance(df, pd.DataFrame): 
+            if "Unnamed: 0" in list(df.columns):                
+                df.drop(["Unnamed: 0"], axis=1, inplace=True)
+            imported_input = (
+                str(df[i][0]) 
+                if i in ["Familienstand", "Baujahr"] 
+                else df[i][0] 
+                for i in list(df.columns)
+            )
+            #print(list(df.columns))
+            if list(df.columns)==default_column:
+                return "**Upload erfolgreich**", *imported_input 
+            if list(df.columns)!=default_column:
+                return "**Falsches Format**", *default_input
+        else:
+            text_message = df
+            return text_message, *default_input
+    else:
+        return text_message, *default_input
 
-# #
-# # CSV Export
-# #
+#
+# CSV Export
+#
 
-# @app.callback(Output('download', 'data'),
-#              [Input('download-results-button', 'n_clicks')],
-#              state=[
-#             State("kaufpreis", "value"),
-#             State("kaufpreis_grundstueck", "value"),
-#             State("kaufpreis_sanierung", "value"),
-#             State("kaufnebenkosten", "value"),
-#             State("renovierungskosten", "value"),
-#             State("mieteinnahmen", "value"),
-#             State("mietsteigerung", "value"),
-#             State("unsicherheit_mietsteigerung", "value"),
-#             State("erste_mieterhoehung", "value"),
-#             State("instandhaltungskosten", "value"),
-#             State("verwaltungskosten", "value"),
-#             State("mietausfall", "value"),
-#             State("unsicherheit_mietausfall", "value"),
-#             State("kostensteigerung", "value"),
-#             State("unsicherheit_kostensteigerung", "value"),
-#             State("eigenkapital", "value"),
-#             State("zinsbindung", "value"),
-#             State("disagio", "value"),
-#             State("zinsatz", "value"),
-#             State("tilgungssatz", "value"),
-#             State("anschlusszinssatz", "value"),
-#             State("unsicherheit_anschlusszinssatz", "value"),
-#             State("familienstand", "value"),
-#             State("einkommen", "value"),
-#             State("baujahr", "value"),
-#             #    Input("sonderabschreibung", "value"),
-#             State("anlagehorizont", "value"),
-#             State("verkaufsfaktor", "value"),
-#             State("unsicherheit_verkaufsfaktor", "value"),
-#             ],
-#             )
-# def download_data(n_clicks, 
-#                 kaufpreis,
-#                 kaufpreis_grundstueck,
-#                 kaufpreis_sanierung,
-#                 kaufnebenkosten,
-#                 renovierungskosten,
-#                 mieteinnahmen,
-#                 mietsteigerung,
-#                 unsicherheit_mietsteigerung,
-#                 erste_mieterhoehung,
-#                 instandhaltungskosten,
-#                 verwaltungskosten,
-#                 mietausfall,
-#                 unsicherheit_mietausfall,
-#                 kostensteigerung,
-#                 unsicherheit_kostensteigerung,
-#                 eigenkapital,
-#                 zinsbindung,
-#                 disagio,
-#                 zinsatz,
-#                 tilgungssatz,
-#                 anschlusszinssatz,
-#                 unsicherheit_anschlusszinssatz,
-#                 familienstand,
-#                 einkommen,
-#                 baujahr,
-#                 #    sonderabschreibung,
-#                 anlagehorizont,
-#                 verkaufsfaktor,
-#                 unsicherheit_verkaufsfaktor,
-# ):
-#     #print(n_clicks)
-#     if n_clicks != None:
-#         df = pd.DataFrame({"Kaufpreis": [kaufpreis], 
-#                            "davon Grundstücksanteil": [kaufpreis_grundstueck],
-#                             "davon Sanierungskosten":[kaufpreis_sanierung],
-#                 "Kaufnebenkosten":[kaufnebenkosten],
-#                 "Renovierungskosten":[renovierungskosten],
-#                 "Mieteinahmen":[mieteinnahmen],
-#                 "Mietsteigerung":[mietsteigerung],
-#                 'Unsicherheit Mietsteigerung':[unsicherheit_mietsteigerung],
-#                 'Erste Mieterhöhung ab Jahr':[erste_mieterhoehung],
-#                 'Instandhaltungskosten Jahr':[instandhaltungskosten],
-#                 'Verwaltungskosten Jahr':[verwaltungskosten],
-#                 'Pauschale für Mietausfall':[mietausfall],
-#                 'Unsicherheit Mietausfall':[unsicherheit_mietausfall],
-#                 'Geschätzte Kostensteigerung':[kostensteigerung],
-#                 'Unsicherheit Kostensteigerung':[unsicherheit_kostensteigerung],
-#                 'Eigenkapital':[eigenkapital],
-#                 'Zinsbindung':[zinsbindung],
-#                 'Disagio':[disagio],
-#                 'Zinssatz':[zinsatz],
-#                 'Tilgungssatz':[tilgungssatz],
-#                 'Anschlusszinssatz':[anschlusszinssatz],
-#                 'Unsicherheit Anschlusszinssatz':[unsicherheit_anschlusszinssatz],
-#                 'Familienstand':[familienstand],
-#                 'Zu versteuerndes Einkommen':[einkommen],
-#                 'Baujahr':[baujahr],
-#                 #    sonderabschreibung,
-#                 'Anlagehorizont':[anlagehorizont],
-#                 'Geschätzter Verkaufsfaktor':[verkaufsfaktor],
-#                 'Unsicherheit Verkaufsfaktor':[unsicherheit_verkaufsfaktor],
-#                            },
-#                           index=["Daten"]
-#         )
-#         #print(df)
-#         return send_data_frame(df.to_csv, filename='data.csv')
+@app.callback(Output('download', 'data'),
+             [Input('download-results-button', 'n_clicks')],
+             state=[
+                State("anlagehorizont", "value"),
+                State("eigenkapital", "value"),
+                
+                State("kaufpreis", "value"),
+                State("renovierungskosten", "value"),
+                State("kaufnebenkosten", "value"),
+                State("instandhaltungskosten", "value"),
+                State("kostensteigerung", "value"),
+                State("unsicherheit_kostensteigerung", "value"),
+                State("wertsteigerung", "value"),
+                State("unsicherheit_wertsteigerung", "value"),
+                
+                State("zinsbindung", "value"),
+                State("zinssatz", "value"),
+                State("tilgungssatz", "value"),
+                State("anschlusszinssatz", "value"),
+                State("unsicherheit_anschlusszinssatz", "value"),
+                
+                State("nettokaltmiete", "value"),
+                State("steigerung_nettokaltmiete", "value"),
+                State("unsicherheit_steigerung_nettokaltmiete", "value"),
+                
+                State("familienstand", "value"),
+                State("kapitalertragssteuer", "value"),
+            
+                
+                State("verzinsung_ek", "value"),
+                State("unsicherheit_verzinsung_ek", "value"),
+                State("etf_vergleich", "value"),
+            ],
+            )
+def download_data(n_clicks, 
+            anlagehorizont,
+            eigenkapital,
+                
+            kaufpreis,
+            renovierungskosten,
+            kaufnebenkosten,
+            instandhaltungskosten,
+            kostensteigerung,
+            unsicherheit_kostensteigerung,
+            wertsteigerung,
+            unsicherheit_wertsteigerung,
+            
+            
+            zinsbindung,
+            zinssatz,
+            tilgungssatz,
+            anschlusszinssatz,
+            unsicherheit_anschlusszinssatz,
+            
+            nettokaltmiete,
+            steigerung_nettokaltmiete,
+            unsicherheit_steigerung_nettokaltmiete,
+            
+            familienstand,
+            kapitalertragssteuer,
+            
+            verzinsung_ek,
+            unsicherheit_verzinsung_ek,
+            etf_vergleich,
+):
+    #print(n_clicks)
+    if n_clicks != None:
+        df = pd.DataFrame({"anlagehorizont":[anlagehorizont],
+   "eigenkapital":[eigenkapital],
+   "kaufpreis":[kaufpreis],
+   "renovierungskosten":[renovierungskosten],
+   "kaufnebenkosten":[kaufnebenkosten],
+   "instandhaltungskosten":[instandhaltungskosten],
+   "kostensteigerung":[kostensteigerung],
+   "unsicherheit_kostensteigerung":[unsicherheit_kostensteigerung],
+   "wertsteigerung":[wertsteigerung],
+   "unsicherheit_wertsteigerung":[unsicherheit_wertsteigerung],
+   
+   "zinsbindung":[zinsbindung],
+   "zinssatz":[zinssatz],
+   "tilgungssatz":[tilgungssatz],
+   "anschlusszinssatz":[anschlusszinssatz],
+   "unsicherheit_anschlusszinssatz":[unsicherheit_anschlusszinssatz],
+   
+   "nettokaltmiete":[nettokaltmiete],
+   "steigerung_nettokaltmiete":[steigerung_nettokaltmiete],
+   "unsicherheit_steigerung_nettokaltmiete":[unsicherheit_steigerung_nettokaltmiete],
+   
+   "familienstand":[familienstand],
+   "kapitalertragssteuer":[kapitalertragssteuer],
+   
+   "verzinsung_ek":[verzinsung_ek],
+   "unsicherheit_verzinsung_ek":[unsicherheit_verzinsung_ek],
+   "etf_vergleich":[etf_vergleich]
+                           },
+                          index=["Daten"]
+        )
+        #print(df)
+        return send_data_frame(df.to_csv, filename='data.csv')
 
 
 if __name__ == "__main__":
