@@ -282,6 +282,7 @@ def mieten_kaufen(
         "festgeld_vermoegen_immo_pj":festgeld_vermoegen_immo_pj,
         "festgeld_vermoegen_versteuert_pj":festgeld_vermoegen_versteuert_pj,
         "festgeld_vermoegen_immo_versteuert_pj":festgeld_vermoegen_immo_versteuert_pj,
+        "festgeld_vermoegen_initial_pj":festgeld_vermoegen_initial_pj,
         "festgeld_vermoegen_initial_versteuert_pj":festgeld_vermoegen_initial_versteuert_pj,
         "etf_vermoegen_initial_pj":etf_vermoegen_initial_pj,
         "etf_vermoegen_initial_versteuert_pj":etf_vermoegen_initial_versteuert_pj,

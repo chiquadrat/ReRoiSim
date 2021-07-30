@@ -874,7 +874,8 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                             # dcc.Store inside the app that stores the intermediate value
-                        dcc.Store(id='intermediate-value'),
+                        dcc.Store(id='intermediate-value-investiert'),
+                        dcc.Store(id='intermediate-value-nicht-investiert'),
                         html.H4(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
@@ -882,7 +883,7 @@ app.layout = html.Div(
                         dcc.Markdown(text_statisch["ergebnisse"]),
                         html.H4("Ergebnisse der Simulation"),
                         html.H6("Vermögensentwicklung: Cashflows werden investiert "),
-                        dcc.Markdown(id='gewinn_text'),
+                        #dcc.Markdown(id='gewinn_text'),
                         dcc.Dropdown(
                         options=[
                             #{'label': 'Immobilie', 'value': 'immo'},
@@ -898,7 +899,20 @@ app.layout = html.Div(
                         value=['Immobilie + ETF (versteuert)', 'ETF (versteuert)'],
                         multi=True,
                         id="grafik_selector_investiert"),  
-                        dcc.Graph(id="mieten_vs_kaufen"),                        
+                        dcc.Graph(id="mieten_vs_kaufen_investiert"),  
+                        html.H6("Vermögensentwicklung: Cashflows werden nicht investiert "),
+                        dcc.Dropdown(
+                        options=[
+                            {'label': 'Immobilie', 'value': 'Immobilie'},
+                            {'label': 'ETF', 'value': 'ETF'},
+                            {'label': 'ETF (versteuert)', 'value': 'ETF (versteuert)'},
+                            {'label': 'Festgeld', 'value': 'Festgeld'},
+                            {'label': 'Festgeld (versteuert)', 'value': 'Festgeld (versteuert)'},
+                        ],
+                        value=['Immobilie', 'ETF (versteuert)'],
+                        multi=True,
+                        id="grafik_selector_nicht_investiert"),  
+                        dcc.Graph(id="mieten_vs_kaufen_nicht_investiert"),                                                
                         html.H4("9. Disclaimer"),
                         dcc.Markdown(text_statisch["haftungsausschluss"]),
                     ],
@@ -925,7 +939,8 @@ app.layout = html.Div(
 
 @app.callback(
   #  Output('mieten_vs_kaufen', 'figure'),
-    Output('intermediate-value', 'data'),
+    Output('intermediate-value-investiert', 'data'),
+    Output('intermediate-value-nicht-investiert', 'data'),
     [Input("button", "n_clicks")],
     state=[
         State("anlagehorizont", "value"),
@@ -1043,7 +1058,7 @@ def custom_figure(
     #print(ergebnis["etf_vermoegen_immo_versteuert_pj"])
     
     # Aufbereitung der Ergebnisse
-    ergebnisse_aufbereitet = {
+    ergebnisse_aufbereitet_investiert = {
         "jahr_pj":ergebnis["jahr_pj"],
         "Immobilie + ETF":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_pj"]),
         "Immobilie + ETF (versteuert)":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),
@@ -1055,53 +1070,71 @@ def custom_figure(
         "Festgeld (versteuert)": ergebnis["festgeld_vermoegen_versteuert_pj"],
     }
     
-
-
+    ergebnisse_aufbereitet_nicht_investiert = {
+        "jahr_pj":ergebnis["jahr_pj"],
+        "Immobilie":ergebnis["vermoegen_immo_pj"],
+        "ETF":ergebnis["etf_vermoegen_initial_pj"],
+        "ETF (versteuert)":ergebnis["etf_vermoegen_initial_versteuert_pj"],
+        "Festgeld":ergebnis["etf_vermoegen_initial_pj"],
+        "Festgeld (versteuert)":ergebnis["etf_vermoegen_initial_versteuert_pj"],
+    }
+    
+    #print(ergebnisse_aufbereitet_investiert)
+    #print(ergebnisse_aufbereitet_nicht_investiert)
     return (
-        ergebnisse_aufbereitet
+        ergebnisse_aufbereitet_investiert,
+        ergebnisse_aufbereitet_nicht_investiert
     )
     
-@app.callback(Output('gewinn_text', 'children'), 
-              Output('mieten_vs_kaufen', 'figure'),
-              Input('intermediate-value', 'data'),
+@app.callback(
+              Output('mieten_vs_kaufen_investiert', 'figure'),
+              Output('mieten_vs_kaufen_nicht_investiert', 'figure'),
+              Input('intermediate-value-investiert', 'data'),
+              Input('intermediate-value-nicht-investiert', 'data'),
               Input('grafik_selector_investiert', "value"),
+              Input('grafik_selector_nicht_investiert', "value"),
                )
-def update_graph(ergebnisse, auswahl):
+def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_selector_investiert,
+                 grafik_selector_nicht_investiert):
 
     # more generally, this line would be
     # json.loads(jsonified_cleaned_data)
-    ergebnis = ergebnisse
-    bla = auswahl
+    # print(ergebnisse_investiert)
+    # print(grafik_selector_investiert)
+    # print(ergebnisse_nicht_investiert)
+    # print(grafik_selector_nicht_investiert)
+   # bla = auswahl
     #print(dff)
   
     
-    fig_vermoegen = go.Figure()
-    for wahl in auswahl:
-        fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis[wahl],
+    fig_vermoegen_investiert = go.Figure()
+    for wahl in grafik_selector_investiert:
+        fig_vermoegen_investiert.add_trace(go.Scatter(x=ergebnisse_investiert["jahr_pj"], y=ergebnisse_investiert[wahl],
                     mode='lines+markers',
                     name=wahl))
-    # fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_versteuert_pj"],
-    #                mode='lines+markers',
-    #                name='ETF versteuert'))
-    # fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
-    #                 y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_pj"]),
-    #                 mode='lines+markers',
-    #                 name='Immobilie + ETF'))    
-    # fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
-    #                 y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),
-    #                 mode='lines+markers',
-    #                 name='Immobilie + ETF versteuert'))        
-    #fig_vermoegen.update_layout(title="Vermögensentwicklung")
-    fig_vermoegen.update_layout(legend=dict(
+
+    fig_vermoegen_investiert.update_layout(legend=dict(
     yanchor="top",
     y=0.99,
     xanchor="left",
     x=0.01
 ))
     
+    fig_vermoegen_nicht_investiert = go.Figure()
+    for wahl in grafik_selector_nicht_investiert:
+        fig_vermoegen_nicht_investiert.add_trace(go.Scatter(x=ergebnisse_nicht_investiert["jahr_pj"], y=ergebnisse_nicht_investiert[wahl],
+                    mode='lines+markers',
+                    name=wahl))
+
+    fig_vermoegen_nicht_investiert.update_layout(legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.01
+))    
     
-    return (f""  ,
-                  fig_vermoegen)
+    
+    return (fig_vermoegen_investiert, fig_vermoegen_nicht_investiert)
     
 # #
 # # CSV/Excel Import
