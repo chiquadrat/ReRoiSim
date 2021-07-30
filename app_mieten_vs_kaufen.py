@@ -989,9 +989,8 @@ def custom_figure(
 
     ergebnis = mieten_kaufen(
         anlagehorizont=anlagehorizont,
-        alleinstehend=alleinstehend,
- #       einkommen=einkommen,
-        steuerjahr=2021,
+        eigenkapital=eigenkapital,
+
         kaufpreis=kaufpreis,
         renovierungskosten=renovierungskosten,
         kaufnebenkosten=kaufnebenkosten,
@@ -1000,37 +999,43 @@ def custom_figure(
         unsicherheit_kostensteigerung=unsicherheit_kostensteigerung,
         wertsteigerung=wertsteigerung/100,
         unsicherheit_wertsteigerung=unsicherheit_wertsteigerung,
-        eigenkapital=eigenkapital,
+        
         zinsbindung=zinsbindung,
-        zinssatz=zinssatz/100,
+        zinsatz=zinssatz/100,
         tilgungssatz=tilgungssatz/100,
         anschlusszinssatz=anschlusszinssatz/100,
         unsicherheit_anschlusszinssatz=unsicherheit_anschlusszinssatz,
-        nettokaltmiete=nettokaltmiete/12,
+
+        nettokaltmiete=nettokaltmiete,
         steigerung_nettokaltmiete=steigerung_nettokaltmiete/100,
         unsicherheit_steigerung_nettokaltmiete=unsicherheit_steigerung_nettokaltmiete,
+
+        alleinstehend=alleinstehend,
+        kapitalertragssteuer=kapitalertragssteuer/100,
+        
         etf_rendite = etf_rendite,
         unsicherheit_etf_rendite=unsicherheit_etf_rendite,
-        verzinsung_ek=verzinsung_ek/100,
-        unsicherheit_verzinsung_ek=unsicherheit_verzinsung_ek,
-        
+        fest_verzinst=verzinsung_ek/100,
+        unsicherheit_fest_verzinst=unsicherheit_verzinsung_ek,
     )
 
-    print(ergebnis)
+    print(ergebnis["etf_vermoegen_immo_versteuert_pj"])
     
     fig_vermoegen = go.Figure()
-    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_pj"],
+#    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_pj"],
+#                    mode='lines+markers',
+#                    name='ETF'))
+#    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_versteuert_pj"],
+#                    mode='lines+markers',
+#                    name='ETF versteuert'))
+    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
+                    y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_pj"]),
                     mode='lines+markers',
-                    name='ETF'))
-    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_minus_neg_cashflows_versteuert_pj"],
+                    name='Immobilie + ETF'))    
+    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
+                    y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),
                     mode='lines+markers',
-                    name='ETF versteuert'))
-    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["vermoegen_immo_pj"],
-                    mode='lines+markers',
-                    name='Immobilie'))    
-    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["vermoegen_immo_versteuert_pj"],
-                    mode='lines+markers',
-                    name='Immobilie versteuert'))    
+                    name='Immobilie + ETF versteuert'))        
     fig_vermoegen.update_layout(title="Vermögensentwicklung")
 
     return (
