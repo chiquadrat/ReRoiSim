@@ -44,6 +44,7 @@ server = app.server
 
 text_statisch = text_static()
 
+
 app.layout = html.Div(
     [
            # row
@@ -872,12 +873,31 @@ app.layout = html.Div(
                 # first column of third row
                 html.Div(
                     children=[
+                            # dcc.Store inside the app that stores the intermediate value
+                        dcc.Store(id='intermediate-value'),
                         html.H4(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
                         dcc.Markdown(text_statisch["eingabeparameter"]),
-                        html.H4("Ergebnisse der Simulation"),
                         dcc.Markdown(text_statisch["ergebnisse"]),
+                        html.H4("Ergebnisse der Simulation"),
+                        html.H6("Vermögensentwicklung: Cashflows werden investiert "),
+                        dcc.Markdown(id='gewinn_text'),
+                        dcc.Dropdown(
+                        options=[
+                            #{'label': 'Immobilie', 'value': 'immo'},
+                            {'label': 'Immobilie + ETF', 'value': 'immo_etf'},
+                            {'label': 'Immobilie + ETF (versteuert)', 'value': 'immo_etf_versteuert'},
+                            {'label': 'Immobilie + Festgeld', 'value': 'immo_festgeld'},
+                            {'label': 'Immobilie + Festgeld (versteuert)', 'value': 'immo_festgeld_versteuert'},
+                            {'label': 'ETF', 'value': 'etf'},
+                            {'label': 'ETF (versteuert)', 'value': 'etf_versteuert'},
+                            {'label': 'Festgeld', 'value': 'festgeld'},
+                            {'label': 'Festgeld (versteuert)', 'value': 'festgeld_versteuert'},
+                        ],
+                        value=['immo_etf_versteuert', 'etf_versteuert'],
+                        multi=True,
+                        id="grafik_selector_investiert"),  
                         dcc.Graph(id="mieten_vs_kaufen"),                        
                         html.H4("9. Disclaimer"),
                         dcc.Markdown(text_statisch["haftungsausschluss"]),
@@ -904,7 +924,8 @@ app.layout = html.Div(
 #
 
 @app.callback(
-    Output('mieten_vs_kaufen', 'figure'),
+  #  Output('mieten_vs_kaufen', 'figure'),
+    Output('intermediate-value', 'data'),
     [Input("button", "n_clicks")],
     state=[
         State("anlagehorizont", "value"),
@@ -1019,15 +1040,35 @@ def custom_figure(
         unsicherheit_fest_verzinst=unsicherheit_verzinsung_ek,
     )
 
-    print(ergebnis["etf_vermoegen_immo_versteuert_pj"])
+    #print(ergebnis["etf_vermoegen_immo_versteuert_pj"])
+    
+
+
+    return (
+  
+        ergebnis
+    )
+    
+@app.callback(Output('gewinn_text', 'children'), 
+              Output('mieten_vs_kaufen', 'figure'),
+              Input('intermediate-value', 'data'),
+              Input('grafik_selector_investiert', "value"))
+def update_graph(ergebnisse, auswahl):
+
+    # more generally, this line would be
+    # json.loads(jsonified_cleaned_data)
+    ergebnis = ergebnisse
+    bla = auswahl
+    #print(dff)
+    print(bla)
     
     fig_vermoegen = go.Figure()
-#    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_pj"],
-#                    mode='lines+markers',
-#                    name='ETF'))
-#    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_versteuert_pj"],
-#                    mode='lines+markers',
-#                    name='ETF versteuert'))
+    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_pj"],
+                   mode='lines+markers',
+                   name='ETF'))
+    fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], y=ergebnis["etf_vermoegen_versteuert_pj"],
+                   mode='lines+markers',
+                   name='ETF versteuert'))
     fig_vermoegen.add_trace(go.Scatter(x=ergebnis["jahr_pj"], 
                     y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_pj"]),
                     mode='lines+markers',
@@ -1036,11 +1077,17 @@ def custom_figure(
                     y=np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),
                     mode='lines+markers',
                     name='Immobilie + ETF versteuert'))        
-    fig_vermoegen.update_layout(title="Vermögensentwicklung")
-
-    return (
-        fig_vermoegen
-    )
+    #fig_vermoegen.update_layout(title="Vermögensentwicklung")
+    fig_vermoegen.update_layout(legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.01
+))
+    
+    
+    return (f"Hello world  und {bla}"  ,
+                  fig_vermoegen)
     
 # #
 # # CSV/Excel Import
