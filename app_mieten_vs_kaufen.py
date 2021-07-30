@@ -1075,8 +1075,8 @@ def custom_figure(
         "Immobilie":ergebnis["vermoegen_immo_pj"],
         "ETF":ergebnis["etf_vermoegen_initial_pj"],
         "ETF (versteuert)":ergebnis["etf_vermoegen_initial_versteuert_pj"],
-        "Festgeld":ergebnis["etf_vermoegen_initial_pj"],
-        "Festgeld (versteuert)":ergebnis["etf_vermoegen_initial_versteuert_pj"],
+        "Festgeld":ergebnis["festgeld_vermoegen_initial_pj"],
+        "Festgeld (versteuert)":ergebnis["festgeld_vermoegen_initial_versteuert_pj"],
     }
     
     #print(ergebnisse_aufbereitet_investiert)
