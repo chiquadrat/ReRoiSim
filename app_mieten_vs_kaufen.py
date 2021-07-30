@@ -46,7 +46,7 @@ text_statisch = text_static()
 
 app.layout = html.Div(
     [
-                # row zero
+           # row
         html.Div(
             children=[
                 # first column of row zero
@@ -63,12 +63,74 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+                # row zero
+        html.Div(
+            children=[
+                # first column of row zero
+                html.Div(
+                    children=[html.H4("1. Allgemein"),],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "3vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
+                html.Div(
+            children=[
+                # first column of first row
+                html.Div(
+                    children=[
+                        html.Label("Vergleichszeitraum"),
+                        dcc.Input(
+                            id="anlagehorizont",
+                            placeholder="Eingabe...",
+                            value=15,
+                            min=1,
+                            type="number",
+                            required=True,
+                            
+                        ),
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                ),
+                # second column of first row
+                html.Div(
+                    children=[
+                        html.Label("Eigenkapital"),
+                        dcc.Input(
+                            id="eigenkapital",
+                            placeholder="Eingabe...",
+                            value=10_000,
+                            type="number",
+                            min=0,
+                            required=True,
+                        ),
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "vertical-align": "top",
+                        "margin-left": "3vw",
+                        "margin-top": "1vw",
+                    },
+                ),
+            ],
+            className="row",
+        ),
         # row zero
         html.Div(
             children=[
                 # first column of row zero
                 html.Div(
-                    children=[html.H4("1. Kennzahlen Immobilie"),],
+                    children=[html.H4("2. Kennzahlen Immobilie"),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -175,7 +237,7 @@ app.layout = html.Div(
                 # second column of second row
                 html.Div(
                     children=[
-                        html.Label("Kostensteigerung Instandhaltungskosten (%)",
+                        html.Label("Steigerung Instandhaltungsk. (%)",
                                    #title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."
                                    ),
                         dcc.Input(
@@ -275,7 +337,7 @@ app.layout = html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("2. Finanzierung Immobilie"),],
+                    children=[html.H4("3. Finanzierung Immobilie"),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -289,26 +351,6 @@ app.layout = html.Div(
         # row nine
         html.Div(
             children=[
-                # first column
-                html.Div(
-                    children=[
-                        html.Label("Eigenkapital (Euro)"),
-                        dcc.Input(
-                            id="eigenkapital",
-                            placeholder="Eingabe...",
-                            type="number",
-                            value=100_000,
-                            min=0,
-                            required=True,
-                        ),
-                    ],
-                    style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
-                    },
-                ),
                 # second column
                 html.Div(
                     children=[
@@ -348,15 +390,6 @@ app.layout = html.Div(
                         "margin-top": "1vw",
                     },
                 ),
-
-            ],
-            className="row",
-        ),
-        # row ten
-        html.Div(
-            children=[
-
-
                 # second column
                 html.Div(
                     children=[
@@ -376,7 +409,17 @@ app.layout = html.Div(
                         "margin-left": "3vw",
                         "margin-top": "1vw",
                     },
-                ),
+                ),                                
+
+            ],
+            className="row",
+        ),
+        # row ten
+        html.Div(
+            children=[
+
+
+
                 # third column
                 html.Div(
                     children=[
@@ -422,20 +465,12 @@ app.layout = html.Div(
             ],
             className="row",
         ),
-        # row eleven
-        # html.Div(
-        #     children=[
-        #         # first column
-
-        #     ],
-        #     className="row",
-        # ),     
         # third row
         html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("3. Wohnen zur Miete"),],
+                    children=[html.H4("4. Wohnen zur Miete"),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -523,7 +558,7 @@ app.layout = html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("4. Steuern"),],
+                    children=[html.H4("5. Steuern"),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -563,12 +598,12 @@ app.layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("zu versteuerndes Einkommen (Euro)"),
+                        html.Label("Kapitalertragssteuer (%)"),
                         dcc.Input(
-                            id="einkommen",
+                            id="kapitalertragssteuer",
                             placeholder="Eingabe...",
                             type="number",
-                            value=100_000,
+                            value=26.375,
                             min=0,
                             required=True,
                         ),
@@ -588,7 +623,7 @@ app.layout = html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("5. Renditeberechnung"),],
+                    children=[html.H4("6. Rendite Alternativanlagen"),],
                     style={
                         "display": "inline-block",
                         "vertical-align": "top",
@@ -602,26 +637,6 @@ app.layout = html.Div(
         # row fiveteen
         html.Div(
             children=[
-                # first column
-                html.Div(
-                    children=[
-                        html.Label("Anlagehorizont (Jahre)"),
-                        dcc.Input(
-                            id="anlagehorizont",
-                            placeholder="Eingabe...",
-                            type="number",
-                            value=15,
-                            min=10,
-                            required=True,
-                        ),
-                    ],
-                    style={
-                        "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
-                    },
-                ),
                 # second column
                 html.Div(
                     children=[
@@ -696,7 +711,7 @@ app.layout = html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("6. Import/Export der Eingabeparameter"),
+                    children=[html.H4("7. Import/Export der Eingabeparameter"),
                               dcc.Markdown(text_statisch["export_import"]),],
                     style={
                         "display": "inline-block",
@@ -777,7 +792,7 @@ app.layout = html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.H4("7. Simulation"),
+                    children=[html.H4("8. Simulation"),
                               dcc.Markdown(text_statisch["simulation"]),],
                     style={
                         "display": "inline-block",
@@ -864,7 +879,7 @@ app.layout = html.Div(
                         html.H4("Ergebnisse der Simulation"),
                         dcc.Markdown(text_statisch["ergebnisse"]),
                         dcc.Graph(id="mieten_vs_kaufen"),                        
-                        html.H4("8. Disclaimer"),
+                        html.H4("9. Disclaimer"),
                         dcc.Markdown(text_statisch["haftungsausschluss"]),
                     ],
                     style={
@@ -892,6 +907,9 @@ app.layout = html.Div(
     Output('mieten_vs_kaufen', 'figure'),
     [Input("button", "n_clicks")],
     state=[
+        State("anlagehorizont", "value"),
+        State("eigenkapital", "value"),
+        
         State("kaufpreis", "value"),
         State("renovierungskosten", "value"),
         State("kaufnebenkosten", "value"),
@@ -900,27 +918,33 @@ app.layout = html.Div(
         State("unsicherheit_kostensteigerung", "value"),
         State("wertsteigerung", "value"),
         State("unsicherheit_wertsteigerung", "value"),
-        State("eigenkapital", "value"),
+        
         State("zinsbindung", "value"),
         State("zinssatz", "value"),
         State("tilgungssatz", "value"),
         State("anschlusszinssatz", "value"),
         State("unsicherheit_anschlusszinssatz", "value"),
+        
         State("nettokaltmiete", "value"),
         State("steigerung_nettokaltmiete", "value"),
         State("unsicherheit_steigerung_nettokaltmiete", "value"),
+        
         State("familienstand", "value"),
-        State("einkommen", "value"),
-        State("anlagehorizont", "value"),
+        State("kapitalertragssteuer", "value"),
+      
+        
         State("verzinsung_ek", "value"),
         State("unsicherheit_verzinsung_ek", "value"),
         State("etf_vergleich", "value"),
-
     ],
 )
 def custom_figure(
     button,
-    kaufpreis,
+    
+   anlagehorizont,
+   eigenkapital,
+    
+   kaufpreis,
    renovierungskosten,
    kaufnebenkosten,
    instandhaltungskosten,
@@ -928,18 +952,21 @@ def custom_figure(
    unsicherheit_kostensteigerung,
    wertsteigerung,
    unsicherheit_wertsteigerung,
-   eigenkapital,
+   
+   
    zinsbindung,
    zinssatz,
    tilgungssatz,
    anschlusszinssatz,
    unsicherheit_anschlusszinssatz,
+   
    nettokaltmiete,
    steigerung_nettokaltmiete,
    unsicherheit_steigerung_nettokaltmiete,
+   
    familienstand,
-   einkommen,
-   anlagehorizont,
+   kapitalertragssteuer,
+   
    verzinsung_ek,
    unsicherheit_verzinsung_ek,
    etf_vergleich,
@@ -963,7 +990,7 @@ def custom_figure(
     ergebnis = mieten_kaufen(
         anlagehorizont=anlagehorizont,
         alleinstehend=alleinstehend,
-        einkommen=einkommen,
+ #       einkommen=einkommen,
         steuerjahr=2021,
         kaufpreis=kaufpreis,
         renovierungskosten=renovierungskosten,
