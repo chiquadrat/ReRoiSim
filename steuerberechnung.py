@@ -77,7 +77,7 @@ def steuerberechnung_immo(jahreseinkommen, splittingtarif, steuerjahr):
 
     return einkommenssteuer
 
-def steuerberechnung_etf(investition, endwert):
-    endwert_versteuert = endwert - (endwert - investition) * 0.26375
+def steuerberechnung_etf(investition, endwert, kapitalertragssteuer=0.26375):
+    endwert_versteuert = endwert - (endwert - investition) * kapitalertragssteuer
     return endwert_versteuert
     
