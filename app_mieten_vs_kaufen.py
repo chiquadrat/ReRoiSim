@@ -1097,22 +1097,70 @@ def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_sele
     
     fig_vermoegen_investiert = go.Figure()
     for wahl in grafik_selector_investiert:
+        print(type(ergebnisse_investiert[wahl]))
+        print(len(ergebnisse_investiert[wahl]))
+        print(len(ergebnisse_investiert["jahr_pj"]))
         fig_vermoegen_investiert.add_trace(go.Scatter(x=ergebnisse_investiert["jahr_pj"], y=ergebnisse_investiert[wahl],
                     mode='lines+markers',
                     name=wahl))
+        fig_vermoegen_investiert.add_scatter(
+        name='Upper Bound',
+        x=ergebnisse_investiert["jahr_pj"],
+        y=np.array(ergebnisse_investiert[wahl])+10000,
+        mode='lines',
+        marker=dict(color="#444"),
+        line=dict(width=0),
+        showlegend=False
+        ),
+        fig_vermoegen_investiert.add_scatter(
+        name='Lower Bound',
+        x=ergebnisse_investiert["jahr_pj"],
+        y=np.array(ergebnisse_investiert[wahl])-10000,
+        marker=dict(color="#444"),
+        line=dict(width=0),
+        mode='lines',
+        fillcolor='rgba(68, 68, 68, 0.3)',
+        fill='tonexty',
+        showlegend=False
+    )        
 
     fig_vermoegen_investiert.update_layout(legend=dict(
     yanchor="top",
     y=0.99,
     xanchor="left",
-    x=0.01
+    x=0.01,
 ))
+    fig_vermoegen_investiert.update_layout(plot_bgcolor="white")
+    fig_vermoegen_investiert.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+    fig_vermoegen_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
     
     fig_vermoegen_nicht_investiert = go.Figure()
     for wahl in grafik_selector_nicht_investiert:
         fig_vermoegen_nicht_investiert.add_trace(go.Scatter(x=ergebnisse_nicht_investiert["jahr_pj"], y=ergebnisse_nicht_investiert[wahl],
                     mode='lines+markers',
                     name=wahl))
+
+        fig_vermoegen_nicht_investiert.add_scatter(
+        name='Upper Bound',
+        x=ergebnisse_nicht_investiert["jahr_pj"],
+        y=np.array(ergebnisse_nicht_investiert[wahl])+10000,
+        mode='lines',
+        marker=dict(color="#444"),
+        line=dict(width=0),
+        showlegend=False
+        ),
+        fig_vermoegen_nicht_investiert.add_scatter(
+        name='Lower Bound',
+        x=ergebnisse_nicht_investiert["jahr_pj"],
+        y=np.array(ergebnisse_nicht_investiert[wahl])-10000,
+        marker=dict(color="#444"),
+        line=dict(width=0),
+        mode='lines',
+        fillcolor='rgba(68, 68, 68, 0.3)',
+        fill='tonexty',
+        showlegend=False
+    )        
+
 
     fig_vermoegen_nicht_investiert.update_layout(legend=dict(
     yanchor="top",
@@ -1121,6 +1169,9 @@ def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_sele
     x=0.01
 ))    
     
+    fig_vermoegen_nicht_investiert.update_layout(plot_bgcolor="white")
+    fig_vermoegen_nicht_investiert.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+    fig_vermoegen_nicht_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
     
     return (fig_vermoegen_investiert, fig_vermoegen_nicht_investiert)
     
