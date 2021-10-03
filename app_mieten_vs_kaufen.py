@@ -943,6 +943,8 @@ app.layout = html.Div(
     Output('intermediate-value-nicht-investiert', 'data'),
     [Input("button", "n_clicks")],
     state=[
+        
+        State("sim_runs", "value"),
         State("anlagehorizont", "value"),
         State("eigenkapital", "value"),
         
@@ -977,6 +979,7 @@ app.layout = html.Div(
 def custom_figure(
     button,
     
+    sim_runs,
    anlagehorizont,
    eigenkapital,
     
@@ -1022,8 +1025,11 @@ def custom_figure(
         unsicherheit_etf_rendite = 0.2276
         name2 = "Dax"
         
+    print(anlagehorizont)
 
     ergebnis = mieten_kaufen(
+        sim_runs=sim_runs, 
+        
         anlagehorizont=anlagehorizont,
         eigenkapital=eigenkapital,
 
@@ -1032,19 +1038,19 @@ def custom_figure(
         kaufnebenkosten=kaufnebenkosten,
         instandhaltungskosten=instandhaltungskosten,
         kostensteigerung=kostensteigerung/100,
-        unsicherheit_kostensteigerung=unsicherheit_kostensteigerung,
+        unsicherheit_kostensteigerung=unsicherheit_kostensteigerung/100,
         wertsteigerung=wertsteigerung/100,
-        unsicherheit_wertsteigerung=unsicherheit_wertsteigerung,
+        unsicherheit_wertsteigerung=unsicherheit_wertsteigerung/100,
         
         zinsbindung=zinsbindung,
         zinsatz=zinssatz/100,
         tilgungssatz=tilgungssatz/100,
         anschlusszinssatz=anschlusszinssatz/100,
-        unsicherheit_anschlusszinssatz=unsicherheit_anschlusszinssatz,
+        unsicherheit_anschlusszinssatz=unsicherheit_anschlusszinssatz/100,
 
         nettokaltmiete=nettokaltmiete,
         steigerung_nettokaltmiete=steigerung_nettokaltmiete/100,
-        unsicherheit_steigerung_nettokaltmiete=unsicherheit_steigerung_nettokaltmiete,
+        unsicherheit_steigerung_nettokaltmiete=unsicherheit_steigerung_nettokaltmiete/100,
 
         alleinstehend=alleinstehend,
         kapitalertragssteuer=kapitalertragssteuer/100,
@@ -1052,22 +1058,48 @@ def custom_figure(
         etf_rendite = etf_rendite,
         unsicherheit_etf_rendite=unsicherheit_etf_rendite,
         fest_verzinst=verzinsung_ek/100,
-        unsicherheit_fest_verzinst=unsicherheit_verzinsung_ek,
+        unsicherheit_fest_verzinst=unsicherheit_verzinsung_ek/100,
     )
 
-    #print(ergebnis["etf_vermoegen_immo_versteuert_pj"])
+    #print("Hello world")
+    #print(ergebnis["etf_vermoegen_initial_versteuert_pj"])
     
     # Aufbereitung der Ergebnisse
     ergebnisse_aufbereitet_investiert = {
         "jahr_pj":ergebnis["jahr_pj"],
-        "Immobilie + ETF":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_pj"]),
-        "Immobilie + ETF (versteuert)":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),
-        "Immobilie + Festgeld":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["festgeld_vermoegen_immo_pj"]),
-        "Immobilie + Festgeld (versteuert)":np.array(ergebnis["vermoegen_immo_pj"])+np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]),
-        "ETF": ergebnis["etf_vermoegen_pj"],
-        "ETF (versteuert)": ergebnis["etf_vermoegen_versteuert_pj"],
-        "Festgeld": ergebnis["festgeld_vermoegen_pj"],
-        "Festgeld (versteuert)": ergebnis["festgeld_vermoegen_versteuert_pj"],
+        
+        "Immobilie + ETF":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0)+np.median(np.array(ergebnis["etf_vermoegen_immo_pj"]), axis=0),
+        "Immobilie + ETF + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_pj"]), q=0.05, axis=0),
+        "Immobilie + ETF + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.90, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_pj"]), q=0.95, axis=0),
+        
+        "Immobilie + ETF (versteuert)":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0) + np.median(np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),axis=0),
+        "Immobilie + ETF (versteuert) + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]), q=0.05, axis=0),
+        "Immobilie + ETF (versteuert) + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.90, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]), q=0.95, axis=0),
+        
+        "Immobilie + Festgeld":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0) + np.median(np.array(ergebnis["festgeld_vermoegen_immo_pj"]), axis=0),
+        "Immobilie + Festgeld + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_pj"]), q=0.05, axis=0),
+        "Immobilie + Festgeld + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.9, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_pj"]), q=0.95, axis=0),
+        
+        "Immobilie + Festgeld (versteuert)":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0) + np.median(np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]), axis=0),
+        "Immobilie + Festgeld (versteuert) + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]), q=0.05, axis=0),
+        "Immobilie + Festgeld (versteuert) + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.9, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]), q=0.95, axis=0),        
+        
+        "ETF": np.median(np.array(ergebnis["etf_vermoegen_pj"]), axis=0),
+        "ETF + lower bound": np.quantile(np.array(ergebnis["etf_vermoegen_pj"]), q=0.1, axis=0),
+        "ETF + upper bound": np.quantile(np.array(ergebnis["etf_vermoegen_pj"]), q=0.9, axis=0),
+        
+        "ETF (versteuert)": np.median(ergebnis["etf_vermoegen_versteuert_pj"], axis=0),
+        "ETF (versteuert) + lower bound": np.quantile(np.array(ergebnis["etf_vermoegen_versteuert_pj"]), q=0.1, axis=0),
+        "ETF (versteuert) + upper bound": np.quantile(np.array(ergebnis["etf_vermoegen_versteuert_pj"]), q=0.90, axis=0),
+        
+        "Festgeld": np.median(ergebnis["festgeld_vermoegen_pj"], axis=0),
+        "Festgeld + lower bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_pj"]), q=0.1, axis=0),
+        "Festgeld + upper bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_pj"]), q=0.9, axis=0),
+        
+        "Festgeld (versteuert)": np.median(ergebnis["festgeld_vermoegen_versteuert_pj"], axis=0),
+        "Festgeld (versteuert) + lower bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_versteuert_pj"]), q=0.1, axis=0),
+        "Festgeld (versteuert) + upper bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_versteuert_pj"]), q=0.9, axis=0),
+        
     }
     
     ergebnisse_aufbereitet_nicht_investiert = {
@@ -1097,16 +1129,16 @@ def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_sele
     
     fig_vermoegen_investiert = go.Figure()
     for wahl in grafik_selector_investiert:
-        print(type(ergebnisse_investiert[wahl]))
-        print(len(ergebnisse_investiert[wahl]))
-        print(len(ergebnisse_investiert["jahr_pj"]))
+        #print(wahl + " lower bound")
+        # print(len(ergebnisse_investiert[wahl]))
+        # print(len(ergebnisse_investiert["jahr_pj"]))
         fig_vermoegen_investiert.add_trace(go.Scatter(x=ergebnisse_investiert["jahr_pj"], y=ergebnisse_investiert[wahl],
                     mode='lines+markers',
                     name=wahl))
         fig_vermoegen_investiert.add_scatter(
         name='Upper Bound',
         x=ergebnisse_investiert["jahr_pj"],
-        y=np.array(ergebnisse_investiert[wahl])+10000,
+        y=np.array(ergebnisse_investiert[wahl + " + lower bound"]),
         mode='lines',
         marker=dict(color="#444"),
         line=dict(width=0),
@@ -1115,7 +1147,7 @@ def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_sele
         fig_vermoegen_investiert.add_scatter(
         name='Lower Bound',
         x=ergebnisse_investiert["jahr_pj"],
-        y=np.array(ergebnisse_investiert[wahl])-10000,
+        y=np.array(ergebnisse_investiert[wahl + " + upper bound"]),
         marker=dict(color="#444"),
         line=dict(width=0),
         mode='lines',
@@ -1135,43 +1167,43 @@ def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_sele
     fig_vermoegen_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
     
     fig_vermoegen_nicht_investiert = go.Figure()
-    for wahl in grafik_selector_nicht_investiert:
-        fig_vermoegen_nicht_investiert.add_trace(go.Scatter(x=ergebnisse_nicht_investiert["jahr_pj"], y=ergebnisse_nicht_investiert[wahl],
-                    mode='lines+markers',
-                    name=wahl))
+#     for wahl in grafik_selector_nicht_investiert:
+#         fig_vermoegen_nicht_investiert.add_trace(go.Scatter(x=ergebnisse_nicht_investiert["jahr_pj"], y=ergebnisse_nicht_investiert[wahl],
+#                     mode='lines+markers',
+#                     name=wahl))
 
-        fig_vermoegen_nicht_investiert.add_scatter(
-        name='Upper Bound',
-        x=ergebnisse_nicht_investiert["jahr_pj"],
-        y=np.array(ergebnisse_nicht_investiert[wahl])+10000,
-        mode='lines',
-        marker=dict(color="#444"),
-        line=dict(width=0),
-        showlegend=False
-        ),
-        fig_vermoegen_nicht_investiert.add_scatter(
-        name='Lower Bound',
-        x=ergebnisse_nicht_investiert["jahr_pj"],
-        y=np.array(ergebnisse_nicht_investiert[wahl])-10000,
-        marker=dict(color="#444"),
-        line=dict(width=0),
-        mode='lines',
-        fillcolor='rgba(68, 68, 68, 0.3)',
-        fill='tonexty',
-        showlegend=False
-    )        
+#         fig_vermoegen_nicht_investiert.add_scatter(
+#         name='Upper Bound',
+#         x=ergebnisse_nicht_investiert["jahr_pj"],
+#         y=np.array(ergebnisse_nicht_investiert[wahl])+10000,
+#         mode='lines',
+#         marker=dict(color="#444"),
+#         line=dict(width=0),
+#         showlegend=False
+#         ),
+#         fig_vermoegen_nicht_investiert.add_scatter(
+#         name='Lower Bound',
+#         x=ergebnisse_nicht_investiert["jahr_pj"],
+#         y=np.array(ergebnisse_nicht_investiert[wahl])-10000,
+#         marker=dict(color="#444"),
+#         line=dict(width=0),
+#         mode='lines',
+#         fillcolor='rgba(68, 68, 68, 0.3)',
+#         fill='tonexty',
+#         showlegend=False
+#     )        
 
 
-    fig_vermoegen_nicht_investiert.update_layout(legend=dict(
-    yanchor="top",
-    y=0.99,
-    xanchor="left",
-    x=0.01
-))    
+#     fig_vermoegen_nicht_investiert.update_layout(legend=dict(
+#     yanchor="top",
+#     y=0.99,
+#     xanchor="left",
+#     x=0.01
+# ))    
     
-    fig_vermoegen_nicht_investiert.update_layout(plot_bgcolor="white")
-    fig_vermoegen_nicht_investiert.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-    fig_vermoegen_nicht_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+#     fig_vermoegen_nicht_investiert.update_layout(plot_bgcolor="white")
+#     fig_vermoegen_nicht_investiert.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+#     fig_vermoegen_nicht_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
     
     return (fig_vermoegen_investiert, fig_vermoegen_nicht_investiert)
     

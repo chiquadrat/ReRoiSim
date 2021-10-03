@@ -16,12 +16,12 @@ from steuerberechnung import steuerberechnung_immo, steuerberechnung_etf
 
 def mieten_kaufen(
     
-    sim_runs = 2,
+    sim_runs = 200,
 
     #
     # Allgemein
     #
-    anlagehorizont = 5,
+    anlagehorizont = 15,
     eigenkapital = 20_000,
 
     #
@@ -121,7 +121,7 @@ def mieten_kaufen(
         jahr_pj = [0]
         wert_immo_pj = [kaufpreis + renovierungskosten]
         hilfsfeld_rate_pj = [0]
-        anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz)
+        anschlussrate_jahr = darlehen * (tilgungssatz + anschlusszinssatz[0, run])
         zinssatz_pj = [0]
         zins_pj = [0]
         restschuld_pj = [darlehen]
@@ -181,6 +181,8 @@ def mieten_kaufen(
             zins_pj.append(restschuld_pj[index_nr - 1] * zinssatz_pj[index_nr])
 
             # Kreditrate
+            #print(hilfsfeld_rate_pj[index_nr])
+            #print(restschuld_pj[index_nr - 1])
             if hilfsfeld_rate_pj[index_nr] > restschuld_pj[index_nr - 1]:
                 kreditrate_pj.append(restschuld_pj[index_nr - 1] * (1 + zinssatz_pj[index_nr]))
             else:
@@ -257,7 +259,7 @@ def mieten_kaufen(
                 etf_vermoegen_pj.append(etf_vermoegen_pj[index_nr - 1] * (etf_rendite[index_nr - 1, run] + 1))
 
                 festgeld_vermoegen_pj.append(
-                    festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst + 1)
+                    festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
                 )
 
                 festgeld_vermoegen_versteuert_pj.append(
@@ -354,9 +356,18 @@ def mieten_kaufen(
         "etf_vermoegen_initial_versteuert_pj":etf_vermoegen_initial_versteuert_pj_runs,
     }
 
-bla = mieten_kaufen()
+#bla = mieten_kaufen()
+#test = np.array(bla["vermoegen_immo_pj"]) 
 
-print(bla["vermoegen_immo_pj"])
+# 2 runs 5 jahre
+
+# print(test)
+# print(test.shape)
+# print(np.median(test, axis=0))
+# print(np.quantile(test,q=.05, axis=0))
+# print(np.quantile(test,q=.95, axis=0))
+
+
 
 
 #plt.plot(jahr_pj, etf_vermoegen, label="ETF Vermoegen")
