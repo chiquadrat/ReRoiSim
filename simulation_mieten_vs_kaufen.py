@@ -90,14 +90,32 @@ def mieten_kaufen(
     festgeld_vermoegen_initial_pj_runs = []
     festgeld_vermoegen_initial_versteuert_pj_runs = []
     etf_vermoegen_initial_pj_runs = []
-    etf_vermoegen_initial_versteuert_pj = []
+    etf_vermoegen_initial_versteuert_pj_runs = []
 
     kostensteigerung = np.random.normal(
         kostensteigerung, unsicherheit_kostensteigerung, sim_runs * anlagehorizont
     ).reshape(anlagehorizont, sim_runs) 
     
-    #print(kostensteigerung)
-
+    wertsteigerung = np.random.normal(
+        wertsteigerung, unsicherheit_wertsteigerung,  sim_runs * anlagehorizont
+    ).reshape(anlagehorizont, sim_runs)
+    
+    anschlusszinssatz = np.random.normal(
+        anschlusszinssatz, unsicherheit_anschlusszinssatz,  sim_runs * anlagehorizont
+    ).reshape(anlagehorizont, sim_runs)    
+    
+    steigerung_nettokaltmiete = np.random.normal(
+        steigerung_nettokaltmiete, unsicherheit_steigerung_nettokaltmiete,  sim_runs * anlagehorizont
+    ).reshape(anlagehorizont, sim_runs)        
+    
+    etf_rendite = np.random.normal(
+        etf_rendite, unsicherheit_etf_rendite,  sim_runs * anlagehorizont
+    ).reshape(anlagehorizont, sim_runs)    
+    
+    fest_verzinst = np.random.normal(
+        fest_verzinst, unsicherheit_fest_verzinst,  sim_runs * anlagehorizont
+    ).reshape(anlagehorizont, sim_runs)    
+    
     # Simulation
     for run in range(sim_runs):
         jahr_pj = [0]
@@ -157,7 +175,7 @@ def mieten_kaufen(
             if jahr_pj[index_nr] <= zinsbindung:
                 zinssatz_pj.append(zinsatz)
             else:
-                zinssatz_pj.append(anschlusszinssatz)
+                zinssatz_pj.append(anschlusszinssatz[index_nr - 1, run])
 
             # Zins
             zins_pj.append(restschuld_pj[index_nr - 1] * zinssatz_pj[index_nr])
@@ -175,23 +193,23 @@ def mieten_kaufen(
             restschuld_pj.append(restschuld_pj[index_nr - 1] - tilgung_pj[index_nr])
 
             # Wert der Immobilie (p.a.)
-            wert_immo_pj.append(wert_immo_pj[index_nr - 1] * (1 + wertsteigerung))
+            wert_immo_pj.append(wert_immo_pj[index_nr - 1] * (1 + wertsteigerung[index_nr - 1, run]))
 
             # Immobilienvermögen (p.a.)
             vermoegen_immo_pj.append(wert_immo_pj[index_nr] - restschuld_pj[index_nr])
 
             festgeld_vermoegen_initial_pj.append(
-                festgeld_vermoegen_initial_pj[index_nr - 1] * (fest_verzinst + 1)
+                festgeld_vermoegen_initial_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
             )
 
             festgeld_vermoegen_initial_versteuert_pj.append(
-                festgeld_vermoegen_initial_versteuert_pj[index_nr - 1] * (fest_verzinst + 1)
-                - (festgeld_vermoegen_initial_versteuert_pj[index_nr - 1] * (fest_verzinst))
+                festgeld_vermoegen_initial_versteuert_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
+                - (festgeld_vermoegen_initial_versteuert_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run]))
                 * kapitalertragssteuer
             )
 
             etf_vermoegen_initial_pj.append(
-                etf_vermoegen_initial_pj[index_nr - 1] * (etf_rendite + 1)
+                etf_vermoegen_initial_pj[index_nr - 1] * (etf_rendite[index_nr - 1, run] + 1)
             )
 
             etf_vermoegen_initial_versteuert_pj.append(
@@ -205,62 +223,62 @@ def mieten_kaufen(
             # ETF Vermögen (p.a.)
             if cashflow_pj[index_nr - 1] > 0:
                 etf_vermoegen_pj.append(
-                    etf_vermoegen_pj[index_nr - 1] * (etf_rendite + 1)
+                    etf_vermoegen_pj[index_nr - 1] * (etf_rendite[index_nr - 1, run] + 1)
                     + cashflow_pj[index_nr - 1]
                 )
 
                 festgeld_vermoegen_pj.append(
-                    festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst + 1)
+                    festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
                     + cashflow_pj[index_nr - 1]
                 )
 
                 festgeld_vermoegen_versteuert_pj.append(
-                    festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst + 1)
-                    - (festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst))
+                    festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
+                    - (festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run]))
                     * kapitalertragssteuer
                     + cashflow_pj[index_nr - 1]
                 )
 
                 etf_vermoegen_immo_pj.append(
-                    etf_vermoegen_immo_pj[index_nr - 1] * (etf_rendite + 1)
+                    etf_vermoegen_immo_pj[index_nr - 1] * (etf_rendite[index_nr - 1, run] + 1)
                 )
 
                 festgeld_vermoegen_immo_pj.append(
-                    festgeld_vermoegen_immo_pj[index_nr - 1] * (fest_verzinst + 1)
+                    festgeld_vermoegen_immo_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
                 )
 
                 festgeld_vermoegen_immo_versteuert_pj.append(
-                    festgeld_vermoegen_immo_versteuert_pj[index_nr - 1] * (fest_verzinst + 1)
-                    - (festgeld_vermoegen_immo_versteuert_pj[index_nr - 1] * (fest_verzinst))
+                    festgeld_vermoegen_immo_versteuert_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
+                    - (festgeld_vermoegen_immo_versteuert_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run]))
                     * kapitalertragssteuer
                 )
 
             else:
-                etf_vermoegen_pj.append(etf_vermoegen_pj[index_nr - 1] * (etf_rendite + 1))
+                etf_vermoegen_pj.append(etf_vermoegen_pj[index_nr - 1] * (etf_rendite[index_nr - 1, run] + 1))
 
                 festgeld_vermoegen_pj.append(
                     festgeld_vermoegen_pj[index_nr - 1] * (fest_verzinst + 1)
                 )
 
                 festgeld_vermoegen_versteuert_pj.append(
-                    festgeld_vermoegen_versteuert_pj[index_nr - 1] * (fest_verzinst + 1)
-                    - (festgeld_vermoegen_versteuert_pj[index_nr - 1] * (fest_verzinst))
+                    festgeld_vermoegen_versteuert_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
+                    - (festgeld_vermoegen_versteuert_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run]))
                     * kapitalertragssteuer
                 )
 
                 etf_vermoegen_immo_pj.append(
-                    etf_vermoegen_immo_pj[index_nr - 1] * (etf_rendite + 1)
+                    etf_vermoegen_immo_pj[index_nr - 1] * (etf_rendite[index_nr - 1, run] + 1)
                     + (cashflow_pj[index_nr - 1] * -1)
                 )
 
                 festgeld_vermoegen_immo_pj.append(
-                    festgeld_vermoegen_immo_pj[index_nr - 1] * (fest_verzinst + 1)
+                    festgeld_vermoegen_immo_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
                     + (cashflow_pj[index_nr - 1] * -1)
                 )
 
                 festgeld_vermoegen_immo_versteuert_pj.append(
-                    festgeld_vermoegen_immo_versteuert_pj[index_nr - 1] * (fest_verzinst + 1)
-                    - (festgeld_vermoegen_immo_versteuert_pj[index_nr - 1] * (fest_verzinst))
+                    festgeld_vermoegen_immo_versteuert_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run] + 1)
+                    - (festgeld_vermoegen_immo_versteuert_pj[index_nr - 1] * (fest_verzinst[index_nr - 1, run]))
                     * kapitalertragssteuer
                     + (cashflow_pj[index_nr - 1] * -1)
                 )
@@ -289,7 +307,7 @@ def mieten_kaufen(
             )
             #print(instandhaltungskosten_pj)
             nettokaltmiete_pj.append(
-                nettokaltmiete_pj[index_nr] * (1 + steigerung_nettokaltmiete)
+                nettokaltmiete_pj[index_nr] * (1 + steigerung_nettokaltmiete[index_nr - 1, run])
             )
 
             cashflow_pj.append(
@@ -300,31 +318,45 @@ def mieten_kaufen(
         
         vermoegen_immo_pj_runs.append(vermoegen_immo_pj)
         etf_vermoegen_pj_runs.append(etf_vermoegen_pj)
+        etf_vermoegen_versteuert_pj_runs.append(etf_vermoegen_versteuert_pj)
+        etf_vermoegen_immo_pj_runs.append(etf_vermoegen_immo_pj)
+        etf_vermoegen_immo_versteuert_pj_runs.append(etf_vermoegen_immo_versteuert_pj)
+        festgeld_vermoegen_pj_runs.append(festgeld_vermoegen_pj)
+        festgeld_vermoegen_immo_pj_runs.append(festgeld_vermoegen_immo_pj)
+        festgeld_vermoegen_versteuert_pj_runs.append(festgeld_vermoegen_versteuert_pj)
+        festgeld_vermoegen_immo_versteuert_pj_runs.append(festgeld_vermoegen_immo_versteuert_pj)
+        festgeld_vermoegen_initial_pj_runs.append(festgeld_vermoegen_initial_pj)
+        festgeld_vermoegen_initial_versteuert_pj_runs.append(festgeld_vermoegen_initial_versteuert_pj)
+        etf_vermoegen_initial_pj_runs.append(etf_vermoegen_initial_pj)
+        etf_vermoegen_initial_versteuert_pj_runs.append(etf_vermoegen_initial_versteuert_pj)
         #print(vermoegen_immo_pj_runs)
         
         #print(cashflow_pj)
-    print(etf_vermoegen_pj_runs)
+    #print(etf_vermoegen_pj_runs)
     return {
         "jahr_pj":jahr_pj,
-        "vermoegen_immo_pj":vermoegen_immo_pj,
+        "vermoegen_immo_pj":vermoegen_immo_pj_runs,
         
-        "etf_vermoegen_pj":etf_vermoegen_pj,
-        "etf_vermoegen_versteuert_pj":etf_vermoegen_versteuert_pj,
+        "etf_vermoegen_pj":etf_vermoegen_pj_runs,
+        "etf_vermoegen_versteuert_pj":etf_vermoegen_versteuert_pj_runs,
     
-        "etf_vermoegen_immo_pj":etf_vermoegen_immo_pj,
-        "etf_vermoegen_immo_versteuert_pj":etf_vermoegen_immo_versteuert_pj,
-        "festgeld_vermoegen_pj":festgeld_vermoegen_pj,
-        "festgeld_vermoegen_immo_pj":festgeld_vermoegen_immo_pj,
-        "festgeld_vermoegen_versteuert_pj":festgeld_vermoegen_versteuert_pj,
-        "festgeld_vermoegen_immo_versteuert_pj":festgeld_vermoegen_immo_versteuert_pj,
-        "festgeld_vermoegen_initial_pj":festgeld_vermoegen_initial_pj,
-        "festgeld_vermoegen_initial_versteuert_pj":festgeld_vermoegen_initial_versteuert_pj,
-        "etf_vermoegen_initial_pj":etf_vermoegen_initial_pj,
-        "etf_vermoegen_initial_versteuert_pj":etf_vermoegen_initial_versteuert_pj,
+        "etf_vermoegen_immo_pj":etf_vermoegen_immo_pj_runs,
+        "etf_vermoegen_immo_versteuert_pj":etf_vermoegen_immo_versteuert_pj_runs,
+        
+        "festgeld_vermoegen_pj":festgeld_vermoegen_pj_runs,
+        "festgeld_vermoegen_immo_pj":festgeld_vermoegen_immo_pj_runs,
+        "festgeld_vermoegen_versteuert_pj":festgeld_vermoegen_versteuert_pj_runs,
+        "festgeld_vermoegen_immo_versteuert_pj":festgeld_vermoegen_immo_versteuert_pj_runs,
+        "festgeld_vermoegen_initial_pj":festgeld_vermoegen_initial_pj_runs,
+        "festgeld_vermoegen_initial_versteuert_pj":festgeld_vermoegen_initial_versteuert_pj_runs,
+        
+        "etf_vermoegen_initial_pj":etf_vermoegen_initial_pj_runs,
+        "etf_vermoegen_initial_versteuert_pj":etf_vermoegen_initial_versteuert_pj_runs,
     }
 
-mieten_kaufen()
+bla = mieten_kaufen()
 
+print(bla["vermoegen_immo_pj"])
 
 
 #plt.plot(jahr_pj, etf_vermoegen, label="ETF Vermoegen")
