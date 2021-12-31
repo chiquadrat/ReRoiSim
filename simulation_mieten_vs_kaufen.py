@@ -380,3 +380,5 @@ def mieten_kaufen(
 # plt.title("Mieten vs. Kaufen")
 # plt.legend()
 # plt.show()
+
+

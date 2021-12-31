@@ -1025,7 +1025,7 @@ def custom_figure(
         unsicherheit_etf_rendite = 0.2276
         name2 = "Dax"
         
-    print(anlagehorizont)
+   # print(anlagehorizont)
 
     ergebnis = mieten_kaufen(
         sim_runs=sim_runs, 
@@ -1069,20 +1069,20 @@ def custom_figure(
         "jahr_pj":ergebnis["jahr_pj"],
         
         "Immobilie + ETF":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0)+np.median(np.array(ergebnis["etf_vermoegen_immo_pj"]), axis=0),
-        "Immobilie + ETF + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_pj"]), q=0.05, axis=0),
-        "Immobilie + ETF + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.90, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_pj"]), q=0.95, axis=0),
+        "Immobilie + ETF + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_pj"]), q=0.10, axis=0),
+        "Immobilie + ETF + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.90, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_pj"]), q=0.90, axis=0),
         
         "Immobilie + ETF (versteuert)":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0) + np.median(np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]),axis=0),
-        "Immobilie + ETF (versteuert) + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]), q=0.05, axis=0),
-        "Immobilie + ETF (versteuert) + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.90, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]), q=0.95, axis=0),
+        "Immobilie + ETF (versteuert) + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]), q=0.1, axis=0),
+        "Immobilie + ETF (versteuert) + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.90, axis=0) + np.quantile(np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"]), q=0.90, axis=0),
         
         "Immobilie + Festgeld":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0) + np.median(np.array(ergebnis["festgeld_vermoegen_immo_pj"]), axis=0),
-        "Immobilie + Festgeld + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_pj"]), q=0.05, axis=0),
-        "Immobilie + Festgeld + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.9, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_pj"]), q=0.95, axis=0),
+        "Immobilie + Festgeld + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_pj"]), q=0.1, axis=0),
+        "Immobilie + Festgeld + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.9, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_pj"]), q=0.90, axis=0),
         
         "Immobilie + Festgeld (versteuert)":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0) + np.median(np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]), axis=0),
-        "Immobilie + Festgeld (versteuert) + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]), q=0.05, axis=0),
-        "Immobilie + Festgeld (versteuert) + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.9, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]), q=0.95, axis=0),        
+        "Immobilie + Festgeld (versteuert) + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]), q=0.1, axis=0),
+        "Immobilie + Festgeld (versteuert) + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.9, axis=0) + np.quantile(np.array(ergebnis["festgeld_vermoegen_immo_versteuert_pj"]), q=0.90, axis=0),        
         
         "ETF": np.median(np.array(ergebnis["etf_vermoegen_pj"]), axis=0),
         "ETF + lower bound": np.quantile(np.array(ergebnis["etf_vermoegen_pj"]), q=0.1, axis=0),
@@ -1102,13 +1102,36 @@ def custom_figure(
         
     }
     
+    
     ergebnisse_aufbereitet_nicht_investiert = {
         "jahr_pj":ergebnis["jahr_pj"],
-        "Immobilie":ergebnis["vermoegen_immo_pj"],
-        "ETF":ergebnis["etf_vermoegen_initial_pj"],
-        "ETF (versteuert)":ergebnis["etf_vermoegen_initial_versteuert_pj"],
-        "Festgeld":ergebnis["festgeld_vermoegen_initial_pj"],
-        "Festgeld (versteuert)":ergebnis["festgeld_vermoegen_initial_versteuert_pj"],
+        #"Immobilie":ergebnis["vermoegen_immo_pj"],
+        
+        "Immobilie":np.median(np.array(ergebnis["vermoegen_immo_pj"]), axis=0),
+        "Immobilie + lower bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.1, axis=0), 
+        "Immobilie + upper bound":np.quantile(np.array(ergebnis["vermoegen_immo_pj"]), q=0.90, axis=0), 
+
+        
+        #"ETF":ergebnis["etf_vermoegen_initial_pj"],
+        "ETF": np.median(np.array(ergebnis["etf_vermoegen_initial_pj"]), axis=0),
+        "ETF + lower bound": np.quantile(np.array(ergebnis["etf_vermoegen_initial_pj"]), q=0.1, axis=0),
+        "ETF + upper bound": np.quantile(np.array(ergebnis["etf_vermoegen_initial_pj"]), q=0.9, axis=0),
+
+        
+        #"ETF (versteuert)":ergebnis["etf_vermoegen_initial_versteuert_pj"],
+        "ETF (versteuert)": np.median(np.array(ergebnis["etf_vermoegen_initial_versteuert_pj"]), axis=0),
+        "ETF (versteuert) + lower bound": np.quantile(np.array(ergebnis["etf_vermoegen_initial_versteuert_pj"]), q=0.1, axis=0),
+        "ETF (versteuert) + upper bound": np.quantile(np.array(ergebnis["etf_vermoegen_initial_versteuert_pj"]), q=0.9, axis=0),
+
+        #"Festgeld":ergebnis["festgeld_vermoegen_initial_pj"],
+        "Festgeld": np.median(np.array(ergebnis["festgeld_vermoegen_initial_pj"]), axis=0),
+        "Festgeld + lower bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_initial_pj"]), q=0.1, axis=0),
+        "Festgeld + upper bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_initial_pj"]), q=0.9, axis=0),
+        
+        #"Festgeld (versteuert)":ergebnis["festgeld_vermoegen_initial_versteuert_pj"],
+        "Festgeld (versteuert)": np.median(np.array(ergebnis["festgeld_vermoegen_initial_versteuert_pj"]), axis=0),
+        "Festgeld (versteuert) + lower bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_initial_versteuert_pj"]), q=0.1, axis=0),
+        "Festgeld (versteuert) + upper bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_initial_versteuert_pj"]), q=0.9, axis=0),
     }
     
     return (
@@ -1127,14 +1150,42 @@ def custom_figure(
 def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_selector_investiert,
                  grafik_selector_nicht_investiert):
     
+    farben = ['#636EFA',
+                '#EF553B',
+                '#00CC96',
+                '#AB63FA',
+                '#FFA15A',
+                '#19D3F3',
+                '#FF6692',
+                '#B6E880',
+                '#FF97FF',
+                '#FECB52']
+    
+    farben_rgb = ["rgba(99, 110, 250, 0.3)",
+                  "rgba(239, 85, 59, 0.3)",
+                  "rgba(0, 204, 150, 0.3)",
+                  "rgba(171, 99, 250, 0.3)",
+                  "rgba(255, 161, 90, 0.3)",
+                  "rgba(25, 211, 243, 0.3)",
+                  "rgba(255, 102, 146, 0.3)",
+                  "rgba(182, 232, 128, 0.3)",
+                  "rgba(255, 151, 255, 0.3)",
+                  "rgba(254, 203, 82, 0.3)"
+                  ]
+    
     fig_vermoegen_investiert = go.Figure()
-    for wahl in grafik_selector_investiert:
+    for i, wahl in enumerate(grafik_selector_investiert):
+        #print(wahl)
+        #print(i)
         #print(wahl + " lower bound")
         # print(len(ergebnisse_investiert[wahl]))
         # print(len(ergebnisse_investiert["jahr_pj"]))
         fig_vermoegen_investiert.add_trace(go.Scatter(x=ergebnisse_investiert["jahr_pj"], y=ergebnisse_investiert[wahl],
                     mode='lines+markers',
+                    line_color = farben[i],
                     name=wahl))
+        
+        
         fig_vermoegen_investiert.add_scatter(
         name='Upper Bound',
         x=ergebnisse_investiert["jahr_pj"],
@@ -1151,8 +1202,9 @@ def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_sele
         marker=dict(color="#444"),
         line=dict(width=0),
         mode='lines',
-        fillcolor='rgba(68, 68, 68, 0.3)',
+        fillcolor=farben_rgb[i],
         fill='tonexty',
+        opacity=0.5,
         showlegend=False
     )        
 
@@ -1167,43 +1219,49 @@ def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_sele
     fig_vermoegen_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
     
     fig_vermoegen_nicht_investiert = go.Figure()
-#     for wahl in grafik_selector_nicht_investiert:
-#         fig_vermoegen_nicht_investiert.add_trace(go.Scatter(x=ergebnisse_nicht_investiert["jahr_pj"], y=ergebnisse_nicht_investiert[wahl],
-#                     mode='lines+markers',
-#                     name=wahl))
+    for i, wahl in enumerate(grafik_selector_nicht_investiert):
+        #print(ergebnisse_nicht_investiert["jahr_pj"])
+        #print(ergebnisse_nicht_investiert[wahl2])
+        fig_vermoegen_nicht_investiert.add_trace(go.Scatter(x=ergebnisse_nicht_investiert["jahr_pj"], y=ergebnisse_nicht_investiert[wahl],
+                    mode='lines+markers',
+                    line_color = farben[i],
+                    name=wahl))
+        
+        
 
-#         fig_vermoegen_nicht_investiert.add_scatter(
-#         name='Upper Bound',
-#         x=ergebnisse_nicht_investiert["jahr_pj"],
-#         y=np.array(ergebnisse_nicht_investiert[wahl])+10000,
-#         mode='lines',
-#         marker=dict(color="#444"),
-#         line=dict(width=0),
-#         showlegend=False
-#         ),
-#         fig_vermoegen_nicht_investiert.add_scatter(
-#         name='Lower Bound',
-#         x=ergebnisse_nicht_investiert["jahr_pj"],
-#         y=np.array(ergebnisse_nicht_investiert[wahl])-10000,
-#         marker=dict(color="#444"),
-#         line=dict(width=0),
-#         mode='lines',
-#         fillcolor='rgba(68, 68, 68, 0.3)',
-#         fill='tonexty',
-#         showlegend=False
-#     )        
+        fig_vermoegen_nicht_investiert.add_scatter(
+        name='Upper Bound',
+        x=ergebnisse_nicht_investiert["jahr_pj"],
+        y=np.array(ergebnisse_nicht_investiert[wahl + " + lower bound"]),
+        mode='lines',
+        marker=dict(color="#444"),
+        line=dict(width=0),
+        showlegend=False
+        ),
+        fig_vermoegen_nicht_investiert.add_scatter(
+        name='Lower Bound',
+        x=ergebnisse_nicht_investiert["jahr_pj"],
+        y=np.array(ergebnisse_nicht_investiert[wahl + " + upper bound"]),
+        marker=dict(color="#444"),
+        line=dict(width=0),
+        mode='lines',
+        fillcolor=farben_rgb[i],
+        fill='tonexty',
+        opacity=0.5,
+        showlegend=False
+    )        
 
 
-#     fig_vermoegen_nicht_investiert.update_layout(legend=dict(
-#     yanchor="top",
-#     y=0.99,
-#     xanchor="left",
-#     x=0.01
-# ))    
+    fig_vermoegen_nicht_investiert.update_layout(legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.01
+    ))    
     
-#     fig_vermoegen_nicht_investiert.update_layout(plot_bgcolor="white")
-#     fig_vermoegen_nicht_investiert.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-#     fig_vermoegen_nicht_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+    fig_vermoegen_nicht_investiert.update_layout(plot_bgcolor="white")
+    fig_vermoegen_nicht_investiert.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+    fig_vermoegen_nicht_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
     
     return (fig_vermoegen_investiert, fig_vermoegen_nicht_investiert)
     
