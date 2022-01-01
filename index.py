@@ -5,6 +5,8 @@ from dash.dependencies import Input, Output
 from app import app
 import app_mieten_vs_kaufen, app_immo_kapitalanlage
 
+server = app.server
+
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
