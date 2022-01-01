@@ -13,19 +13,19 @@ import plotly.figure_factory as ff
 from dash.exceptions import PreventUpdate
 from scipy.stats import iqr
 
-# Import
 import base64
 import io
 import xlrd
 
-# Export
 from dash_extensions import Download
 from dash_extensions.snippets import send_data_frame
 import openpyxl
 
-from formeln import renditerechner
+#from formeln import renditerechner
 from text import text_generator, text_static
 from simulation_mieten_vs_kaufen import mieten_kaufen
+
+from app import app
 
 #VALID_USERNAME_PASSWORD_PAIRS = {
 #                                "Immobilien":"Simulator",
@@ -33,8 +33,8 @@ from simulation_mieten_vs_kaufen import mieten_kaufen
 #                                 "Jack":"Singer"}
 
 # Initialize the app
-app = dash.Dash(__name__)
-server = app.server
+# app = dash.Dash(__name__)
+# server = app.server
 #auth = dash_auth.BasicAuth(app, VALID_USERNAME_PASSWORD_PAIRS)
 # app.config.suppress_callback_exceptions = True
 
@@ -45,7 +45,8 @@ server = app.server
 text_statisch = text_static()
 
 
-app.layout = html.Div(
+#app.layout = html.Div(
+layout = html.Div(
     [
            # row
         html.Div(
@@ -87,7 +88,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Vergleichszeitraum"),
                         dcc.Input(
-                            id="anlagehorizont",
+                            id="anlagehorizont_mk",
                             placeholder="Eingabe...",
                             value=15,
                             min=1,
@@ -108,7 +109,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Eigenkapital"),
                         dcc.Input(
-                            id="eigenkapital",
+                            id="eigenkapital_mk",
                             placeholder="Eingabe...",
                             value=10_000,
                             type="number",
@@ -150,7 +151,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Kaufpreis (Euro)"),
                         dcc.Input(
-                            id="kaufpreis",
+                            id="kaufpreis_mk",
                             placeholder="Eingabe...",
                             value=300_000,
                             min=1,
@@ -171,7 +172,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Renovierungskosten"),
                         dcc.Input(
-                            id="renovierungskosten",
+                            id="renovierungskosten_mk",
                             placeholder="Eingabe...",
                             value=10_000,
                             type="number",
@@ -193,7 +194,7 @@ app.layout = html.Div(
                                   # title="nach § 7h oder § 7i EStG: Nur für die Sanierung von Baudenkmälern und Gebäuden in Sanierungsgebieten"
                                   ),
                         dcc.Input(
-                            id="kaufnebenkosten",
+                            id="kaufnebenkosten_mk",
                             placeholder="Eingabe...",
                             value=30000,
                             type="number",
@@ -220,7 +221,7 @@ app.layout = html.Div(
                                    #title="Umfassen Makler und Notarkosten sowie die Grunderwerbssteuer."
                                    ),
                         dcc.Input(
-                            id="instandhaltungskosten",
+                            id="instandhaltungskosten_mk",
                             placeholder="Eingabe...",
                             value=2_000,
                             type="number",
@@ -242,7 +243,7 @@ app.layout = html.Div(
                                    #title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."
                                    ),
                         dcc.Input(
-                            id="kostensteigerung",
+                            id="kostensteigerung_mk",
                             placeholder="Eingabe...",
                             value=1.5,
                             type="number",
@@ -264,7 +265,7 @@ app.layout = html.Div(
                                    #title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."
                                    ),
                         dcc.Input(
-                            id="unsicherheit_kostensteigerung",
+                            id="unsicherheit_kostensteigerung_mk",
                             placeholder="Eingabe...",
                             value=1.5,
                             type="number",
@@ -293,7 +294,7 @@ app.layout = html.Div(
                                    #title="Umfassen Makler und Notarkosten sowie die Grunderwerbssteuer."
                                    ),
                         dcc.Input(
-                            id="wertsteigerung",
+                            id="wertsteigerung_mk",
                             placeholder="Eingabe...",
                             value=1.5,
                             type="number",
@@ -315,7 +316,7 @@ app.layout = html.Div(
                                    #title="Kosten die im Jahr des Kaufs anfallen und steuerlich Absetzbar sind (Sanierungskosten dürfen 15% der Gebäudekosten nicht überschreiten)."
                                    ),
                         dcc.Input(
-                            id="unsicherheit_wertsteigerung",
+                            id="unsicherheit_wertsteigerung_mk",
                             placeholder="Eingabe...",
                             value=1.5,
                             type="number",
@@ -357,7 +358,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Zinsbindung (Jahre)"),
                         dcc.Input(
-                            id="zinsbindung",
+                            id="zinsbindung_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=15,
@@ -377,7 +378,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Zinssatz (%)"),
                         dcc.Input(
-                            id="zinssatz",
+                            id="zinssatz_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=1.5,
@@ -396,7 +397,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Tilgungssatz (%)"),
                         dcc.Input(
-                            id="tilgungssatz",
+                            id="tilgungssatz_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=2.5,
@@ -427,7 +428,7 @@ app.layout = html.Div(
                         html.Label("Anschlusszinssatz (%)",
                                    title="Erwartungswert"),
                         dcc.Input(
-                            id="anschlusszinssatz",
+                            id="anschlusszinssatz_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=4,
@@ -448,7 +449,7 @@ app.layout = html.Div(
                         html.Label("Unsicherheit Anschlusszinssatz (%)",
                                    title="Standardabweichung"),
                         dcc.Input(
-                            id="unsicherheit_anschlusszinssatz",
+                            id="unsicherheit_anschlusszinssatz_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=1.5,
@@ -492,7 +493,7 @@ app.layout = html.Div(
                                    #title="Nettokaltmiete"
                                    ),
                         dcc.Input(
-                            id="nettokaltmiete",
+                            id="nettokaltmiete_mk",
                             placeholder="Eingabe...",
                             value=6_500,
                             type="number",
@@ -514,7 +515,7 @@ app.layout = html.Div(
                                   title="Erwartungswert"
                                    ),
                         dcc.Input(
-                            id="steigerung_nettokaltmiete",
+                            id="steigerung_nettokaltmiete_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=2,
@@ -535,7 +536,7 @@ app.layout = html.Div(
                                    title="Standardabweichung"
                                   ),
                         dcc.Input(
-                            id="unsicherheit_steigerung_nettokaltmiete",
+                            id="unsicherheit_steigerung_nettokaltmiete_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=1,
@@ -578,7 +579,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Familienstand"),
                         dcc.RadioItems(
-                            id="familienstand",
+                            id="familienstand_mk",
                             options=[
                                 {"label": "alleinstehend", "value": "0"},
                                 {
@@ -601,7 +602,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Kapitalertragssteuer (%)"),
                         dcc.Input(
-                            id="kapitalertragssteuer",
+                            id="kapitalertragssteuer_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=26.375,
@@ -644,7 +645,7 @@ app.layout = html.Div(
                         html.Label("Zinssatz fest verzinste Anlage (%)"),
                                  #  title="Kaufpreis-Miet-Verhältnis (Erwartungswert)"),
                         dcc.Input(
-                            id="verzinsung_ek",
+                            id="verzinsung_ek_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=2.2,
@@ -665,7 +666,7 @@ app.layout = html.Div(
                         html.Label("Unsicherheit Zinsatz (%)",
                                    title="Standardabweichung"),
                         dcc.Input(
-                            id="unsicherheit_verzinsung_ek",
+                            id="unsicherheit_verzinsung_ek_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=1,
@@ -690,7 +691,7 @@ app.layout = html.Div(
                 html.Div(
                     children=[html.Label("ETF Vergleich"),
                         dcc.RadioItems(
-                            id="etf_vergleich",
+                            id="etf_vergleich_mk",
                             options=[
                                 {"label": "MSCI World (einschließlich Dividenden)", "value": "0"},
                                 {"label": "Dax (einschließlich Dividenden)","value": "1",},
@@ -733,8 +734,8 @@ app.layout = html.Div(
                     html.Div(
             children=[
                 # first column of third row
-                html.Button("Eingabe exportieren", id='download-results-button'),
-                Download(id='download'),                
+                html.Button("Eingabe exportieren", id='download-results-button_mk'),
+                Download(id='download_mk'),                
             ],                    
             style={
                         "display": "inline-block",
@@ -747,7 +748,7 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                             dcc.Upload(
-        id='upload-data',
+        id='upload-data_mk',
         children=html.Div([
             'DATEN IMPORTIEREN',
             #html.A('Select Files')
@@ -775,7 +776,7 @@ app.layout = html.Div(
                 # second column
                                 html.Div(
                     children=[
-           dcc.Markdown(id='upload-status')
+           dcc.Markdown(id='upload-status_mk')
                     ],
                     style={
                         "display": "inline-block",
@@ -814,7 +815,7 @@ app.layout = html.Div(
                     children=[
                         html.Label("Anzahl der Simulationsläufe"),
                         dcc.Input(
-                            id="sim_runs",
+                            id="sim_runs_mk",
                             placeholder="Eingabe...",
                             type="number",
                             value=250,
@@ -838,7 +839,7 @@ app.layout = html.Div(
             children=[
                 # first column of third row
                 html.Div(
-                    children=[html.Button("Start der Simulation", id="button"),
+                    children=[html.Button("Start der Simulation", id="button_mk"),
 ],
                     style={
                         "display": "inline-block",
@@ -852,7 +853,7 @@ app.layout = html.Div(
                                                           dcc.Loading(
             id="loading-1",
             type="default",
-            children=html.Div(id="loading-output-1")
+            children=html.Div(id="loading-output-1_mk")
         ),
                     
                 ],
@@ -874,8 +875,8 @@ app.layout = html.Div(
                 html.Div(
                     children=[
                             # dcc.Store inside the app that stores the intermediate value
-                        dcc.Store(id='intermediate-value-investiert'),
-                        dcc.Store(id='intermediate-value-nicht-investiert'),
+                        dcc.Store(id='intermediate-value-investiert_mk'),
+                        dcc.Store(id='intermediate-value-nicht-investiert_mk'),
                         html.H4(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
@@ -898,8 +899,8 @@ app.layout = html.Div(
                         ],
                         value=['Immobilie + ETF (versteuert)', 'ETF (versteuert)'],
                         multi=True,
-                        id="grafik_selector_investiert"),  
-                        dcc.Graph(id="mieten_vs_kaufen_investiert"),  
+                        id="grafik_selector_investiert_mk"),  
+                        dcc.Graph(id="mieten_vs_kaufen_investiert_mk"),  
                         html.H6("Vermögensentwicklung: Cashflows werden nicht investiert "),
                         dcc.Dropdown(
                         options=[
@@ -911,8 +912,8 @@ app.layout = html.Div(
                         ],
                         value=['Immobilie', 'ETF (versteuert)'],
                         multi=True,
-                        id="grafik_selector_nicht_investiert"),  
-                        dcc.Graph(id="mieten_vs_kaufen_nicht_investiert"),                                                
+                        id="grafik_selector_nicht_investiert_mk"),  
+                        dcc.Graph(id="mieten_vs_kaufen_nicht_investiert_mk"),                                                
                         html.H4("9. Disclaimer"),
                         dcc.Markdown(text_statisch["haftungsausschluss"]),
                     ],
@@ -939,41 +940,41 @@ app.layout = html.Div(
 
 @app.callback(
   #  Output('mieten_vs_kaufen', 'figure'),
-    Output('intermediate-value-investiert', 'data'),
-    Output('intermediate-value-nicht-investiert', 'data'),
-    [Input("button", "n_clicks")],
+    Output('intermediate-value-investiert_mk', 'data'),
+    Output('intermediate-value-nicht-investiert_mk', 'data'),
+    [Input("button_mk", "n_clicks")],
     state=[
         
-        State("sim_runs", "value"),
-        State("anlagehorizont", "value"),
-        State("eigenkapital", "value"),
+        State("sim_runs_mk", "value"),
+        State("anlagehorizont_mk", "value"),
+        State("eigenkapital_mk", "value"),
         
-        State("kaufpreis", "value"),
-        State("renovierungskosten", "value"),
-        State("kaufnebenkosten", "value"),
-        State("instandhaltungskosten", "value"),
-        State("kostensteigerung", "value"),
-        State("unsicherheit_kostensteigerung", "value"),
-        State("wertsteigerung", "value"),
-        State("unsicherheit_wertsteigerung", "value"),
+        State("kaufpreis_mk", "value"),
+        State("renovierungskosten_mk", "value"),
+        State("kaufnebenkosten_mk", "value"),
+        State("instandhaltungskosten_mk", "value"),
+        State("kostensteigerung_mk", "value"),
+        State("unsicherheit_kostensteigerung_mk", "value"),
+        State("wertsteigerung_mk", "value"),
+        State("unsicherheit_wertsteigerung_mk", "value"),
         
-        State("zinsbindung", "value"),
-        State("zinssatz", "value"),
-        State("tilgungssatz", "value"),
-        State("anschlusszinssatz", "value"),
-        State("unsicherheit_anschlusszinssatz", "value"),
+        State("zinsbindung_mk", "value"),
+        State("zinssatz_mk", "value"),
+        State("tilgungssatz_mk", "value"),
+        State("anschlusszinssatz_mk", "value"),
+        State("unsicherheit_anschlusszinssatz_mk", "value"),
         
-        State("nettokaltmiete", "value"),
-        State("steigerung_nettokaltmiete", "value"),
-        State("unsicherheit_steigerung_nettokaltmiete", "value"),
+        State("nettokaltmiete_mk", "value"),
+        State("steigerung_nettokaltmiete_mk", "value"),
+        State("unsicherheit_steigerung_nettokaltmiete_mk", "value"),
         
-        State("familienstand", "value"),
-        State("kapitalertragssteuer", "value"),
+        State("familienstand_mk", "value"),
+        State("kapitalertragssteuer_mk", "value"),
       
         
-        State("verzinsung_ek", "value"),
-        State("unsicherheit_verzinsung_ek", "value"),
-        State("etf_vergleich", "value"),
+        State("verzinsung_ek_mk", "value"),
+        State("unsicherheit_verzinsung_ek_mk", "value"),
+        State("etf_vergleich_mk", "value"),
     ],
 )
 def custom_figure(
@@ -1140,12 +1141,12 @@ def custom_figure(
     )
     
 @app.callback(
-              Output('mieten_vs_kaufen_investiert', 'figure'),
-              Output('mieten_vs_kaufen_nicht_investiert', 'figure'),
-              Input('intermediate-value-investiert', 'data'),
-              Input('intermediate-value-nicht-investiert', 'data'),
-              Input('grafik_selector_investiert', "value"),
-              Input('grafik_selector_nicht_investiert', "value"),
+              Output('mieten_vs_kaufen_investiert_mk', 'figure'),
+              Output('mieten_vs_kaufen_nicht_investiert_mk', 'figure'),
+              Input('intermediate-value-investiert_mk', 'data'),
+              Input('intermediate-value-nicht-investiert_mk', 'data'),
+              Input('grafik_selector_investiert_mk', "value"),
+              Input('grafik_selector_nicht_investiert_mk', "value"),
                )
 def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_selector_investiert,
                  grafik_selector_nicht_investiert):
@@ -1288,41 +1289,41 @@ def parse_contents(contents, filename, date):
 # could checkout:
 # https://community.plotly.com/t/reuploading-same-file/42178
 # https://community.plotly.com/t/can-i-upload-the-same-file-twice-in-a-row/40526/3
-@app.callback(Output('upload-status', 'children'),
+@app.callback(Output('upload-status_mk', 'children'),
               
               
-        Output("anlagehorizont", "value"),
-        Output("eigenkapital", "value"),
+        Output("anlagehorizont_mk", "value"),
+        Output("eigenkapital_mk", "value"),
         
-        Output("kaufpreis", "value"),
-        Output("renovierungskosten", "value"),
-        Output("kaufnebenkosten", "value"),
-        Output("instandhaltungskosten", "value"),
-        Output("kostensteigerung", "value"),
-        Output("unsicherheit_kostensteigerung", "value"),
-        Output("wertsteigerung", "value"),
-        Output("unsicherheit_wertsteigerung", "value"),
+        Output("kaufpreis_mk", "value"),
+        Output("renovierungskosten_mk", "value"),
+        Output("kaufnebenkosten_mk", "value"),
+        Output("instandhaltungskosten_mk", "value"),
+        Output("kostensteigerung_mk", "value"),
+        Output("unsicherheit_kostensteigerung_mk", "value"),
+        Output("wertsteigerung_mk", "value"),
+        Output("unsicherheit_wertsteigerung_mk", "value"),
         
-        Output("zinsbindung", "value"),
-        Output("zinssatz", "value"),
-        Output("tilgungssatz", "value"),
-        Output("anschlusszinssatz", "value"),
-        Output("unsicherheit_anschlusszinssatz", "value"),
+        Output("zinsbindung_mk", "value"),
+        Output("zinssatz_mk", "value"),
+        Output("tilgungssatz_mk", "value"),
+        Output("anschlusszinssatz_mk", "value"),
+        Output("unsicherheit_anschlusszinssatz_mk", "value"),
         
-        Output("nettokaltmiete", "value"),
-        Output("steigerung_nettokaltmiete", "value"),
-        Output("unsicherheit_steigerung_nettokaltmiete", "value"),
+        Output("nettokaltmiete_mk", "value"),
+        Output("steigerung_nettokaltmiete_mk", "value"),
+        Output("unsicherheit_steigerung_nettokaltmiete_mk", "value"),
         
-        Output("familienstand", "value"),
-        Output("kapitalertragssteuer", "value"),
+        Output("familienstand_mk", "value"),
+        Output("kapitalertragssteuer_mk", "value"),
       
         
-        Output("verzinsung_ek", "value"),
-        Output("unsicherheit_verzinsung_ek", "value"),
-        Output("etf_vergleich", "value"),
-              [Input('upload-data', 'contents')],
-              [State('upload-data', 'filename'),
-               State('upload-data', 'last_modified')])
+        Output("verzinsung_ek_mk", "value"),
+        Output("unsicherheit_verzinsung_ek_mk", "value"),
+        Output("etf_vergleich_mk", "value"),
+              [Input('upload-data_mk', 'contents')],
+              [State('upload-data_mk', 'filename'),
+               State('upload-data_mk', 'last_modified')])
 def update_output(list_of_contents, list_of_names, list_of_dates):
     default_input = [
         15, 100_00, 300_000, 1_000, 30_000, 2_000, 1.5, 1.5, 1.5, 1.5, 15, 1.5, 2.5, 4,
@@ -1386,38 +1387,38 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 # CSV Export
 #
 
-@app.callback(Output('download', 'data'),
-             [Input('download-results-button', 'n_clicks')],
+@app.callback(Output('download_mk', 'data'),
+             [Input('download-results-button_mk', 'n_clicks')],
              state=[
-                State("anlagehorizont", "value"),
-                State("eigenkapital", "value"),
+                State("anlagehorizont_mk", "value"),
+                State("eigenkapital_mk", "value"),
                 
-                State("kaufpreis", "value"),
-                State("renovierungskosten", "value"),
-                State("kaufnebenkosten", "value"),
-                State("instandhaltungskosten", "value"),
-                State("kostensteigerung", "value"),
-                State("unsicherheit_kostensteigerung", "value"),
-                State("wertsteigerung", "value"),
-                State("unsicherheit_wertsteigerung", "value"),
+                State("kaufpreis_mk", "value"),
+                State("renovierungskosten_mk", "value"),
+                State("kaufnebenkosten_mk", "value"),
+                State("instandhaltungskosten_mk", "value"),
+                State("kostensteigerung_mk", "value"),
+                State("unsicherheit_kostensteigerung_mk", "value"),
+                State("wertsteigerung_mk", "value"),
+                State("unsicherheit_wertsteigerung_mk", "value"),
                 
-                State("zinsbindung", "value"),
-                State("zinssatz", "value"),
-                State("tilgungssatz", "value"),
-                State("anschlusszinssatz", "value"),
-                State("unsicherheit_anschlusszinssatz", "value"),
+                State("zinsbindung_mk", "value"),
+                State("zinssatz_mk", "value"),
+                State("tilgungssatz_mk", "value"),
+                State("anschlusszinssatz_mk", "value"),
+                State("unsicherheit_anschlusszinssatz_mk", "value"),
                 
-                State("nettokaltmiete", "value"),
-                State("steigerung_nettokaltmiete", "value"),
-                State("unsicherheit_steigerung_nettokaltmiete", "value"),
+                State("nettokaltmiete_mk", "value"),
+                State("steigerung_nettokaltmiete_mk", "value"),
+                State("unsicherheit_steigerung_nettokaltmiete_mk", "value"),
                 
-                State("familienstand", "value"),
-                State("kapitalertragssteuer", "value"),
+                State("familienstand_mk", "value"),
+                State("kapitalertragssteuer_mk", "value"),
             
                 
-                State("verzinsung_ek", "value"),
-                State("unsicherheit_verzinsung_ek", "value"),
-                State("etf_vergleich", "value"),
+                State("verzinsung_ek_mk", "value"),
+                State("unsicherheit_verzinsung_ek_mk", "value"),
+                State("etf_vergleich_mk", "value"),
             ],
             )
 def download_data(n_clicks, 
@@ -1487,5 +1488,5 @@ def download_data(n_clicks,
         return send_data_frame(df.to_csv, filename='data.csv')
 
 
-if __name__ == "__main__":
-    app.run_server(debug=True)
+# if __name__ == "__main__":
+#     app.run_server(debug=True)
