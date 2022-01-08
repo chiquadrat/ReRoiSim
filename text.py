@@ -82,14 +82,17 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
 
 
     # Verkaufsfaktor
-    verkaufsfaktor_text = f"""In der Simulation wird davon ausgegangen, dass Sie nach
-     **{anlagehorizont} Jahren**  einen 
-     durchschnittlichen Verkaufsfaktor von ** {round(np.array(ergebnis["verkaufsfaktor"]).mean(), 1)}**
-     erzielen werden. Bei der von Ihnen gewählten Unsicherheit wird in 90 % der Simulationsläufe ein 
-     Verkaufsfaktor zwischen **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.05), 1)}** und
-     **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.95), 1)}** (blau schraffierter Bereich) für die Berechnung der 
-     Rendite und Ergebnisse  angenommen.
-     """
+    if "verkaufsfaktor" in ergebnis:
+        verkaufsfaktor_text = f"""In der Simulation wird davon ausgegangen, dass Sie nach
+        **{anlagehorizont} Jahren**  einen 
+        durchschnittlichen Verkaufsfaktor von ** {round(np.array(ergebnis["verkaufsfaktor"]).mean(), 1)}**
+        erzielen werden. Bei der von Ihnen gewählten Unsicherheit wird in 90 % der Simulationsläufe ein 
+        Verkaufsfaktor zwischen **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.05), 1)}** und
+        **{round(np.quantile(np.array(ergebnis["verkaufsfaktor"]), q=0.95), 1)}** (blau schraffierter Bereich) für die Berechnung der 
+        Rendite und Ergebnisse  angenommen.
+        """
+    else:
+        verkaufsfaktor_text=""
 
     # Zinsbindung
     if zinsbindung >= anlagehorizont:
@@ -121,6 +124,14 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
         **{round(np.quantile(np.array(ergebnis["mietsteigerung"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
         """
 
+    
+    mietsteigerung_selbst_text = f"""In der Simulation wird  von einer jährlichen durchschnittlichen
+        Mietsteigerung von ** {round(np.array(ergebnis["mietsteigerung"]*100).mean(),2)} %** ausgegangen. 
+        Bei der von Ihnen gewählten Unsicherheit liegt die jährliche Mietsteigerung in der Simulation
+        in 90 % der Fälle zwischen **{round(np.quantile(np.array(ergebnis["mietsteigerung"])*100, q=0.05), 2)} %** und
+        **{round(np.quantile(np.array(ergebnis["mietsteigerung"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
+        """
+
     # Kostensteigerung
     kostensteigerung_text = f"""In der Simulation wird von einer jährlichen durchschnittlichen
         Kostensteigerung von ** {round(np.array(ergebnis["kostensteigerung"]*100).mean(),2)} %** ausgegangen. 
@@ -128,115 +139,162 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
         in 90 % der Fälle zwischen **{round(np.quantile(np.array(ergebnis["kostensteigerung"])*100, q=0.05), 2)} %** und
         **{round(np.quantile(np.array(ergebnis["kostensteigerung"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
         """
+    
+    # Zinssatz fest verzinst
+    if "zinssatz" in ergebnis:
+        zinssatz_fest_text = f"""In der Simulation wird von einem jährlichen durchschnittlichen Zinssatz Ihrer
+            fest verzinsten Anlage
+            von ** {round(np.array(ergebnis["zinssatz"]*100).mean(),2)} %** ausgegangen. 
+            Bei der von Ihnen gewählten Unsicherheit liegt der jährliche Zinssatz  in der Simulation
+            in 90 % der Fälle zwischen **{round(np.quantile(np.array(ergebnis["zinssatz"])*100, q=0.05), 2)} %** und
+            **{round(np.quantile(np.array(ergebnis["zinssatz"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
+            """
+    else:
+        zinssatz_fest_text=""
+        
+    # Wertsteigerung
+    if "wertsteigerung" in ergebnis:
+        wertsteigerung_text = f"""In der Simulation wird von einer jährlichen durchschnittlichen
+        Wertsteigerung der Immobilie von ** {round(np.array(ergebnis["wertsteigerung"]*100).mean(),2)} %** ausgegangen. 
+        Bei der von Ihnen gewählten Unsicherheit liegt die jährliche Wertsteigerung  in der Simulation
+        in 90 % der Fälle zwischen **{round(np.quantile(np.array(ergebnis["wertsteigerung"])*100, q=0.05), 2)} %** und
+        **{round(np.quantile(np.array(ergebnis["wertsteigerung"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
+        """
+    else:
+        wertsteigerung_text=""
+        
 
     # Mietausfall
-    mietausfall_text = f"""
-    Bei der Simulation werden negative Mietausfälle nicht ausgewertet. Dadurch ist 
-    die resultierende Häufigkeitsverteilung 
-    für den Mietausfall gegebenenfalls nicht normalverteilt. 
-    In der Simulation wird von einem jährlichen durchschnittlichen
-        Mietausfall von ** {round(np.array(ergebnis["mietausfall"]*100).mean(),2)} %** ausgegangen. 
-        Bei der von Ihnen gewählten Unsicherheit liegt der jährliche Mietausfall in der Simulation
-        in 90 % der Fälle zwischen **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.05), 2)} %** und
-        **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
-        """
+    if "mietausfall" in ergebnis:
+        mietausfall_text = f"""
+        Bei der Simulation werden negative Mietausfälle nicht ausgewertet. Dadurch ist 
+        die resultierende Häufigkeitsverteilung 
+        für den Mietausfall gegebenenfalls nicht normalverteilt. 
+        In der Simulation wird von einem jährlichen durchschnittlichen
+            Mietausfall von ** {round(np.array(ergebnis["mietausfall"]*100).mean(),2)} %** ausgegangen. 
+            Bei der von Ihnen gewählten Unsicherheit liegt der jährliche Mietausfall in der Simulation
+            in 90 % der Fälle zwischen **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.05), 2)} %** und
+            **{round(np.quantile(np.array(ergebnis["mietausfall"])*100, q=0.95), 2)} %** (blau schraffierter Bereich). 
+            """
+    else:
+        mietausfall_text=""
    
    # Verkaufspreis
-    verkaufspreis = np.array(ergebnis["verkaufspreis"])
-    verkaufspreis = verkaufspreis[~np.isnan(verkaufspreis)]
-    if verkaufspreis.min() < kaufpreis:
-        verkaufspreis_text = f"""Im Durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont} Jahren** für 
-        **{int(np.array(ergebnis["verkaufspreis"]).mean())} Euro** verkaufen können. Bei einem Kaufpreis
-        von  **{int(kaufpreis)} Euro** beträgt Ihr durchschnittlicher Verkaufsgewinn bzw. Verlust
-        somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)} Euro**. Mit einer
-        Wahrscheinlichkeit von  **{round(len(verkaufspreis[verkaufspreis<kaufpreis])/len(verkaufspreis)*100,2)} %** wird der 
-        zu erzielende
-        Verkaufspreis
-        unter dem Kaufpreis liegen.
-        """
+    if "verkaufspreis" in ergebnis:
+        verkaufspreis = np.array(ergebnis["verkaufspreis"])
+        verkaufspreis = verkaufspreis[~np.isnan(verkaufspreis)]
+        if verkaufspreis.min() < kaufpreis:
+            verkaufspreis_text = f"""Im Durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont} Jahren** für 
+            **{int(np.array(ergebnis["verkaufspreis"]).mean())} Euro** verkaufen können. Bei einem Kaufpreis
+            von  **{int(kaufpreis)} Euro** beträgt Ihr durchschnittlicher Verkaufsgewinn bzw. Verlust
+            somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)} Euro**. Mit einer
+            Wahrscheinlichkeit von  **{round(len(verkaufspreis[verkaufspreis<kaufpreis])/len(verkaufspreis)*100,2)} %** wird der 
+            zu erzielende
+            Verkaufspreis
+            unter dem Kaufpreis liegen.
+            """
+        else:
+            verkaufspreis_text = f"""Im Durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont} Jahren** für 
+            **{int(np.array(ergebnis["verkaufspreis"]).mean())} Euro** verkaufen können. Ihr durchschnittlicher Verkaufsgewinn
+            beträgt somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)} Euro**. 
+            """
     else:
-        verkaufspreis_text = f"""Im Durchschnitt werden Sie Ihr Objekt nach **{anlagehorizont} Jahren** für 
-        **{int(np.array(ergebnis["verkaufspreis"]).mean())} Euro** verkaufen können. Ihr durchschnittlicher Verkaufsgewinn
-        beträgt somit **{int(np.array(ergebnis["verkaufspreis"]).mean()-kaufpreis)} Euro**. 
-        """
+        verkaufspreis_text=""
 
     # Objektrendite
-    objektrendite = np.array(ergebnis["objektrendite"])
-    objektrendite = objektrendite[~np.isnan(objektrendite)]
-    if objektrendite.min() < 0:
-        objektrendite_text = f"""Die durchschnittliche Objektrendite nach **{anlagehorizont} Jahren**
-        beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. Mit einer Wahrscheinlichkeit von 
-        **{round(len(objektrendite[objektrendite<0])/len(objektrendite)*100,2)} %** 
-        wird die Objektrendite negativ sein.
-        """
+    if "objektrendite" in ergebnis:
+        objektrendite = np.array(ergebnis["objektrendite"])
+        objektrendite = objektrendite[~np.isnan(objektrendite)]
+        if objektrendite.min() < 0:
+            objektrendite_text = f"""Die durchschnittliche Objektrendite nach **{anlagehorizont} Jahren**
+            beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. Mit einer Wahrscheinlichkeit von 
+            **{round(len(objektrendite[objektrendite<0])/len(objektrendite)*100,2)} %** 
+            wird die Objektrendite negativ sein.
+            """
+        else:
+            objektrendite_text = f"""Die durchschnittliche Objektrendite nach **{anlagehorizont} Jahren**
+            beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. 
+            """
     else:
-        objektrendite_text = f"""Die durchschnittliche Objektrendite nach **{anlagehorizont} Jahren**
-        beträgt **{round(np.array(ergebnis["objektrendite"]).mean()*100, 2)} %**. 
-        """
+        objektrendite_text=""
     
     # Eigenkapitalrendite
-    eigenkapitalrendite = np.array(ergebnis["eigenkapitalrendite"])
-    eigenkapitalrendite = eigenkapitalrendite[~np.isnan(eigenkapitalrendite)]
-    if eigenkapitalrendite.min() < 0:
-        eigenkapitalrendite_text = f"""Die durchschnittliche Eigenkapitalrendite nach **{anlagehorizont} Jahren**
-        beträgt **{round(eigenkapitalrendite.mean()*100, 2)} %**. Mit einer Wahrscheinlichkeit von
-        **{round(len(eigenkapitalrendite[eigenkapitalrendite<0])/len(eigenkapitalrendite)*100,2)} %** 
-        wird die Eigenkapitalrendite negativ sein.
+    if "eigenkapitalrendite" in ergebnis:
+        eigenkapitalrendite = np.array(ergebnis["eigenkapitalrendite"])
+        eigenkapitalrendite = eigenkapitalrendite[~np.isnan(eigenkapitalrendite)]
+        if eigenkapitalrendite.min() < 0:
+            eigenkapitalrendite_text = f"""Die durchschnittliche Eigenkapitalrendite nach **{anlagehorizont} Jahren**
+            beträgt **{round(eigenkapitalrendite.mean()*100, 2)} %**. Mit einer Wahrscheinlichkeit von
+            **{round(len(eigenkapitalrendite[eigenkapitalrendite<0])/len(eigenkapitalrendite)*100,2)} %** 
+            wird die Eigenkapitalrendite negativ sein.
+            """
+        else:
+            eigenkapitalrendite_text = f"""Die durchschnittliche Eigenkapitalrendite nach **{anlagehorizont} Jahren**
+            beträgt **{round(np.array(ergebnis["eigenkapitalrendite"]).mean()*100, 2)} %**. 
+            """
+    else:
+        eigenkapitalrendite_text=""
+
+    if "gewinn" in ergebnis:        
+        gewinn = np.array(ergebnis["gewinn"])
+        gewinn = gewinn[~np.isnan(gewinn)]
+        if gewinn.min() < 0:
+            gewinn_text = f"""Der durchschnittliche Gewinn nach **{anlagehorizont} Jahren**
+            beträgt **{int(gewinn.mean())} Euro**. Mit einer Wahrscheinlichkeit von 
+            **{round(len(gewinn[gewinn<0])/len(gewinn)*100,2)} %** werden Sie mit Ihrem
+            Objekt Verlust machen. Im Verlustfall beträgt die durchschnittliche Höhe Ihres Verlusts
+            **{int(gewinn[gewinn<0].mean())} Euro**.
+            """
+        else:
+            gewinn_text = f"""Der durchschnittliche Gewinn nach **{anlagehorizont} Jahren**
+            beträgt **{int(gewinn.mean())} Euro**."""
+    else:
+        gewinn_text=""
+    
+    if "minimaler_cashflow" in ergebnis:
+        minimaler_cashflow = np.array(ergebnis["minimaler_cashflow"])
+        minimaler_cashflow = minimaler_cashflow[~np.isnan(minimaler_cashflow)]
+        minimaler_cashflow_text = f"""
+        Der minimale jährliche Cashflow liegt bei durchschnittlich **{int(minimaler_cashflow.mean())} Euro**. Mit einer
+        Wahrscheinlichkeit von
+        5% wird der minimale jährliche Cashflow bei unter **{int(np.quantile(minimaler_cashflow, q=0.05))} Euro ** liegen.
         """
     else:
-        eigenkapitalrendite_text = f"""Die durchschnittliche Eigenkapitalrendite nach **{anlagehorizont} Jahren**
-        beträgt **{round(np.array(ergebnis["eigenkapitalrendite"]).mean()*100, 2)} %**. 
-        """
+        minimaler_cashflow_text = ""
+    
+    if "etf_ek_rendite" in ergebnis:
+        eigenkapitalrendite_etf = np.array(ergebnis["etf_ek_rendite"])
+        eigenkapitalrendite_etf = eigenkapitalrendite_etf[~np.isnan(eigenkapitalrendite_etf)]
+        etf_rendite_text = f"""
+        Beim Kauf der Immobilie können Sie eine durchschnittliche Eigenkapitalrendite von **{round(eigenkapitalrendite.mean()*100, 2)} %** 
+        erwarten. Wenn Sie stattdessen das initial eingesetzte Eigenkapital und die jährlichen negativen Cashflows (falls vorhanden) 
+        in einen ETF investieren würden, könnten Sie eine durchschnittliche Eigenkapitalrendite 
+        von **{round(np.array(ergebnis['etf_ek_rendite']).mean() * 100, 2)} %** (nach Steuern) erwarten.
+        Mit einer Wahrscheinlichkeit von 
+        **{round((sum(np.array(ergebnis['etf_ek_rendite']) > np.array(ergebnis['eigenkapitalrendite']))/len(ergebnis['eigenkapitalrendite']))*100, 2)}  %** würden Sie mit einer ETF-Investition eine höhere Rendite erzielen 
+        als mit dem Kauf der Immobilie.
+    
+    
+        Am Ende Ihres Anlagehorizonts werden Sie bei einer ETF Investition mit einer Wahrscheinlichkeit von
+        **{round(len(eigenkapitalrendite_etf[eigenkapitalrendite_etf<0])/len(eigenkapitalrendite_etf)*100,2)} %**
+        eine negative Rendite erzielt haben. Bei einer Immobilieninvestition beträgt die Wahrscheinlichkeit
+        für eine negative Rendite am Ende Ihres Anlagehorizonts **{round(len(eigenkapitalrendite[eigenkapitalrendite<0])/len(eigenkapitalrendite)*100,2)} %**.
         
-    gewinn = np.array(ergebnis["gewinn"])
-    gewinn = gewinn[~np.isnan(gewinn)]
-    if gewinn.min() < 0:
-        gewinn_text = f"""Der durchschnittliche Gewinn nach **{anlagehorizont} Jahren**
-        beträgt **{int(gewinn.mean())} Euro**. Mit einer Wahrscheinlichkeit von 
-        **{round(len(gewinn[gewinn<0])/len(gewinn)*100,2)} %** werden Sie mit Ihrem
-        Objekt Verlust machen. Im Verlustfall beträgt die durchschnittliche Höhe Ihres Verlusts
-        **{int(gewinn[gewinn<0].mean())} Euro**.
         """
     else:
-        gewinn_text = f"""Der durchschnittliche Gewinn nach **{anlagehorizont} Jahren**
-        beträgt **{int(gewinn.mean())} Euro**."""
-    
-    minimaler_cashflow = np.array(ergebnis["minimaler_cashflow"])
-    minimaler_cashflow = minimaler_cashflow[~np.isnan(minimaler_cashflow)]
-    minimaler_cashflow_text = f"""
-    Der minimale jährliche Cashflow liegt bei durchschnittlich **{int(minimaler_cashflow.mean())} Euro**. Mit einer
-    Wahrscheinlichkeit von
-    5% wird der minimale jährliche Cashflow bei unter **{int(np.quantile(minimaler_cashflow, q=0.05))} Euro ** liegen.
-    """
-    
-    eigenkapitalrendite_etf = np.array(ergebnis["etf_ek_rendite"])
-    eigenkapitalrendite_etf = eigenkapitalrendite_etf[~np.isnan(eigenkapitalrendite_etf)]
-    etf_rendite_text = f"""
-    Beim Kauf der Immobilie können Sie eine durchschnittliche Eigenkapitalrendite von **{round(eigenkapitalrendite.mean()*100, 2)} %** 
-    erwarten. Wenn Sie stattdessen das initial eingesetzte Eigenkapital und die jährlichen negativen Cashflows (falls vorhanden) 
-    in einen ETF investieren würden, könnten Sie eine durchschnittliche Eigenkapitalrendite 
-    von **{round(np.array(ergebnis['etf_ek_rendite']).mean() * 100, 2)} %** (nach Steuern) erwarten.
-    Mit einer Wahrscheinlichkeit von 
-    **{round((sum(np.array(ergebnis['etf_ek_rendite']) > np.array(ergebnis['eigenkapitalrendite']))/len(ergebnis['eigenkapitalrendite']))*100, 2)}  %** würden Sie mit einer ETF-Investition eine höhere Rendite erzielen 
-    als mit dem Kauf der Immobilie.
-    
-    
-    Am Ende Ihres Anlagehorizonts werden Sie bei einer ETF Investition mit einer Wahrscheinlichkeit von
-    **{round(len(eigenkapitalrendite_etf[eigenkapitalrendite_etf<0])/len(eigenkapitalrendite_etf)*100,2)} %**
-    eine negative Rendite erzielt haben. Bei einer Immobilieninvestition beträgt die Wahrscheinlichkeit
-    für eine negative Rendite am Ende Ihres Anlagehorizonts **{round(len(eigenkapitalrendite[eigenkapitalrendite<0])/len(eigenkapitalrendite)*100,2)} %**.
-    
-    """
+        etf_rendite_text=""
  
- 
-    etf_gewinn_text = f"""
-    Beim Kauf der Immobilie beträgt ihr durchschnittlicher Gewinn **{int(gewinn.mean())} Euro**. 
-    Der durchschnittliche Gewinn bei der Anlage Ihres initialen Eigenkapitals
-    und der jährlichen negativen Cashflows (falls vorhanden) in einen ETF
-    beträgt **{int(np.array(ergebnis['etf_gewinn']).mean())} Euro**. Mit einer Wahrscheinlichkeit von 
-    **{round((sum(np.array(ergebnis['etf_gewinn']) > np.array(ergebnis['gewinn']))/len(ergebnis['etf_gewinn']))*100, 2)}  %** 
-    hätten Sie mit einer ETF-Investition einen höheren Gewinn erzielt  als mit dem Kauf der Immobilie.
-    """
+    if "etf_gewinn" in ergebnis:
+        etf_gewinn_text = f"""
+        Beim Kauf der Immobilie beträgt ihr durchschnittlicher Gewinn **{int(gewinn.mean())} Euro**. 
+        Der durchschnittliche Gewinn bei der Anlage Ihres initialen Eigenkapitals
+        und der jährlichen negativen Cashflows (falls vorhanden) in einen ETF
+        beträgt **{int(np.array(ergebnis['etf_gewinn']).mean())} Euro**. Mit einer Wahrscheinlichkeit von 
+        **{round((sum(np.array(ergebnis['etf_gewinn']) > np.array(ergebnis['gewinn']))/len(ergebnis['etf_gewinn']))*100, 2)}  %** 
+        hätten Sie mit einer ETF-Investition einen höheren Gewinn erzielt  als mit dem Kauf der Immobilie.
+        """
+    else:
+        etf_gewinn_text=""
     
     text_dynamisch = {
         "verkaufsfaktor": verkaufsfaktor_text,
@@ -251,6 +309,9 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
         "mietausfall":mietausfall_text,
         "etf_rendite":etf_rendite_text,
         "etf_gewinn":etf_gewinn_text,
+        "wertsteigerung":wertsteigerung_text,
+        "mietsteigerung_selbst":mietsteigerung_selbst_text,
+        "zinssatz":zinssatz_fest_text,
     }
 
     return text_dynamisch

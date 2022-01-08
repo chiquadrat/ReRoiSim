@@ -24,6 +24,7 @@ import openpyxl
 #from formeln import renditerechner
 from text import text_generator, text_static
 from simulation_mieten_vs_kaufen import mieten_kaufen
+from figures import figure_vermoegensentwicklung, figure_ein_aus_gabeparameter
 
 from app import app
 
@@ -217,7 +218,7 @@ layout = html.Div(
                 # first column of second row
                 html.Div(
                     children=[
-                        html.Label("Instandhaltungskosten",
+                        html.Label("Instandhaltungskosten (p.a.)",
                                    #title="Umfassen Makler und Notarkosten sowie die Grunderwerbssteuer."
                                    ),
                         dcc.Input(
@@ -290,7 +291,7 @@ layout = html.Div(
                 # first column of second row
                 html.Div(
                     children=[
-                        html.Label("Wertsteigerung Immobilie (%)",
+                        html.Label("Wertsteigerung Immobilie (%) (p.a.)",
                                    #title="Umfassen Makler und Notarkosten sowie die Grunderwerbssteuer."
                                    ),
                         dcc.Input(
@@ -489,7 +490,7 @@ layout = html.Div(
                 # first column
                 html.Div(
                     children=[
-                        html.Label("Nettokaltmiete (Euro)",
+                        html.Label("Nettokaltmiete (Euro) (p.a.)",
                                    #title="Nettokaltmiete"
                                    ),
                         dcc.Input(
@@ -511,7 +512,7 @@ layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Mietsteigerung (%)",
+                        html.Label("Mietsteigerung (%) (p.a.)",
                                   title="Erwartungswert"
                                    ),
                         dcc.Input(
@@ -642,7 +643,7 @@ layout = html.Div(
                 # second column
                 html.Div(
                     children=[
-                        html.Label("Zinssatz fest verzinste Anlage (%)"),
+                        html.Label("Zinssatz fest verzinste Anlage (%) (p.a.)"),
                                  #  title="Kaufpreis-Miet-Verhältnis (Erwartungswert)"),
                         dcc.Input(
                             id="verzinsung_ek_mk",
@@ -881,8 +882,18 @@ layout = html.Div(
                             "Verteilung der mit Unsicherheit behafteten Eingabeparameter"
                         ),
                         dcc.Markdown(text_statisch["eingabeparameter"]),
-                        dcc.Markdown(text_statisch["ergebnisse"]),
+                        dcc.Graph(id="eingabe_kostensteigerung_mk"),
+                        dcc.Markdown(id='kostensteigerung_text_mk'),
+                        dcc.Graph(id="eingabe_wertsteigerung_mk"),
+                        dcc.Markdown(id='wertsteigerung_text_mk'),
+                        dcc.Graph(id="eingabe_anschlusszinssatz_mk"),
+                        dcc.Markdown(id='anschlusszinssatz_text_mk'),                        
+                        dcc.Graph(id="eingabe_mietsteigerung_mk"),
+                        dcc.Markdown(id='mietsteigerung_text_mk'),
+                        dcc.Graph(id="eingabe_zinsatz_mk"),
+                        dcc.Markdown(id='zinsatz_text_mk'),
                         html.H4("Ergebnisse der Simulation"),
+                        dcc.Markdown(text_statisch["ergebnisse"]),
                         html.H6("Vermögensentwicklung: Cashflows werden investiert "),
                         #dcc.Markdown(id='gewinn_text'),
                         dcc.Dropdown(
@@ -935,13 +946,22 @@ layout = html.Div(
 
 
 #
-# Callbacks
+# Callback Simulation
 #
-
 @app.callback(
   #  Output('mieten_vs_kaufen', 'figure'),
     Output('intermediate-value-investiert_mk', 'data'),
     Output('intermediate-value-nicht-investiert_mk', 'data'),
+    Output("eingabe_anschlusszinssatz_mk", "figure"),
+    Output("eingabe_kostensteigerung_mk", "figure"),
+    Output("eingabe_wertsteigerung_mk", "figure"),
+    Output("eingabe_mietsteigerung_mk", "figure"),
+    Output("eingabe_zinsatz_mk", "figure"),
+    Output("anschlusszinssatz_text_mk", "children"),
+    Output("kostensteigerung_text_mk", "children"),
+    Output("wertsteigerung_text_mk", "children"),
+    Output("mietsteigerung_text_mk", "children"),
+    Output("zinsatz_text_mk", "children"),
     [Input("button_mk", "n_clicks")],
     state=[
         
@@ -1061,9 +1081,6 @@ def custom_figure(
         fest_verzinst=verzinsung_ek/100,
         unsicherheit_fest_verzinst=unsicherheit_verzinsung_ek/100,
     )
-
-    #print("Hello world")
-    #print(ergebnis["etf_vermoegen_initial_versteuert_pj"])
     
     # Aufbereitung der Ergebnisse
     ergebnisse_aufbereitet_investiert = {
@@ -1135,11 +1152,91 @@ def custom_figure(
         "Festgeld (versteuert) + upper bound": np.quantile(np.array(ergebnis["festgeld_vermoegen_initial_versteuert_pj"]), q=0.9, axis=0),
     }
     
-    return (
-        ergebnisse_aufbereitet_investiert,
-        ergebnisse_aufbereitet_nicht_investiert
+    #
+    # Figure mit Unsicherheit behaftete Eingabeparameter
+    #
+    fig_anschlusszinssatz = figure_ein_aus_gabeparameter(
+        ergebnis=ergebnis,
+        eingabeparameter="anschlusszinssatz",
+        name="Anschlusszinssatz",
+        zeichen="%",
+        x=100,
+        runden=2,
+        area="middle",
+        kaufpreis=kaufpreis,
     )
     
+    fig_kostensteigerung = figure_ein_aus_gabeparameter(
+        ergebnis=ergebnis,
+        eingabeparameter="kostensteigerung",
+        name="Kostensteigerung pro Jahr",
+        zeichen="%",
+        x=100,
+        runden=2,
+        area="middle",
+        kaufpreis=kaufpreis,
+    )
+    
+    fig_wertsteigerung = figure_ein_aus_gabeparameter(
+        ergebnis=ergebnis,
+        eingabeparameter="wertsteigerung",
+        name="Wertsteigerung pro Jahr",
+        zeichen="%",
+        x=100,
+        runden=2,
+        area="middle",
+        kaufpreis=kaufpreis,
+    )
+
+    fig_mietsteigerung = figure_ein_aus_gabeparameter(
+        ergebnis=ergebnis,
+        eingabeparameter="mietsteigerung",
+        name="Mietsteigerung pro Jahr",
+        zeichen="%",
+        x=100,
+        runden=2,
+        area="middle",
+        kaufpreis=kaufpreis,
+    )
+    
+    fig_zinsatz = figure_ein_aus_gabeparameter(
+        ergebnis=ergebnis,
+        eingabeparameter="zinssatz",
+        name="Zinssatz fest verzinste Anlage",
+        zeichen="%",
+        x=100,
+        runden=2,
+        area="middle",
+        kaufpreis=kaufpreis,
+    )
+   
+    # Generate text output
+    text_dynamisch = text_generator(
+        ergebnis=ergebnis,
+        zinsbindung=zinsbindung,
+        anlagehorizont=anlagehorizont,
+        erste_mieterhoehung=5,
+        kaufpreis=kaufpreis,
+        ) 
+    
+    return (
+        ergebnisse_aufbereitet_investiert,
+        ergebnisse_aufbereitet_nicht_investiert,
+        fig_anschlusszinssatz,
+        fig_kostensteigerung,
+        fig_wertsteigerung,
+        fig_mietsteigerung,
+        fig_zinsatz,
+        text_dynamisch["anschlusszinssatz"],
+        text_dynamisch["kostensteigerung"],
+        text_dynamisch["wertsteigerung"],
+        text_dynamisch["mietsteigerung_selbst"],
+        text_dynamisch["zinssatz"],
+    )
+    
+#
+# Callback und Darstellung der Ergebnisse
+#
 @app.callback(
               Output('mieten_vs_kaufen_investiert_mk', 'figure'),
               Output('mieten_vs_kaufen_nicht_investiert_mk', 'figure'),
@@ -1151,123 +1248,15 @@ def custom_figure(
 def update_graph(ergebnisse_investiert, ergebnisse_nicht_investiert, grafik_selector_investiert,
                  grafik_selector_nicht_investiert):
     
-    farben = ['#636EFA',
-                '#EF553B',
-                '#00CC96',
-                '#AB63FA',
-                '#FFA15A',
-                '#19D3F3',
-                '#FF6692',
-                '#B6E880',
-                '#FF97FF',
-                '#FECB52']
-    
-    farben_rgb = ["rgba(99, 110, 250, 0.3)",
-                  "rgba(239, 85, 59, 0.3)",
-                  "rgba(0, 204, 150, 0.3)",
-                  "rgba(171, 99, 250, 0.3)",
-                  "rgba(255, 161, 90, 0.3)",
-                  "rgba(25, 211, 243, 0.3)",
-                  "rgba(255, 102, 146, 0.3)",
-                  "rgba(182, 232, 128, 0.3)",
-                  "rgba(255, 151, 255, 0.3)",
-                  "rgba(254, 203, 82, 0.3)"
-                  ]
-    
-    fig_vermoegen_investiert = go.Figure()
-    for i, wahl in enumerate(grafik_selector_investiert):
-        #print(wahl)
-        #print(i)
-        #print(wahl + " lower bound")
-        # print(len(ergebnisse_investiert[wahl]))
-        # print(len(ergebnisse_investiert["jahr_pj"]))
-        fig_vermoegen_investiert.add_trace(go.Scatter(x=ergebnisse_investiert["jahr_pj"], y=ergebnisse_investiert[wahl],
-                    mode='lines+markers',
-                    line_color = farben[i],
-                    name=wahl))
-        
-        
-        fig_vermoegen_investiert.add_scatter(
-        name='Upper Bound',
-        x=ergebnisse_investiert["jahr_pj"],
-        y=np.array(ergebnisse_investiert[wahl + " + lower bound"]),
-        mode='lines',
-        marker=dict(color="#444"),
-        line=dict(width=0),
-        showlegend=False
-        ),
-        fig_vermoegen_investiert.add_scatter(
-        name='Lower Bound',
-        x=ergebnisse_investiert["jahr_pj"],
-        y=np.array(ergebnisse_investiert[wahl + " + upper bound"]),
-        marker=dict(color="#444"),
-        line=dict(width=0),
-        mode='lines',
-        fillcolor=farben_rgb[i],
-        fill='tonexty',
-        opacity=0.5,
-        showlegend=False
-    )        
-
-    fig_vermoegen_investiert.update_layout(legend=dict(
-    yanchor="top",
-    y=0.99,
-    xanchor="left",
-    x=0.01,
-))
-    fig_vermoegen_investiert.update_layout(plot_bgcolor="white")
-    fig_vermoegen_investiert.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-    fig_vermoegen_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-    
-    fig_vermoegen_nicht_investiert = go.Figure()
-    for i, wahl in enumerate(grafik_selector_nicht_investiert):
-        #print(ergebnisse_nicht_investiert["jahr_pj"])
-        #print(ergebnisse_nicht_investiert[wahl2])
-        fig_vermoegen_nicht_investiert.add_trace(go.Scatter(x=ergebnisse_nicht_investiert["jahr_pj"], y=ergebnisse_nicht_investiert[wahl],
-                    mode='lines+markers',
-                    line_color = farben[i],
-                    name=wahl))
-        
-        
-
-        fig_vermoegen_nicht_investiert.add_scatter(
-        name='Upper Bound',
-        x=ergebnisse_nicht_investiert["jahr_pj"],
-        y=np.array(ergebnisse_nicht_investiert[wahl + " + lower bound"]),
-        mode='lines',
-        marker=dict(color="#444"),
-        line=dict(width=0),
-        showlegend=False
-        ),
-        fig_vermoegen_nicht_investiert.add_scatter(
-        name='Lower Bound',
-        x=ergebnisse_nicht_investiert["jahr_pj"],
-        y=np.array(ergebnisse_nicht_investiert[wahl + " + upper bound"]),
-        marker=dict(color="#444"),
-        line=dict(width=0),
-        mode='lines',
-        fillcolor=farben_rgb[i],
-        fill='tonexty',
-        opacity=0.5,
-        showlegend=False
-    )        
-
-
-    fig_vermoegen_nicht_investiert.update_layout(legend=dict(
-    yanchor="top",
-    y=0.99,
-    xanchor="left",
-    x=0.01
-    ))    
-    
-    fig_vermoegen_nicht_investiert.update_layout(plot_bgcolor="white")
-    fig_vermoegen_nicht_investiert.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
-    fig_vermoegen_nicht_investiert.update_yaxes(showgrid=True, gridwidth=1, gridcolor='lightgrey')
+    fig_vermoegen_investiert, fig_vermoegen_nicht_investiert = figure_vermoegensentwicklung(
+        ergebnisse_investiert=ergebnisse_investiert, ergebnisse_nicht_investiert=ergebnisse_nicht_investiert,
+        grafik_selector_investiert=grafik_selector_investiert, grafik_selector_nicht_investiert=grafik_selector_nicht_investiert
+    )
     
     return (fig_vermoegen_investiert, fig_vermoegen_nicht_investiert)
     
 #
-# CSV/Excel Import
+# Callback CSV/Excel Import
 #
 
 def parse_contents(contents, filename, date):
@@ -1384,7 +1373,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
         return text_message, *default_input
 
 #
-# CSV Export
+# Callback CSV Export
 #
 
 @app.callback(Output('download_mk', 'data'),

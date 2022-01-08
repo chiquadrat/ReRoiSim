@@ -354,6 +354,11 @@ def mieten_kaufen(
         
         "etf_vermoegen_initial_pj":etf_vermoegen_initial_pj_runs,
         "etf_vermoegen_initial_versteuert_pj":etf_vermoegen_initial_versteuert_pj_runs,
+        "anschlusszinssatz": anschlusszinssatz,
+        "kostensteigerung": kostensteigerung, 
+        "wertsteigerung":wertsteigerung,
+        "mietsteigerung":steigerung_nettokaltmiete,
+        "zinssatz": fest_verzinst,
     }
 
 #bla = mieten_kaufen()
