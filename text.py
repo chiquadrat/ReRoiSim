@@ -71,7 +71,9 @@ def text_static():
     
 
 
-def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, kaufpreis):
+def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, kaufpreis,
+                   ergebnisse_aufbereitet_investiert=None, ergebnisse_aufbereitet_nicht_investiert=None,
+                   eigenkapital=None, kaufnebenkosten=None):
     """Function that generates interactive text outputs for all plots.
 
     Args:
@@ -295,6 +297,26 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
         """
     else:
         etf_gewinn_text=""
+        
+    #"Liquiditätsströme"
+    # "Vergelich mit Depot: Eigenkapital wird zu beginn einmalig, laufender Nettoauswand monatlich als sparplan"
+    vermoegensentwicklung_investiert_text=f"""
+    In der Grafik wird die Vermögensentwicklung des Mieters und des Käufers dargestellt sowie die assoziierte Unsicherheit dargestellt.
+    Der Käufer (_Immobilie + ETF (versteuert)_) erwirbt zu Beginn des Anlagezeitraums, in Jahr 0, die Immobilie.
+    Dabei setzt der Käufer ein Eingenkapitals in Höhe von **{eigenkapital} Euro** ein. Aufgrund der initialen
+    Kaufnebenkosten in Höhe von **{kaufnebenkosten} Euro ** 
+    beträgt das Vermögen des Käufers am Tag es Kaufs **{ergebnis["vermoegen_immo_pj"][0][0]} Euro**.
+    
+    ...
+    
+    
+    Dabei hat der Käufer in der Regel zu Beginn des Kaufs Aufwendungen die das Vermögen des Käufers mindern (z.B. Maklerkosten).
+    Das Eigenkapitel wird zu Beginn des Anlagezeitraums
+    Der
+    
+    """
+    vermoegensentwicklung_nicht_investiert_text= "Bla2"
+    
     
     text_dynamisch = {
         "verkaufsfaktor": verkaufsfaktor_text,
@@ -312,6 +334,8 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
         "wertsteigerung":wertsteigerung_text,
         "mietsteigerung_selbst":mietsteigerung_selbst_text,
         "zinssatz":zinssatz_fest_text,
+        "vermoegensentwicklung_investiert_text":vermoegensentwicklung_investiert_text,
+        "vermoegensentwicklung_nicht_investiert_text":vermoegensentwicklung_nicht_investiert_text,
     }
 
     return text_dynamisch
