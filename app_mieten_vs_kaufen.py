@@ -894,8 +894,8 @@ layout = html.Div(
                         dcc.Markdown(id='zinsatz_text_mk'),
                         html.H4("Ergebnisse der Simulation"),
                         dcc.Markdown(text_statisch["ergebnisse"]),
-                        html.H6("Vermögensentwicklung: Cashflows werden investiert "),
-                        #dcc.Markdown(id='gewinn_text'),
+                        html.H6("Vermögensentwicklung: Jährlicher Aufwandsüberhang wird investiert"),
+                        
                         dcc.Dropdown(
                         options=[
                             #{'label': 'Immobilie', 'value': 'immo'},
@@ -912,7 +912,8 @@ layout = html.Div(
                         multi=True,
                         id="grafik_selector_investiert_mk"),  
                         dcc.Graph(id="mieten_vs_kaufen_investiert_mk"),  
-                        html.H6("Vermögensentwicklung: Cashflows werden nicht investiert "),
+                        dcc.Markdown(id='cashflows_investiert_mk'),
+                        html.H6("Vermögensentwicklung: Jährlicher Aufwandsüberhang wird nicht investiert"),
                         dcc.Dropdown(
                         options=[
                             {'label': 'Immobilie', 'value': 'Immobilie'},
@@ -925,6 +926,7 @@ layout = html.Div(
                         multi=True,
                         id="grafik_selector_nicht_investiert_mk"),  
                         dcc.Graph(id="mieten_vs_kaufen_nicht_investiert_mk"),                                                
+                        dcc.Markdown(id='cashflows_nicht_investiert_mk'),
                         html.H4("9. Disclaimer"),
                         dcc.Markdown(text_statisch["haftungsausschluss"]),
                     ],
@@ -962,6 +964,9 @@ layout = html.Div(
     Output("wertsteigerung_text_mk", "children"),
     Output("mietsteigerung_text_mk", "children"),
     Output("zinsatz_text_mk", "children"),
+    Output("cashflows_investiert_mk", "children"),
+    Output("cashflows_nicht_investiert_mk", "children"),
+    
     [Input("button_mk", "n_clicks")],
     state=[
         
@@ -1217,6 +1222,10 @@ def custom_figure(
         anlagehorizont=anlagehorizont,
         erste_mieterhoehung=5,
         kaufpreis=kaufpreis,
+        ergebnisse_aufbereitet_investiert=ergebnisse_aufbereitet_investiert,
+        ergebnisse_aufbereitet_nicht_investiert= ergebnisse_aufbereitet_nicht_investiert,
+        eigenkapital=eigenkapital,
+        kaufnebenkosten=kaufnebenkosten,
         ) 
     
     return (
@@ -1232,6 +1241,8 @@ def custom_figure(
         text_dynamisch["wertsteigerung"],
         text_dynamisch["mietsteigerung_selbst"],
         text_dynamisch["zinssatz"],
+        text_dynamisch["vermoegensentwicklung_investiert_text"],
+        text_dynamisch["vermoegensentwicklung_nicht_investiert_text"],
     )
     
 #

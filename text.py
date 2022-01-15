@@ -71,7 +71,9 @@ def text_static():
     
 
 
-def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, kaufpreis):
+def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, kaufpreis,
+                   ergebnisse_aufbereitet_investiert=None, ergebnisse_aufbereitet_nicht_investiert=None,
+                   eigenkapital=None, kaufnebenkosten=None):
     """Function that generates interactive text outputs for all plots.
 
     Args:
@@ -296,6 +298,78 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
     else:
         etf_gewinn_text=""
     
+    #print(ergebnis["vermoegen_immo_pj"])
+    # print(np.array(ergebnis["vermoegen_immo_pj"]).shape)
+    # print(np.array(ergebnis["vermoegen_immo_pj"])[:,-1].shape)
+    # print(np.array(ergebnis["vermoegen_immo_pj"])[:,-1])
+    
+    
+     
+    
+    #"Liquiditätsströme"
+    # "Vergelich mit Depot: Eigenkapital wird zu beginn einmalig, laufender Nettoauswand monatlich als sparplan"
+    if ergebnisse_aufbereitet_investiert is not None:
+        mieter_tmp = np.array(ergebnis["etf_vermoegen_versteuert_pj"])[:,-1]
+        kaeufer_tmp = np.array(ergebnis["vermoegen_immo_pj"])[:,-1] + np.array(ergebnis["etf_vermoegen_immo_versteuert_pj"])[:,-1]
+
+        vermoegensentwicklung_investiert_text=f"""
+        In der Grafik wird die Vermögensentwicklung des Mieters und des Käufers sowie die assoziierte Unsicherheit dargestellt.
+        Der Käufer _(Immobilie + ETF (versteuert))_ erwirbt zu Beginn des Anlagezeitraums, im Jahr 0, die Immobilie.
+        Dabei setzt der Käufer ein Eingenkapital in Höhe von **{eigenkapital} Euro** ein. Aufgrund der initialen
+        Kaufnebenkosten in Höhe von **{kaufnebenkosten} Euro ** 
+        beträgt das Vermögen des Käufers am Tag es Kaufs **{ergebnis["vermoegen_immo_pj"][0][0]} Euro**. 
+        Der Mieter investiert das Eigenkapital in Höhe von **{eigenkapital} Euro**, z.B., in einen ETF
+        _(ETF (versteuert))_. Während des Vergleichszeitraums von **{anlagehorizont} Jahren** sind die laufenden Aufwendungen
+        entweder auf Mieter (Nettokaltmiete) oder Käufer (Finanzierung und Instandhaltungskosten) Seite höher. 
+        Gibt es einen Aufwandsüberhang auf Käuferseite, wird die Höhe des Überhangs auf Mieterseite investiert (z.B. in einen ETF).
+        Gibt es einen Aufwandsüberhang auf Mieterseite, wird die Höhe des Überhangs auf Käuferseite investiert (z.B. in einen ETF).
+        In der Grafik ist die Vermögensentwicklung über den Vergleichszeitraum dargestellt. Für das Szenario
+        _(Immobilie + ETF (versteuert))_ verfügt der Käufer am Ende des
+        Vergleichszeitraums (nach **{anlagehorizont} Jahren**) über ein durchschnittliches (Median)
+        Vermögen von **{int(ergebnisse_aufbereitet_investiert["Immobilie + ETF (versteuert)"][-1])} Euro **.
+        Für das Szenario _(ETF (versteuert))_ verfügt der Mieter am Ende des
+        Vergleichszeitraums (nach **{anlagehorizont} Jahren**) über ein durchschnittliches (Median)
+        Vermögen von **{int(ergebnisse_aufbereitet_investiert["ETF (versteuert)"][-1])} Euro **.
+        Der hell schraffierte Bereich deckt die Szenarien ab, die mit einer Wahrscheinlichkeit von 80 % eintreffen werden.
+        Mit 
+        **{round((sum(np.array(mieter_tmp) > np.array(kaeufer_tmp))/len(kaeufer_tmp))*100, 2)}  %**  Wahrscheinlichkeit
+        verfügt der Mieter am Ende des Vergleichszeitraums über ein höheres Vermögen als der Käufer.
+        """
+    else:
+        vermoegensentwicklung_investiert_text=""
+        
+    
+    if ergebnisse_aufbereitet_investiert is not None:
+        mieter_tmp = np.array(ergebnis["etf_vermoegen_initial_pj"])[:,-1]
+        kaeufer_tmp = np.array(ergebnis["vermoegen_immo_pj"])[:,-1]
+
+        vermoegensentwicklung_nicht_investiert_text=f"""
+        In der Grafik wird die Vermögensentwicklung des Mieters und des Käufers sowie die assoziierte Unsicherheit dargestellt.
+        Der Käufer _(Immobilie)_ erwirbt zu Beginn des Anlagezeitraums, im Jahr 0, die Immobilie.
+        Dabei setzt der Käufer ein Eingenkapital in Höhe von **{eigenkapital} Euro** ein. Aufgrund der initialen
+        Kaufnebenkosten in Höhe von **{kaufnebenkosten} Euro ** 
+        beträgt das Vermögen des Käufers am Tag es Kaufs **{ergebnis["vermoegen_immo_pj"][0][0]} Euro**. 
+        Der Mieter investiert das Eigenkapital in Höhe von **{eigenkapital} Euro**, z.B., in einen ETF
+        _(ETF (versteuert))_. Während des Vergleichszeitraums von **{anlagehorizont} Jahren** sind die laufenden Aufwendungen
+        entweder auf Mieter (Nettokaltmiete) oder Käufer (Finanzierung und Instandhaltungskosten) Seite höher. 
+        **In dieser Grafik wird davon ausgegangen, dass Aufwandsüberhänge verkonsumiert 
+        und weder investiert noch zum Vermögensvergleich kummuliert werden (sowohl als Käufer- als auch auf Mieterseite).**
+        In der Grafik ist die Vermögensentwicklung über den Vergleichszeitraum dargestellt. Für das Szenario
+        _(Immobilie)_ verfügt der Käufer am Ende des
+        Vergleichszeitraums (nach **{anlagehorizont} Jahren**) über ein durchschnittliches (Median)
+        Vermögen von **{int(ergebnisse_aufbereitet_nicht_investiert["Immobilie"][-1])} Euro **.
+        Für das Szenario _(ETF (versteuert))_ verfügt der Mieter am Ende des
+        Vergleichszeitraums (nach **{anlagehorizont} Jahren**) über ein durchschnittliches (Median)
+        Vermögen von **{int(ergebnisse_aufbereitet_nicht_investiert["ETF (versteuert)"][-1])} Euro **.
+        Der hell schraffierte Bereich deckt die Szenarien ab, die mit einer Wahrscheinlichkeit von 80 % eintreffen werden.
+        Mit
+        **{round((sum(np.array(mieter_tmp) > np.array(kaeufer_tmp))/len(kaeufer_tmp))*100, 2)}  %** Wahrscheinlichkeit
+        verfügt der Mieter am Ende des Vergleichszeitraums über ein höheres Vermögen als der Käufer.
+        """
+    else:
+        vermoegensentwicklung_nicht_investiert_text=""
+    
+    
     text_dynamisch = {
         "verkaufsfaktor": verkaufsfaktor_text,
         "anschlusszinssatz": anschlusszinssatz_text,
@@ -312,6 +386,8 @@ def text_generator(ergebnis, zinsbindung, anlagehorizont, erste_mieterhoehung, k
         "wertsteigerung":wertsteigerung_text,
         "mietsteigerung_selbst":mietsteigerung_selbst_text,
         "zinssatz":zinssatz_fest_text,
+        "vermoegensentwicklung_investiert_text":vermoegensentwicklung_investiert_text,
+        "vermoegensentwicklung_nicht_investiert_text":vermoegensentwicklung_nicht_investiert_text,
     }
 
     return text_dynamisch
