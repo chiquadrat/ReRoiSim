@@ -894,7 +894,7 @@ layout = html.Div(
                         dcc.Markdown(id='zinsatz_text_mk'),
                         html.H4("Ergebnisse der Simulation"),
                         dcc.Markdown(text_statisch["ergebnisse"]),
-                        html.H6("Vermögensentwicklung: Cashflows werden investiert "),
+                        html.H6("Vermögensentwicklung: Jährlicher Aufwandsüberhang wird investiert"),
                         
                         dcc.Dropdown(
                         options=[
@@ -913,7 +913,7 @@ layout = html.Div(
                         id="grafik_selector_investiert_mk"),  
                         dcc.Graph(id="mieten_vs_kaufen_investiert_mk"),  
                         dcc.Markdown(id='cashflows_investiert_mk'),
-                        html.H6("Vermögensentwicklung: Cashflows werden nicht investiert "),
+                        html.H6("Vermögensentwicklung: Jährlicher Aufwandsüberhang wird nicht investiert"),
                         dcc.Dropdown(
                         options=[
                             {'label': 'Immobilie', 'value': 'Immobilie'},
