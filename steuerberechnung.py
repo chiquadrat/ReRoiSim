@@ -47,6 +47,15 @@ def steuerberechnung_immo(jahreseinkommen, splittingtarif, steuerjahr):
             [0.42, 9136.63],
             [0.45, 17374.99],
         ]
+    elif steuerjahr == 2023:
+        grenzsteuersaetze = [10908, 15999, 62809, 277825]
+        parameter_steuersatz = [
+            0,
+            [979.18, 1400],
+            [192.59, 2397, 966.53],
+            [0.42, 9972.98],
+            [0.45, 18307.73],
+        ]
 
     if splittingtarif:
         jahreseinkommen = jahreseinkommen / 2
