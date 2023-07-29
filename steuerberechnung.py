@@ -55,7 +55,7 @@ def steuerberechnung_immo(jahreseinkommen, splittingtarif, steuerjahr):
             [192.59, 2397, 966.53],
             [0.42, 9972.98],
             [0.45, 18307.73],
-        ]
+        ]
 
     if splittingtarif:
         jahreseinkommen = jahreseinkommen / 2
