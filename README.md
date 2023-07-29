@@ -11,7 +11,7 @@
 
 Seit längerem beschäftigen wir (Paul Walter - Machine Learning Engineer / Statistiker und Markus Juling - Ingenieur / Metrologe) uns intensiv mit dem Thema Immobilienkauf als Kapitalanlage. Bei den bereits im Internet verfügbaren Kalkulationstools zur Berechnung der Wirtschaftlichkeit einer potenziellen Immobilieninvestition hat uns immer eine Abschätzung des Risikos gefehlt. Als Investoren sind wir unter Anderem daran interessiert zu wissen, mit welcher Wahrscheinlichkeit z.B. die Eigenkapitalrendite negativ werden könnte und wie hoch dann der durchschnittliche Verlust sein wird. Um das Risiko einer Immobilieninvestition besser abschätzen zu können, es zu objektivieren, haben wir uns entschieden ein eigenes Kalkulationstool (einen Immobilienrendite-Simulator) zu implementieren. 
 
-Außerdem wollten wir die, oft hitzig, geführte Mieten vs. Kaufen Diskussion objektifizieren. Aufgrund dessen, haben wir auch einen Mieten vs. Kaufen Simulator implementiert.
+Außerdem wollten wir die, oft hitzig, geführte Mieten vs. Kaufen Diskussion objektivieren. Aufgrund dessen, haben wir auch einen Mieten vs. Kaufen Simulator implementiert.
 
 Hier gehts zum [Mieten vs. Kaufen](https://reroisim.herokuapp.com/app_mieten_vs_kaufen) und hier zum [Immobilienrendite-Simulator](https://reroisim.herokuapp.com/app_immo_kapitalanlage).
 
