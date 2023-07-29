@@ -3,6 +3,7 @@ import numpy as np
 def text_static():
     # Einleitung
     einleitung = f"""
+    von Paul Walter und Markus Juling
     """
     
 #     einleitung = f"""
