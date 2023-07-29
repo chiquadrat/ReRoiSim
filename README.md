@@ -7,7 +7,7 @@
 - [Disclaimer](#disc)
 
 <a name="einleitung"></a>
-## Über Uns
+## Einleitung
 
 Seit längerem beschäftigen wir (Paul Walter - Machine Learning Engineer / Statistiker und Markus Juling - Ingenieur / Metrologe) uns intensiv mit dem Thema Immobilienkauf als Kapitalanlage. Bei den bereits im Internet verfügbaren Kalkulationstools zur Berechnung der Wirtschaftlichkeit einer potenziellen Immobilieninvestition hat uns immer eine Abschätzung des Risikos gefehlt. Als Investoren sind wir unter Anderem daran interessiert zu wissen, mit welcher Wahrscheinlichkeit z.B. die Eigenkapitalrendite negativ werden könnte und wie hoch dann der durchschnittliche Verlust sein wird. Um das Risiko einer Immobilieninvestition besser abschätzen zu können, es zu objektivieren, haben wir uns entschieden ein eigenes Kalkulationstool (einen Immobilienrendite-Simulator) zu implementieren. 
 
