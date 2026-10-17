@@ -20,7 +20,7 @@ def berechnung_formeln (mietsteigerung, kostensteigerung):
     ################################################################################
 
     # Objekt
-    baujahr = 1925
+    afasatz_gebaeude = 0.02
     kaufpreis = 100_000
     kaufpreis_grundstueck = 30_000
     kaufpreis_sanierung = 7_000
@@ -78,7 +78,6 @@ def berechnung_formeln (mietsteigerung, kostensteigerung):
         + kaufnebenkosten
         - (kaufpreis_grundstueck + kaufpreis_sanierung) * (1 + kaufnebenkosten / kaufpreis)
     )
-    abschreibungsart = "Linear 2,0%" if baujahr > 1924 else "Linear 2,5%"
     bemessung_sonderabschreibung = kaufpreis_sanierung * gesamtkosten / kaufpreis
 
     # Renditeberechnung <- ToDo
@@ -183,10 +182,7 @@ def berechnung_formeln (mietsteigerung, kostensteigerung):
         bemessung_afa_gebaeude_pj.append(bemessung_abschreibung)
 
         # Afasatz Gebäude
-        if baujahr > 1924:
-            afasatz_gebaeude_pj.append(0.02)
-        else:
-            afasatz_gebaeude_pj.append(0.025)
+        afasatz_gebaeude_pj.append(afasatz_gebaeude)
 
         # Afa Gebäude
         afa_gebaeude_pj.append(bemessung_afa_gebaeude_pj[index_nr]*afasatz_gebaeude_pj[index_nr])
