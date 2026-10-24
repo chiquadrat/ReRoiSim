@@ -42,7 +42,7 @@ def renditerechner(
     # Steuern
     alleinstehend=False,  #
     einkommen=50_000,  # zu versteuerndes Jahreseinkommen
-    steuerjahr=2023,  # nur 2015 und 2021 implementiert
+    steuerjahr=2026,  # Supported: 2015, 2021, 2023, 2026
     # Renditeberechnung
     anlagehorizont=30,
     verkaufsfaktor=25,
