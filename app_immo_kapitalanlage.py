@@ -1367,7 +1367,7 @@ def custom_figure(
         verkaufsfaktor=verkaufsfaktor,
         unsicherheit_verkaufsfaktor=unsicherheit_verkaufsfaktor,
         sim_runs=sim_runs,
-        steuerjahr=2021,
+        steuerjahr=2026,
         etf_rendite=etf_rendite,
         unsicherheit_etf_rendite=unsicherheit_etf_rendite,
     )
