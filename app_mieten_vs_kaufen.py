@@ -1,14 +1,8 @@
 import numpy as np
 import pandas as pd
-import dash
-import dash_html_components as html
-import dash_core_components as dcc
-from dash_table import DataTable
-import dash_table
-import dash_auth
+from dash import Input, Output, State, dcc, dash_table, html
 import plotly.graph_objects as go
 import plotly.express as px
-from dash.dependencies import Input, Output, State
 import plotly.figure_factory as ff
 from dash.exceptions import PreventUpdate
 from scipy.stats import iqr
@@ -17,8 +11,6 @@ import base64
 import io
 import xlrd
 
-from dash_extensions import Download
-from dash_extensions.snippets import send_data_frame
 import openpyxl
 
 #from formeln import renditerechner
@@ -58,9 +50,9 @@ layout = html.Div(
                               dcc.Markdown(text_statisch["einleitung"]),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
                     },
                 ),
             ],
@@ -74,9 +66,9 @@ layout = html.Div(
                     children=[html.H4("1. Allgemein"),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
                     },
                 ),
             ],
@@ -100,9 +92,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # second column of first row
@@ -120,9 +112,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -136,9 +128,9 @@ layout = html.Div(
                     children=[html.H4("2. Kennzahlen Immobilie"),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
                     },
                 ),
             ],
@@ -163,9 +155,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # second column of first row
@@ -183,9 +175,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # third column of first row
@@ -204,9 +196,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -232,9 +224,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # second column of second row
@@ -255,9 +247,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 html.Div(
@@ -277,9 +269,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -305,9 +297,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # second column of second row
@@ -328,9 +320,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -343,9 +335,9 @@ layout = html.Div(
                     children=[html.H4("3. Finanzierung Immobilie"),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
                     },
                 ),
             ],
@@ -369,9 +361,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 
@@ -388,9 +380,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # second column
@@ -408,9 +400,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),                                
 
@@ -439,9 +431,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 
@@ -460,9 +452,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -476,9 +468,9 @@ layout = html.Div(
                     children=[html.H4("4. Wohnen zur Miete"),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
                     },
                 ),
             ],
@@ -504,9 +496,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # second column
@@ -525,9 +517,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # third column
@@ -547,9 +539,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -564,9 +556,9 @@ layout = html.Div(
                     children=[html.H4("5. Steuern"),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
                     },
                 ),
             ],
@@ -593,9 +585,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # second column
@@ -613,9 +605,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -629,9 +621,9 @@ layout = html.Div(
                     children=[html.H4("6. Rendite Alternativanlagen"),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
                     },
                 ),
             ],
@@ -656,9 +648,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
                 # third column
@@ -677,9 +669,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -701,9 +693,9 @@ layout = html.Div(
                         ),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
                     },
                 ),
             ],
@@ -718,10 +710,10 @@ layout = html.Div(
                               dcc.Markdown(text_statisch["export_import"]),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
-                        "margin-right": "10vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
+                        "marginRight": "10vw",
                     },
                 ),
             ],
@@ -736,13 +728,13 @@ layout = html.Div(
             children=[
                 # first column of third row
                 html.Button("Eingabe exportieren", id='download-results-button_mk'),
-                Download(id='download_mk'),                
+                dcc.Download(id='download_mk'),
             ],                    
             style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                     ),
                 # first column of third row
@@ -769,9 +761,9 @@ layout = html.Div(
     ),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "2.3vw",
-                        "margin-top": "0vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "2.3vw",
+                        "marginTop": "0vw",
                     },
                 ),
                 # second column
@@ -781,9 +773,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -799,10 +791,10 @@ layout = html.Div(
                               dcc.Markdown(text_statisch["simulation"]),],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
-                        "margin-right": "10vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
+                        "marginRight": "10vw",
                     },
                 ),
             ],
@@ -827,9 +819,9 @@ layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             ],
@@ -844,9 +836,9 @@ layout = html.Div(
 ],
                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
                 ),
             html.Div(
@@ -860,9 +852,9 @@ layout = html.Div(
                 ],
                                     style={
                         "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "1vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "1vw",
                     },
             )
             ],
@@ -932,10 +924,10 @@ layout = html.Div(
                     ],
                     style={
                         # "display": "inline-block",
-                        "vertical-align": "top",
-                        "margin-left": "3vw",
-                        "margin-top": "3vw",
-                        "margin-right": "10vw",
+                        "verticalAlign": "top",
+                        "marginLeft": "3vw",
+                        "marginTop": "3vw",
+                        "marginRight": "10vw",
                     },
                 ),
             ],
@@ -968,7 +960,7 @@ layout = html.Div(
     Output("cashflows_nicht_investiert_mk", "children"),
     
     [Input("button_mk", "n_clicks")],
-    state=[
+    *[
         
         State("sim_runs_mk", "value"),
         State("anlagehorizont_mk", "value"),
@@ -1389,7 +1381,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 
 @app.callback(Output('download_mk', 'data'),
              [Input('download-results-button_mk', 'n_clicks')],
-             state=[
+             *[
                 State("anlagehorizont_mk", "value"),
                 State("eigenkapital_mk", "value"),
                 
@@ -1485,8 +1477,8 @@ def download_data(n_clicks,
                           index=["Daten"]
         )
         #print(df)
-        return send_data_frame(df.to_csv, filename='data.csv')
+        return dcc.send_data_frame(df.to_csv, 'data.csv')
 
 
 # if __name__ == "__main__":
-#     app.run_server(debug=True)
+#     app.run(debug=True)
