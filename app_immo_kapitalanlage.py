@@ -688,14 +688,14 @@ layout = html.Div(
                 # third column
                 html.Div(
                     children=[
-                        html.Label("Baujahr"),
-                        dcc.RadioItems(
-                            id="baujahr",
-                            options=[
-                                {"label": "nach 1924", "value": "0"},
-                                {"label": "bis 1924", "value": "1"},
-                            ],
-                            value="0",
+                        html.Label("Höhe der Abschreibung (%)"),
+                        dcc.Input(
+                            id="afasatz_gebaeude",
+                            placeholder="Eingabe...",
+                            type="number",
+                            value=2,
+                            min=0,
+                            required=True,
                         ),
                     ],
                     style={
@@ -1134,7 +1134,6 @@ layout = html.Div(
     Input("unsicherheit_anschlusszinssatz", "value"),
     Input("familienstand", "value"),
     Input("einkommen", "value"),
-    Input("baujahr", "value"),
     #    Input("sonderabschreibung", "value"),
     Input("anlagehorizont", "value"),
     Input("verkaufsfaktor", "value"),
@@ -1166,7 +1165,6 @@ def updateTable(
     unsicherheit_anschlusszinssatz,
     familienstand,
     einkommen,
-    baujahr,
     #    sonderabschreibung,
     anlagehorizont,
     verkaufsfaktor,
@@ -1287,7 +1285,7 @@ def updateTable(
         State("unsicherheit_anschlusszinssatz", "value"),
         State("familienstand", "value"),
         State("einkommen", "value"),
-        State("baujahr", "value"),
+        State("afasatz_gebaeude", "value"),
         #     State('sonderabschreibung', 'value'),
         State("anlagehorizont", "value"),
         State("verkaufsfaktor", "value"),
@@ -1322,7 +1320,7 @@ def custom_figure(
     unsicherheit_anschlusszinssatz,
     familienstand,
     einkommen,
-    baujahr,
+    afasatz_gebaeude,
     #    sonderabschreibung,
     anlagehorizont,
     verkaufsfaktor,
@@ -1333,11 +1331,6 @@ def custom_figure(
     # Call formeln.py here
 
     # Preprocessing arguments
-    if int(baujahr) == 0:
-        baujahr = 1950
-    else:
-        baujahr = 1900
-    
     if int(familienstand) == 0:
         alleinstehend = True
     else:
@@ -1377,7 +1370,7 @@ def custom_figure(
         unsicherheit_anschlusszinssatz=(unsicherheit_anschlusszinssatz / 100),
         alleinstehend=alleinstehend,
         einkommen=einkommen,
-        baujahr=baujahr,
+        afasatz_gebaeude=(afasatz_gebaeude / 100),
         anlagehorizont=anlagehorizont,
         verkaufsfaktor=verkaufsfaktor,
         unsicherheit_verkaufsfaktor=unsicherheit_verkaufsfaktor,
@@ -1609,7 +1602,7 @@ def parse_contents(contents, filename, date):
                 Output("unsicherheit_anschlusszinssatz", "value"),
                 Output("familienstand", "value"),
                 Output("einkommen", "value"),
-                Output("baujahr", "value"),
+                Output("afasatz_gebaeude", "value"),
                 #    Input("sonderabschreibung", "value"),
                 Output("anlagehorizont", "value"),
                 Output("verkaufsfaktor", "value"),
@@ -1620,7 +1613,7 @@ def parse_contents(contents, filename, date):
 def update_output(list_of_contents, list_of_names, list_of_dates):
     default_input = [
         300_000, 100_000, 0, 40_000, 1_000, 12_000, 2, 1, 5, 1_200, 600, 2, 2, 1.5,
-        2, 100_000, 20, 0, 1.5, 2.5, 4, 1.5, "0", 100_000, "0", 15, 22, 4
+        2, 100_000, 20, 0, 1.5, 2.5, 4, 1.5, "0", 100_000, 2, 15, 22, 4
     ]   
     default_column = [
         'Kaufpreis', 'davon Grundstücksanteil', 'davon Sanierungskosten', 
@@ -1630,7 +1623,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
         'Geschätzte Kostensteigerung', 'Unsicherheit Kostensteigerung', 'Eigenkapital', 
         'Zinsbindung', 'Disagio', 'Zinssatz', 'Tilgungssatz', 'Anschlusszinssatz', 
         'Unsicherheit Anschlusszinssatz', 'Familienstand', 'Zu versteuerndes Einkommen', 
-        'Baujahr', 'Anlagehorizont', 'Geschätzter Verkaufsfaktor', 'Unsicherheit Verkaufsfaktor'
+        'Höhe der Abschreibung (%)', 'Anlagehorizont', 'Geschätzter Verkaufsfaktor', 'Unsicherheit Verkaufsfaktor'
     ] 
     text_message = ""
     if list_of_contents is not None:
@@ -1640,7 +1633,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
                 df.drop(["Unnamed: 0"], axis=1, inplace=True)
             imported_input = (
                 str(df[i][0]) 
-                if i in ["Familienstand", "Baujahr"] 
+                if i == "Familienstand" 
                 else df[i][0] 
                 for i in list(df.columns)
             )
@@ -1686,7 +1679,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
             State("unsicherheit_anschlusszinssatz", "value"),
             State("familienstand", "value"),
             State("einkommen", "value"),
-            State("baujahr", "value"),
+            State("afasatz_gebaeude", "value"),
             #    Input("sonderabschreibung", "value"),
             State("anlagehorizont", "value"),
             State("verkaufsfaktor", "value"),
@@ -1718,7 +1711,7 @@ def download_data(n_clicks,
                 unsicherheit_anschlusszinssatz,
                 familienstand,
                 einkommen,
-                baujahr,
+                afasatz_gebaeude,
                 #    sonderabschreibung,
                 anlagehorizont,
                 verkaufsfaktor,
@@ -1750,7 +1743,7 @@ def download_data(n_clicks,
                 'Unsicherheit Anschlusszinssatz':[unsicherheit_anschlusszinssatz],
                 'Familienstand':[familienstand],
                 'Zu versteuerndes Einkommen':[einkommen],
-                'Baujahr':[baujahr],
+                'Höhe der Abschreibung (%)':[afasatz_gebaeude],
                 #    sonderabschreibung,
                 'Anlagehorizont':[anlagehorizont],
                 'Geschätzter Verkaufsfaktor':[verkaufsfaktor],

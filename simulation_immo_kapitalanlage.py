@@ -19,7 +19,7 @@ from steuerberechnung import steuerberechnung_immo, steuerberechnung_etf
 
 def renditerechner(
     # Objekt
-    baujahr=1925,
+    afasatz_gebaeude=0.02,
     kaufpreis=100_000,
     kaufpreis_grundstueck=30_000,
     kaufpreis_sanierung=7_000,
@@ -60,7 +60,7 @@ def renditerechner(
     Verkaufspreis
 
     Args:
-        baujahr (int, optional): [description]. Defaults to 1925.
+        afasatz_gebaeude (float, optional): Building depreciation rate. Defaults to 0.02.
         kaufpreis (float, optional): [description]. Defaults to 100_000.
         kaufpreis_grundstueck (float, optional): [description]. Defaults to 30_000.
         kaufpreis_sanierung (float, optional): [description]. Defaults to 7_000.
@@ -118,7 +118,6 @@ def renditerechner(
         - (kaufpreis_grundstueck + kaufpreis_sanierung)
         * (1 + kaufnebenkosten / kaufpreis)
     )
-    abschreibungsart = "Linear 2,0%" if baujahr > 1924 else "Linear 2,5%"
     bemessung_sonderabschreibung = kaufpreis_sanierung * gesamtkosten / kaufpreis
     
     # Etf Startbetrag
@@ -275,10 +274,7 @@ def renditerechner(
             bemessung_afa_gebaeude_pj.append(bemessung_abschreibung)
 
             # Afasatz Gebäude
-            if baujahr > 1924:
-                afasatz_gebaeude_pj.append(0.02)
-            else:
-                afasatz_gebaeude_pj.append(0.025)
+            afasatz_gebaeude_pj.append(afasatz_gebaeude)
 
             # Afa Gebäude
             afa_gebaeude_pj.append(

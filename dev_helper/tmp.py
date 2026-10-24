@@ -1,7 +1,7 @@
 import numpy as np
 
 ergebnis = renditerechner(
-baujahr=1925,
+afasatz_gebaeude=0.02,
 kaufpreis=100_000,
 kaufpreis_grundstueck=30_000,
 kaufpreis_sanierung=7_000,
