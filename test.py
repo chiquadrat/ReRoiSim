@@ -1,5 +1,5 @@
 import unittest
-from formeln import renditerechner
+from simulation_immo_kapitalanlage import renditerechner
 
 
 class Renditeberechnung(unittest.TestCase):
@@ -24,7 +24,7 @@ class Renditeberechnung(unittest.TestCase):
         )
 
     def test_renditeberechnung_szenario_3(self):
-        ergebnis = renditerechner(baujahr=1918, verkaufsfaktor=20,)
+        ergebnis = renditerechner(afasatz_gebaeude=0.025, verkaufsfaktor=20,)
         self.assertEqual(int(ergebnis["verkaufspreis"][0]), 167341, "Should be 167342")
         self.assertEqual(
             round(ergebnis["eigenkapitalrendite"][0], 4), 0.088, "Should be 8.85%"
