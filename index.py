@@ -1,6 +1,4 @@
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash import Input, Output, dcc, html
 
 from app import app
 import app_mieten_vs_kaufen, app_immo_kapitalanlage
@@ -32,4 +30,4 @@ def display_page(pathname):
         return index_page
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)

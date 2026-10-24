@@ -1,7 +1,37 @@
 import numpy as np
 import plotly.graph_objects as go
-import plotly.figure_factory as ff
-from scipy.stats import iqr
+from scipy.stats import gaussian_kde, iqr
+
+
+def _add_density_traces(fig, datasets, labels, colors):
+    for values, label, color in zip(datasets, labels, colors):
+        if len(values) > 1 and np.ptp(values) > 0:
+            density = gaussian_kde(values)
+            bandwidth = np.sqrt(density.covariance[0, 0])
+            x_values = np.linspace(
+                values.min() - 3 * bandwidth,
+                values.max() + 3 * bandwidth,
+                200,
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=x_values,
+                    y=density(x_values),
+                    mode="lines",
+                    name=label,
+                    line_color=color,
+                )
+            )
+        else:
+            fig.add_trace(
+                go.Histogram(
+                    x=values,
+                    histnorm="probability density",
+                    name=label,
+                    opacity=0.5,
+                    marker_color=color,
+                )
+            )
 
 
 def figure_ein_aus_gabeparameter(
@@ -26,8 +56,9 @@ def figure_ein_aus_gabeparameter(
     if np.all(eingabeparameter == eingabeparameter[0]) == True:
         fig = go.Figure(data=[go.Table()])
     else:
-        fig = ff.create_distplot(
-            [eingabeparameter], [name], show_hist=False, show_rug=False
+        fig = go.Figure()
+        _add_density_traces(
+            fig, [eingabeparameter], [name], ["#1f77b4"]
         )
 
         if (name == "Verkaufspreis") and (eingabeparameter.min() < kaufpreis):
@@ -210,11 +241,12 @@ def figure_etf_vergleich(
     eingabeparameter2 = np.array(ergebnis[eingabeparameter2])
     eingabeparameter2 = eingabeparameter2[~np.isnan(eingabeparameter2)]
 
-    fig = ff.create_distplot(
+    fig = go.Figure()
+    _add_density_traces(
+        fig,
         [eingabeparameter1, eingabeparameter2],
         [name1, name2],
-        show_hist=False,
-        show_rug=False,
+        ["cornflowerblue", "orange"],
     )
 
     if runden == 0:
